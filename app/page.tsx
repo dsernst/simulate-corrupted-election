@@ -28,7 +28,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-center p-24 gap-8">
       <button
         onClick={handleSimulate}
-        className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xl font-semibold"
+        className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-xl font-semibold cursor-pointer"
       >
         Simulate new Election
       </button>
