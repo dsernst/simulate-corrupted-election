@@ -34,28 +34,31 @@ const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({
     )
   }
 
+  const topRightColor = 'bg-blue-200/65'
+
   return (
-    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 flex items-center mx-auto">
+    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 flex items-center mx-auto font-bold text-gray-800">
       {/* Vertical axis label outside the table */}
       <div
-        className="font-bold text-base text-gray-800 mr-2 flex-shrink-0 border border-gray-400 relative top-[76px] left-2 bg-yellow-100 px-2.5 rotate-180"
+        className="text-base mr-2 border border-gray-400/70 relative top-[76px] left-2 h-29 text-center bg-yellow-100 rotate-180"
         style={{
           writingMode: 'vertical-rl',
           letterSpacing: '0.05em',
         }}
       >
-        {`Test ${first} Said`}
+        Test {first}
       </div>
-      <div className="flex-1">
+
+      <div>
         <div className="font-extrabold text-lg mb-2 text-center">
           {first} vs {second}{' '}
           <span className="text-xs text-gray-500">(n={grandTotal})</span>
         </div>
-        <table className="min-w-[16em] text-xs text-center overflow-hidden border-separate border-spacing-0">
+        <table className="min-w-[16em] text-base text-center overflow-hidden border-separate border-spacing-0 font-extrabold">
           <thead>
             <tr>
               <th
-                className="bg-gray-300 font-extrabold text-base text-gray-800 border border-gray-400 text-center px-6 py-4"
+                className="bg-gray-300/80 border border-gray-400/70 px-6 py-4"
                 rowSpan={2}
                 style={{ minWidth: '5em' }}
               >
@@ -67,49 +70,55 @@ const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({
                 </div>
               </th>
               <th
-                className="bg-blue-200 font-extrabold text-base text-gray-800 border border-gray-400 text-center px-6 py-4"
+                className={`border border-gray-400/65 px-6 py-4 ${topRightColor}`}
                 colSpan={2}
-              >{`Test ${second} Said`}</th>
+              >
+                Test {second}
+              </th>
             </tr>
             <tr>
-              <th className="bg-blue-200 font-extrabold text-base text-gray-800 border border-gray-400 text-center px-6 py-4">
+              <th
+                className={` border border-gray-300 px-6 py-4 ${topRightColor}`}
+              >
                 Clean
               </th>
-              <th className="bg-blue-200 font-extrabold text-base text-gray-800 border border-gray-400 text-center px-6 py-4">
+              <th
+                className={` border border-gray-300 px-6 py-4 ${topRightColor}`}
+              >
                 Compromised
               </th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <th className="bg-yellow-200 font-extrabold text-base text-gray-800 border border-gray-400 text-center px-6 py-4">
+              <th className="bg-yellow-200/70 font-extrabold border border-gray-300 px-6 py-4">
                 Clean
               </th>
               <td
-                className="bg-green-50 border border-gray-400 text-center font-bold text-base px-4 py-3"
+                className="bg-green-50 border border-gray-300 px-4 py-3"
                 style={{ minWidth: '3em' }}
               >
                 {matrix.clean_clean}
               </td>
               <td
-                className="bg-red-50 border border-gray-400 text-center font-bold text-base px-4 py-3"
+                className="bg-red-50 border border-gray-300 px-4 py-3"
                 style={{ minWidth: '3em' }}
               >
                 {matrix.clean_compromised}
               </td>
             </tr>
             <tr>
-              <th className="bg-yellow-200 font-extrabold text-base text-gray-800 border border-gray-400 text-center px-6 py-4">
+              <th className="bg-yellow-200/70 font-extrabold border border-gray-300 px-6 py-4">
                 Compromised
               </th>
               <td
-                className="bg-red-50 border border-gray-400 text-center font-bold text-base px-4 py-3"
+                className="bg-red-50 border border-gray-300 px-4 py-3"
                 style={{ minWidth: '3em' }}
               >
                 {matrix.compromised_clean}
               </td>
               <td
-                className="bg-green-50 border border-gray-400 text-center font-bold text-base px-4 py-3"
+                className="bg-green-50 border border-gray-300 font-bold px-4 py-3"
                 style={{ minWidth: '3em' }}
               >
                 {matrix.compromised_compromised}
