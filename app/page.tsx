@@ -1,165 +1,43 @@
 'use client'
 
 import { useState } from 'react'
-import { NumberInput } from './components/NumberInput'
+import { SimulationResultsDisplay } from './components/SimulationResults'
+import { TestInputs, TestResults } from './components/TestInputs'
+import { SimulationResults, generateSimulation } from './utils/simulation'
 import { Button } from './components/Button'
 
 export default function Home() {
-  const [showSimulation, setShowSimulation] = useState(false)
+  const [simulation, setSimulation] = useState<SimulationResults | null>(null)
   const [showCompromised, setShowCompromised] = useState(false)
-  const [simulationResults, setSimulationResults] = useState({
-    winnerVotes: 0,
-    runnerUpVotes: 0,
-    otherVotes: 0,
-    totalVotes: 0,
-    compromisedVotes: 0,
-    compromisedPercentage: 0,
-  })
-  const [testResults, setTestResults] = useState({
+  const [testResults, setTestResults] = useState<TestResults>({
     gatherA: '',
     gatherB: '',
     gatherC: '',
   })
 
   const handleSimulate = () => {
-    // For now, just generate random numbers for demonstration
-    const winnerVotes = Math.floor(Math.random() * 1000000)
-    const runnerUpVotes = Math.floor(Math.random() * winnerVotes)
-    const otherVotes = Math.floor(Math.random() * (winnerVotes * 0.2)) // Other votes up to 20% of winner's votes
-    const totalVotes = winnerVotes + runnerUpVotes + otherVotes
-
-    // Generate random compromised percentage between 0 and 100
-    const compromisedPercentage = Math.random() * 100
-    const compromisedVotes = Math.floor(
-      (compromisedPercentage / 100) * totalVotes
-    )
-
-    setSimulationResults({
-      winnerVotes,
-      runnerUpVotes,
-      otherVotes,
-      totalVotes,
-      compromisedVotes,
-      compromisedPercentage,
-    })
-    setShowSimulation(true)
-    setShowCompromised(false) // Reset reveal state when new simulation
-  }
-
-  const handleTestResultChange = (field: string, value: string) => {
-    setTestResults((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
-  }
-
-  const handleSubmit = () => {
-    // Here you can process the test results
-    console.log('Submitting test results:', testResults)
-    // TODO: Add your submission logic here
-  }
-
-  const calculatePercentage = (votes: number, total: number) => {
-    return ((votes / total) * 100).toFixed(1)
+    setSimulation(generateSimulation())
+    setShowCompromised(false)
   }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 gap-8">
-      {!showSimulation ? (
+      {!simulation ? (
         <Button onClick={handleSimulate}>Simulate new Election</Button>
       ) : (
-        <div className="mt-8 p-6 bg-white shadow-lg rounded-lg w-full max-w-2xl">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">Preliminary Results</h2>
-            <Button
-              onClick={handleSimulate}
-              variant="outline"
-              className="text-sm py-2 px-4"
-            >
-              Start Over
-            </Button>
-          </div>
-          <div className="space-y-2 mb-6">
-            <p className="text-lg">
-              Winner&apos;s Votes:{' '}
-              {simulationResults.winnerVotes.toLocaleString()}
-              <span className="text-gray-600 ml-2">
-                (
-                {calculatePercentage(
-                  simulationResults.winnerVotes,
-                  simulationResults.totalVotes
-                )}
-                %)
-              </span>
-            </p>
-            <p className="text-lg">
-              Runner&apos;s Up Votes:{' '}
-              {simulationResults.runnerUpVotes.toLocaleString()}
-              <span className="text-gray-600 ml-2">
-                (
-                {calculatePercentage(
-                  simulationResults.runnerUpVotes,
-                  simulationResults.totalVotes
-                )}
-                %)
-              </span>
-            </p>
-            <p className="text-lg font-semibold">
-              Total Votes Cast: {simulationResults.totalVotes.toLocaleString()}
-            </p>
-
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <Button
-                onClick={() => setShowCompromised(!showCompromised)}
-                variant="outline"
-                className="w-full"
-              >
-                {showCompromised
-                  ? 'Hide Compromised Votes'
-                  : 'Reveal Compromised Votes'}
-              </Button>
-              {showCompromised && (
-                <div className="mt-2 p-4 bg-red-50 rounded-lg">
-                  <p className="text-lg text-red-700">
-                    Compromised Votes:{' '}
-                    {simulationResults.compromisedVotes.toLocaleString()}
-                    <span className="text-red-600 ml-2">
-                      ({simulationResults.compromisedPercentage.toFixed(1)}% of
-                      total)
-                    </span>
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-4 mt-6">
-            <NumberInput
-              id="gatherA"
-              label="Gather A test results:"
-              value={testResults.gatherA}
-              onChange={(value) => handleTestResultChange('gatherA', value)}
-            />
-
-            <NumberInput
-              id="gatherB"
-              label="Gather B test results:"
-              value={testResults.gatherB}
-              onChange={(value) => handleTestResultChange('gatherB', value)}
-            />
-
-            <NumberInput
-              id="gatherC"
-              label="Gather C test results:"
-              value={testResults.gatherC}
-              onChange={(value) => handleTestResultChange('gatherC', value)}
-            />
-
-            <Button onClick={handleSubmit} variant="success" fullWidth>
-              Submit Request
-            </Button>
-          </div>
-        </div>
+        <>
+          <SimulationResultsDisplay
+            results={simulation}
+            showCompromised={showCompromised}
+            onToggleCompromised={() => setShowCompromised(!showCompromised)}
+            onStartOver={handleSimulate}
+          />
+          <TestInputs
+            testResults={testResults}
+            onTestResultsChange={setTestResults}
+            onSubmit={handleSimulate}
+          />
+        </>
       )}
     </main>
   )
