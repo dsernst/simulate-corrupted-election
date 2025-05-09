@@ -6,11 +6,14 @@ import { Button } from './components/Button'
 
 export default function Home() {
   const [showSimulation, setShowSimulation] = useState(false)
+  const [showCompromised, setShowCompromised] = useState(false)
   const [simulationResults, setSimulationResults] = useState({
     winnerVotes: 0,
     runnerUpVotes: 0,
     otherVotes: 0,
     totalVotes: 0,
+    compromisedVotes: 0,
+    compromisedPercentage: 0,
   })
   const [testResults, setTestResults] = useState({
     gatherA: '',
@@ -25,13 +28,22 @@ export default function Home() {
     const otherVotes = Math.floor(Math.random() * (winnerVotes * 0.2)) // Other votes up to 20% of winner's votes
     const totalVotes = winnerVotes + runnerUpVotes + otherVotes
 
+    // Generate random compromised percentage between 0 and 100
+    const compromisedPercentage = Math.random() * 100
+    const compromisedVotes = Math.floor(
+      (compromisedPercentage / 100) * totalVotes
+    )
+
     setSimulationResults({
       winnerVotes,
       runnerUpVotes,
       otherVotes,
       totalVotes,
+      compromisedVotes,
+      compromisedPercentage,
     })
     setShowSimulation(true)
+    setShowCompromised(false) // Reset reveal state when new simulation
   }
 
   const handleTestResultChange = (field: string, value: string) => {
@@ -95,6 +107,30 @@ export default function Home() {
             <p className="text-lg font-semibold">
               Total Votes Cast: {simulationResults.totalVotes.toLocaleString()}
             </p>
+
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <Button
+                onClick={() => setShowCompromised(!showCompromised)}
+                variant="outline"
+                className="w-full"
+              >
+                {showCompromised
+                  ? 'Hide Compromised Votes'
+                  : 'Reveal Compromised Votes'}
+              </Button>
+              {showCompromised && (
+                <div className="mt-2 p-4 bg-red-50 rounded-lg">
+                  <p className="text-lg text-red-700">
+                    Compromised Votes:{' '}
+                    {simulationResults.compromisedVotes.toLocaleString()}
+                    <span className="text-red-600 ml-2">
+                      ({simulationResults.compromisedPercentage.toFixed(1)}% of
+                      total)
+                    </span>
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="space-y-4 mt-6">
