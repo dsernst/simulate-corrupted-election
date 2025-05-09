@@ -14,10 +14,10 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
   return (
     <div className="mt-8 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
       <h3 className="text-xl font-semibold text-gray-800 mb-4">
-        Final Results: Votes Detected as Compromised by Multiple Tests
+        Intersection Results
       </h3>
       <div className="overflow-x-auto">
-        <table className="min-w-full text-left text-sm">
+        <table className="min-w-full text-sm text-center">
           <thead>
             <tr className="bg-gray-100">
               <th className="px-4 py-2 font-semibold text-gray-700">
