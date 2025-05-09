@@ -46,11 +46,20 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 gap-8">
-      <Button onClick={handleSimulate}>Simulate new Election</Button>
-
-      {showSimulation && (
+      {!showSimulation ? (
+        <Button onClick={handleSimulate}>Simulate new Election</Button>
+      ) : (
         <div className="mt-8 p-6 bg-white shadow-lg rounded-lg w-full max-w-2xl">
-          <h2 className="text-2xl font-bold mb-4">Preliminary Results</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold">Preliminary Results</h2>
+            <Button
+              onClick={handleSimulate}
+              variant="outline"
+              className="text-sm py-2 px-4"
+            >
+              Start Over
+            </Button>
+          </div>
           <div className="space-y-2 mb-6">
             <p className="text-lg">
               Winner&apos;s Votes:{' '}
