@@ -7,36 +7,28 @@ export interface SimulationResults {
   compromisedPercentage: number
 }
 
+interface TestResult {
+  count: number
+  detectedCompromised: number
+}
+
+interface TestEffectivenessRates {
+  falseCleanRate: number
+  falseCompromisedRate: number
+}
+
 export interface TestEffectiveness {
-  testA: {
-    falseCleanRate: number // Rate of falsely detecting a compromised vote as clean
-    falseCompromisedRate: number // Rate of falsely detecting a clean vote as compromised
-  }
-  testB: {
-    falseCleanRate: number
-    falseCompromisedRate: number
-  }
-  testC: {
-    falseCleanRate: number
-    falseCompromisedRate: number
-  }
+  testA: TestEffectivenessRates
+  testB: TestEffectivenessRates
+  testC: TestEffectivenessRates
 }
 
 export interface TestDetectionResults {
   totalTests: number
   testBreakdown: {
-    testA: {
-      count: number
-      detectedCompromised: number
-    }
-    testB: {
-      count: number
-      detectedCompromised: number
-    }
-    testC: {
-      count: number
-      detectedCompromised: number
-    }
+    testA: TestResult
+    testB: TestResult
+    testC: TestResult
   }
 }
 
@@ -72,7 +64,6 @@ function sampleVote(compromisedVotes: number, totalVotes: number): boolean {
 }
 
 function runTest(
-  testType: 'A' | 'B' | 'C',
   effectiveness: {
     falseCleanRate: number
     falseCompromisedRate: number
@@ -124,42 +115,23 @@ export function calculateTestResults(
     testC: { count: 0, detectedCompromised: 0 },
   }
 
-  // Run each test and aggregate results
-  for (let i = 0; i < counts.testA; i++) {
-    const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes)
-    const isDetectedCompromised = runTest(
-      'A',
-      effectiveness.testA,
-      isActuallyCompromised
-    )
-    testBreakdown.testA.count++
-    if (isDetectedCompromised) testBreakdown.testA.detectedCompromised++
-  }
-
-  for (let i = 0; i < counts.testB; i++) {
-    const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes)
-    const isDetectedCompromised = runTest(
-      'B',
-      effectiveness.testB,
-      isActuallyCompromised
-    )
-    testBreakdown.testB.count++
-    if (isDetectedCompromised) testBreakdown.testB.detectedCompromised++
-  }
-
-  for (let i = 0; i < counts.testC; i++) {
-    const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes)
-    const isDetectedCompromised = runTest(
-      'C',
-      effectiveness.testC,
-      isActuallyCompromised
-    )
-    testBreakdown.testC.count++
-    if (isDetectedCompromised) testBreakdown.testC.detectedCompromised++
-  }
+  // Run tests for each type
+  const testTypes = ['A', 'B', 'C']
+  testTypes.forEach((testType) => {
+    const testKey = `test${testType}` as keyof typeof testBreakdown
+    for (let i = 0; i < counts[testKey]; i++) {
+      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes)
+      const isDetectedCompromised = runTest(
+        effectiveness[testKey],
+        isActuallyCompromised
+      )
+      testBreakdown[testKey].count++
+      if (isDetectedCompromised) testBreakdown[testKey].detectedCompromised++
+    }
+  })
 
   return {
-    totalTests: counts.testA + counts.testB + counts.testC,
+    totalTests: Object.values(counts).reduce((sum, count) => sum + count, 0),
     testBreakdown,
   }
 }
