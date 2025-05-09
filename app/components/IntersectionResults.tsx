@@ -83,49 +83,89 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
       <h3 className="text-xl font-semibold text-gray-800 mb-4">
         Pairwise Confusion Matrices
       </h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {confusionMatrices.map(({ first, second, matrix }) => (
-          <div
-            key={`${first}-${second}`}
-            className="bg-gray-50 rounded-lg p-4 border border-gray-200"
-          >
-            <div className="font-semibold mb-2 text-center">
-              {first} vs {second}{' '}
-              <span className="text-xs text-gray-500">(n={matrix.total})</span>
+      <div className="grid grid-cols-1 gap-8 mb-8">
+        {confusionMatrices.map(({ first, second, matrix }) => {
+          const rowTotal1 = matrix.clean_clean + matrix.clean_compromised
+          const rowTotal2 =
+            matrix.compromised_clean + matrix.compromised_compromised
+          const colTotal1 = matrix.clean_clean + matrix.compromised_clean
+          const colTotal2 =
+            matrix.clean_compromised + matrix.compromised_compromised
+          const grandTotal = rowTotal1 + rowTotal2
+          return (
+            <div
+              key={`${first}-${second}`}
+              className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+            >
+              <div className="font-semibold mb-2 text-center">
+                {first} vs {second}{' '}
+                <span className="text-xs text-gray-500">
+                  (n={matrix.total})
+                </span>
+              </div>
+              <table className="min-w-full text-xs text-center rounded-lg overflow-hidden border border-gray-200">
+                <thead>
+                  <tr>
+                    <th className="border-b border-gray-200"></th>
+                    <th className="px-3 py-2 border-b border-gray-200 font-semibold text-gray-700 text-center">
+                      {second}: Clean
+                    </th>
+                    <th className="px-3 py-2 border-b border-gray-200 font-semibold text-gray-700 text-center">
+                      {second}: Compromised
+                    </th>
+                    <th className="px-3 py-2 border-b border-gray-200 font-semibold text-gray-700 text-center">
+                      Row Total
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th className="text-right font-semibold text-gray-700 px-3 py-2 border-r border-gray-200 align-middle">
+                      {first}: Clean
+                    </th>
+                    <td className="px-3 py-2 bg-green-100 border border-gray-200 text-center align-middle">
+                      {matrix.clean_clean}
+                    </td>
+                    <td className="px-3 py-2 bg-red-100 border border-gray-200 text-center align-middle">
+                      {matrix.clean_compromised}
+                    </td>
+                    <td className="px-3 py-2 font-bold border border-gray-200 text-center align-middle">
+                      {rowTotal1}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="text-right font-semibold text-gray-700 px-3 py-2 border-r border-gray-200 align-middle">
+                      {first}: Compromised
+                    </th>
+                    <td className="px-3 py-2 bg-red-100 border border-gray-200 text-center align-middle">
+                      {matrix.compromised_clean}
+                    </td>
+                    <td className="px-3 py-2 bg-green-100 border border-gray-200 text-center align-middle">
+                      {matrix.compromised_compromised}
+                    </td>
+                    <td className="px-3 py-2 font-bold border border-gray-200 text-center align-middle">
+                      {rowTotal2}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="text-right font-semibold text-gray-700 px-3 py-2 border-r border-gray-200 align-middle">
+                      Col Total
+                    </th>
+                    <td className="px-3 py-2 font-bold border border-gray-200 text-center align-middle">
+                      {colTotal1}
+                    </td>
+                    <td className="px-3 py-2 font-bold border border-gray-200 text-center align-middle">
+                      {colTotal2}
+                    </td>
+                    <td className="px-3 py-2 font-bold border border-gray-200 text-center align-middle">
+                      {grandTotal}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <table className="min-w-full text-xs text-center rounded-lg overflow-hidden">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th className="px-2 py-1">{second}: Clean</th>
-                  <th className="px-2 py-1">{second}: Compromised</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th className="text-right font-normal">{first}: Clean</th>
-                  <td className="px-2 py-1 bg-green-50 rounded-tl-lg">
-                    {matrix.clean_clean}
-                  </td>
-                  <td className="px-2 py-1 bg-red-50">
-                    {matrix.clean_compromised}
-                  </td>
-                </tr>
-                <tr>
-                  <th className="text-right font-normal">
-                    {first}: Compromised
-                  </th>
-                  <td className="px-2 py-1 bg-red-50">
-                    {matrix.compromised_clean}
-                  </td>
-                  <td className="px-2 py-1 bg-green-50 rounded-br-lg">
-                    {matrix.compromised_compromised}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        ))}
+          )
+        })}
       </div>
       <h3 className="text-xl font-semibold text-gray-800 mb-4">
         Intersection Results
