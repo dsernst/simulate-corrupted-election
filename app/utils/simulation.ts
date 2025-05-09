@@ -142,43 +142,121 @@ export function calculateTestResults(
   // Create a map to track votes across tests
   const voteMap = new Map<number, VoteTestResult>()
 
-  // Run tests for each type
-  const testTypes = ['A', 'B', 'C']
-  testTypes.forEach((testType) => {
-    const testKey = `test${testType}` as keyof typeof testBreakdown
-    for (let i = 0; i < counts[testKey]; i++) {
-      // Generate a vote ID (could be random or sequential)
-      const voteId = Math.floor(Math.random() * totalVotes)
+  // Helper function to get a random vote that hasn't been tested by a specific test
+  function getUntestedVote(testType: 'A' | 'B' | 'C'): number {
+    const untestedVotes = Array.from(voteMap.entries())
+      .filter(([, vote]) => !vote.testResults[`test${testType}`])
+      .map(([id]) => id)
 
-      // Get or create the vote result
-      let voteResult = voteMap.get(voteId)
-      if (!voteResult) {
-        const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes)
-        voteResult = {
-          voteId,
-          isActuallyCompromised,
-          testResults: {},
-        }
-        voteMap.set(voteId, voteResult)
-      }
-
-      // Run the test
-      const isDetectedCompromised = runTest(
-        effectiveness[testKey],
-        voteResult.isActuallyCompromised
-      )
-
-      // Update the vote result
-      voteResult.testResults[
-        `test${testType}` as keyof typeof voteResult.testResults
-      ] = isDetectedCompromised
-
-      // Update test breakdown
-      testBreakdown[testKey].count++
-      if (isDetectedCompromised) testBreakdown[testKey].detectedCompromised++
-      testBreakdown[testKey].voteResults.push(voteResult)
+    if (untestedVotes.length > 0) {
+      return untestedVotes[Math.floor(Math.random() * untestedVotes.length)]
     }
-  })
+    return Math.floor(Math.random() * totalVotes)
+  }
+
+  // Helper function to get a random vote that has been tested by a specific test
+  function getTestedVote(testType: 'A' | 'B' | 'C'): number {
+    const testedVotes = Array.from(voteMap.entries())
+      .filter(([, vote]) => vote.testResults[`test${testType}`] !== undefined)
+      .map(([id]) => id)
+
+    if (testedVotes.length > 0) {
+      return testedVotes[Math.floor(Math.random() * testedVotes.length)]
+    }
+    return Math.floor(Math.random() * totalVotes)
+  }
+
+  // Run test A first
+  for (let i = 0; i < counts.testA; i++) {
+    const voteId = Math.floor(Math.random() * totalVotes)
+    let voteResult = voteMap.get(voteId)
+    if (!voteResult) {
+      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes)
+      voteResult = {
+        voteId,
+        isActuallyCompromised,
+        testResults: {},
+      }
+      voteMap.set(voteId, voteResult)
+    }
+
+    const isDetectedCompromised = runTest(
+      effectiveness.testA,
+      voteResult.isActuallyCompromised
+    )
+    voteResult.testResults.testA = isDetectedCompromised
+
+    testBreakdown.testA.count++
+    if (isDetectedCompromised) testBreakdown.testA.detectedCompromised++
+    testBreakdown.testA.voteResults.push(voteResult)
+  }
+
+  // Run test B with a mix of A and not A
+  for (let i = 0; i < counts.testB; i++) {
+    // Alternate between tested and untested votes
+    const voteId = i % 2 === 0 ? getTestedVote('A') : getUntestedVote('A')
+
+    let voteResult = voteMap.get(voteId)
+    if (!voteResult) {
+      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes)
+      voteResult = {
+        voteId,
+        isActuallyCompromised,
+        testResults: {},
+      }
+      voteMap.set(voteId, voteResult)
+    }
+
+    const isDetectedCompromised = runTest(
+      effectiveness.testB,
+      voteResult.isActuallyCompromised
+    )
+    voteResult.testResults.testB = isDetectedCompromised
+
+    testBreakdown.testB.count++
+    if (isDetectedCompromised) testBreakdown.testB.detectedCompromised++
+    testBreakdown.testB.voteResults.push(voteResult)
+  }
+
+  // Run test C with a mix of B, not B, A, and not A
+  for (let i = 0; i < counts.testC; i++) {
+    // Cycle through different combinations
+    const voteId = (() => {
+      switch (i % 4) {
+        case 0: // B & A
+          return getTestedVote('B')
+        case 1: // B & not A
+          return getTestedVote('B')
+        case 2: // not B & A
+          return getUntestedVote('B')
+        case 3: // not B & not A
+          return getUntestedVote('B')
+        default:
+          return Math.floor(Math.random() * totalVotes)
+      }
+    })()
+
+    let voteResult = voteMap.get(voteId)
+    if (!voteResult) {
+      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes)
+      voteResult = {
+        voteId,
+        isActuallyCompromised,
+        testResults: {},
+      }
+      voteMap.set(voteId, voteResult)
+    }
+
+    const isDetectedCompromised = runTest(
+      effectiveness.testC,
+      voteResult.isActuallyCompromised
+    )
+    voteResult.testResults.testC = isDetectedCompromised
+
+    testBreakdown.testC.count++
+    if (isDetectedCompromised) testBreakdown.testC.detectedCompromised++
+    testBreakdown.testC.voteResults.push(voteResult)
+  }
 
   return {
     totalTests: Object.values(counts).reduce((sum, count) => sum + count, 0),
