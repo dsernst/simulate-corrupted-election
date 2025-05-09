@@ -2,6 +2,7 @@ import {
   TestRun,
   calculateIntersectionStats,
 } from '../utils/calculateIntersections'
+import { calculatePercentage } from '../utils/simulation'
 
 interface IntersectionResultsProps {
   testRuns: TestRun[]
@@ -19,27 +20,24 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm text-center">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="px-4 py-2 font-semibold text-gray-700">
-                Tested by
-              </th>
-              <th className="px-4 py-2 font-semibold text-gray-700">
-                Compromises Detected
-              </th>
-              <th className="px-4 py-2 font-semibold text-gray-700">
-                # Tested
-              </th>
+            <tr className="bg-gray-100 font-semibold text-gray-700">
+              <th className="px-4 py-2">Tested by</th>
+              <th className="px-4 py-2">Rate</th>
+              <th className="px-4 py-2">Compromises Detected</th>
+              <th className="px-4 py-2"># Tested</th>
             </tr>
           </thead>
           <tbody>
             {results.map(({ label, detected, tested }, idx) => {
               let displayLabel = label
               if (idx < 3) displayLabel += ' only'
+              const percent = calculatePercentage(detected, tested)
               return (
                 <tr key={label} className="border-t border-gray-200">
                   <td className="px-4 py-2 whitespace-nowrap">
                     {displayLabel}
                   </td>
+                  <td className="px-4 py-2 whitespace-nowrap">{percent}%</td>
                   <td className="px-4 py-2 whitespace-nowrap">
                     {detected.toLocaleString()}
                   </td>
