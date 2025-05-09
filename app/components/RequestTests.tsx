@@ -36,6 +36,14 @@ export function RequestTests({
   onTestResultsChange,
   onSubmit,
 }: RequestTestsProps) {
+  const hasValidTests = Object.values(testResults).some(
+    (value) => parseInt(value) > 0
+  )
+
+  const handleSubmit = () => {
+    if (hasValidTests) onSubmit()
+  }
+
   return (
     <div className="mt-6 p-4 bg-gray-50 rounded-lg">
       <h3 className="text-lg font-semibold mb-4">Request Tests</h3>
@@ -53,14 +61,18 @@ export function RequestTests({
                 onChange={(value) =>
                   onTestResultsChange({ ...testResults, [key]: value })
                 }
-                onEnterKey={onSubmit}
+                onEnterKey={handleSubmit}
                 placeholder="Enter count"
               />
             </div>
           ))}
         </div>
         <div className="flex justify-end">
-          <Button onClick={onSubmit} className="px-6">
+          <Button
+            onClick={handleSubmit}
+            className="px-6"
+            disabled={!hasValidTests}
+          >
             Run Tests
           </Button>
         </div>
