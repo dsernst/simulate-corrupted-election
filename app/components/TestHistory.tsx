@@ -68,30 +68,13 @@ function calculateIntersections(testRuns: TestRun[]): IntersectionCounts {
 
 const TestRunDisplay = ({
   run,
-  allRuns,
+  isLastRun,
+  finalIntersections,
 }: {
   run: TestRun
-  allRuns: TestRun[]
+  isLastRun: boolean
+  finalIntersections?: IntersectionCounts
 }) => {
-  // Memoize the intersection calculations for all runs up to and including this one
-  const intersections = useMemo(
-    () => calculateIntersections(allRuns.slice(0, allRuns.indexOf(run) + 1)),
-    [allRuns, run]
-  )
-
-  // Filter out zero intersections and format the display
-  const nonZeroIntersections = Object.entries(intersections)
-    .filter(([, value]) => value > 0)
-    .map(([key, value]) => ({
-      label: key.replaceAll(' ∩ ', ' & ').replace(' only', ''),
-      value,
-      description: key.includes('only')
-        ? `Detected only by Test ${key[0]}`
-        : `Detected by both Test ${key[0]} and Test ${key[4]}${
-            key.includes('∩ C') ? ' and Test C' : ''
-          }`,
-    }))
-
   return (
     <div className="p-4 bg-blue-50 rounded-lg">
       <div className="flex justify-between items-center mb-2">
@@ -135,22 +118,33 @@ const TestRunDisplay = ({
           })}
         </div>
 
-        {/* Intersection Results */}
-        {nonZeroIntersections.length > 0 && (
+        {/* Intersection Results - only show in the last run */}
+        {isLastRun && finalIntersections && (
           <div className="mt-4 pt-4 border-t border-blue-200">
             <h4 className="font-medium text-blue-800 mb-3">
-              Votes Detected as Compromised by Multiple Tests
+              Final Results: Votes Detected as Compromised by Multiple Tests
             </h4>
             <div className="grid grid-cols-2 gap-3">
-              {nonZeroIntersections.map(({ label, value, description }) => (
-                <div key={label} className="bg-white p-3 rounded shadow-sm">
-                  <p className="text-sm font-medium text-blue-800">{label}</p>
-                  <p className="text-sm text-gray-600">
-                    {value.toLocaleString()} votes
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">{description}</p>
-                </div>
-              ))}
+              {Object.entries(finalIntersections)
+                .filter(([, value]) => value > 0)
+                .map(([key, value]) => ({
+                  label: key.replaceAll(' ∩ ', ' & ').replace(' only', ''),
+                  value,
+                  description: key.includes('only')
+                    ? `Detected only by Test ${key[0]}`
+                    : `Detected by both Test ${key[0]} and Test ${key[4]}${
+                        key.includes('∩ C') ? ' and Test C' : ''
+                      }`,
+                }))
+                .map(({ label, value, description }) => (
+                  <div key={label} className="bg-white p-3 rounded shadow-sm">
+                    <p className="text-sm font-medium text-blue-800">{label}</p>
+                    <p className="text-sm text-gray-600">
+                      {value.toLocaleString()} votes
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">{description}</p>
+                  </div>
+                ))}
             </div>
           </div>
         )}
@@ -160,10 +154,21 @@ const TestRunDisplay = ({
 }
 
 export const TestHistory = ({ testRuns }: { testRuns: TestRun[] }) => {
+  // Calculate intersections only once for the final state
+  const finalIntersections = useMemo(
+    () => calculateIntersections(testRuns),
+    [testRuns]
+  )
+
   return (
     <>
-      {testRuns.map((run) => (
-        <TestRunDisplay key={run.id} run={run} allRuns={testRuns} />
+      {testRuns.map((run, index) => (
+        <TestRunDisplay
+          key={run.id}
+          run={run}
+          isLastRun={index === testRuns.length - 1}
+          finalIntersections={finalIntersections}
+        />
       ))}
     </>
   )
