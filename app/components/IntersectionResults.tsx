@@ -33,7 +33,12 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
               if (idx < 3) displayLabel += ' only'
               const percent = calculatePercentage(detected, tested)
               return (
-                <tr key={label} className="border-t border-gray-200">
+                <tr
+                  key={label}
+                  className={`${
+                    tested === 0 && 'opacity-30'
+                  } border-t border-gray-200`}
+                >
                   <td className="px-4 py-2 whitespace-nowrap">
                     {displayLabel}
                   </td>
