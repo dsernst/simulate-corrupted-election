@@ -277,29 +277,25 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
   const groups: {
     label: string
     indentLevel: number
-    bias?: string
     filter: (v: VoteResult) => boolean
     test: 'A' | 'B' | 'C' | null
   }[] = [
     // Individual
     {
-      label: 'A: Voter Autonomous',
+      label: 'A',
       indentLevel: 0,
-      bias: 'high',
       filter: (v) => v.testedA === true,
       test: 'A',
     },
     {
-      label: 'B: Guided by Auditor',
+      label: 'B',
       indentLevel: 0,
-      bias: 'medium',
       filter: (v) => v.testedB === true,
       test: 'B',
     },
     {
-      label: 'C: In-person Paper',
+      label: 'C',
       indentLevel: 0,
-      bias: 'low',
       filter: (v) => v.testedC === true,
       test: 'C',
     },
@@ -359,7 +355,7 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
   ]
 
   // Calculate stats for each group
-  return groups.map(({ label, indentLevel, bias, filter, test }) => {
+  return groups.map(({ label, indentLevel, filter, test }) => {
     const votes = filterVotes(filter)
     const tested = votes.length
     const compromised = test && tested > 0 ? countCompromised(votes, test) : 0
@@ -369,7 +365,6 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
       compromised,
       percentCompromised: percent(compromised, tested),
       indentLevel,
-      bias,
     }
   })
 }

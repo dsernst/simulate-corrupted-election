@@ -27,7 +27,6 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
               <th className="px-4 py-2">% Compromised</th>
               <th className="px-4 py-2"># Compromised</th>
               <th className="px-4 py-2"># Tested</th>
-              <th className="px-4 py-2">Sample Bias</th>
             </tr>
           </thead>
           <tbody>
@@ -38,7 +37,6 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
                 compromised,
                 percentCompromised,
                 indentLevel,
-                bias,
               }) => (
                 <tr
                   key={label}
@@ -63,7 +61,6 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
                   <td className="px-4 py-2 whitespace-nowrap">
                     {tested.toLocaleString()}
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap">{bias || ''}</td>
                 </tr>
               )
             )}

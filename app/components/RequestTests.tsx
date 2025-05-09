@@ -17,17 +17,23 @@ const TESTS = [
   {
     key: 'testA' as const,
     label: 'Test A',
-    description: 'Quick, but less reliable',
+    subtitle: 'Voter Autonomous',
+    description: 'Easiest, but least reliable',
+    bias: 'High',
   },
   {
     key: 'testB' as const,
     label: 'Test B',
-    description: 'Balanced cost and reliability',
+    subtitle: 'Guided by Auditor',
+    description: 'Medium cost & reliability',
+    bias: 'Medium',
   },
   {
     key: 'testC' as const,
     label: 'Test C',
+    subtitle: 'Against In-person Paper',
     description: 'Highest cost, perfect accuracy',
+    bias: 'Low',
   },
 ] as const
 
@@ -49,10 +55,11 @@ export function RequestTests({
       <h3 className="text-lg font-semibold mb-4">Request Tests</h3>
       <div className="space-y-4">
         <div className="grid grid-cols-3 gap-4">
-          {TESTS.map(({ key, label, description }) => (
+          {TESTS.map(({ key, label, subtitle, description }) => (
             <div key={key}>
               <div className="mb-2">
-                <span className="text-sm text-gray-600">{description}</span>
+                <div className="text-xs text-gray-500">{subtitle}</div>
+                <div className="text-sm text-gray-600">{description}</div>
               </div>
               <NumberInput
                 id={key}
