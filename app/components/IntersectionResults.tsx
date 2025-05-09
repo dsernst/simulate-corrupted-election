@@ -85,84 +85,104 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
       </h3>
       <div className="grid grid-cols-1 gap-8 mb-8">
         {confusionMatrices.map(({ first, second, matrix }) => {
-          const rowTotal1 = matrix.clean_clean + matrix.clean_compromised
-          const rowTotal2 =
-            matrix.compromised_clean + matrix.compromised_compromised
-          const colTotal1 = matrix.clean_clean + matrix.compromised_clean
-          const colTotal2 =
-            matrix.clean_compromised + matrix.compromised_compromised
-          const grandTotal = rowTotal1 + rowTotal2
+          const grandTotal =
+            matrix.clean_clean +
+            matrix.clean_compromised +
+            matrix.compromised_clean +
+            matrix.compromised_compromised
           return (
             <div
               key={`${first}-${second}`}
-              className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+              className="bg-gray-50 rounded-lg p-4 border border-gray-200 flex items-center"
             >
-              <div className="font-semibold mb-2 text-center">
-                {first} vs {second}{' '}
-                <span className="text-xs text-gray-500">
-                  (n={matrix.total})
-                </span>
+              {/* Vertical axis label outside the table */}
+              <div
+                className="font-bold text-base text-gray-800 mr-2 flex-shrink-0 border-2 border-gray-400 relative top-[78px] left-2 bg-yellow-100 px-2.5 rotate-180"
+                style={{
+                  writingMode: 'vertical-rl',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                {`Test ${first} Said`}
               </div>
-              <table className="min-w-full text-xs text-center rounded-lg overflow-hidden border border-gray-200">
-                <thead>
-                  <tr>
-                    <th className="border-b border-gray-200"></th>
-                    <th className="px-3 py-2 border-b border-gray-200 font-semibold text-gray-700 text-center">
-                      {second}: Clean
-                    </th>
-                    <th className="px-3 py-2 border-b border-gray-200 font-semibold text-gray-700 text-center">
-                      {second}: Compromised
-                    </th>
-                    <th className="px-3 py-2 border-b border-gray-200 font-semibold text-gray-700 text-center">
-                      Row Total
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th className="text-right font-semibold text-gray-700 px-3 py-2 border-r border-gray-200 align-middle">
-                      {first}: Clean
-                    </th>
-                    <td className="px-3 py-2 bg-green-100 border border-gray-200 text-center align-middle">
-                      {matrix.clean_clean}
-                    </td>
-                    <td className="px-3 py-2 bg-red-100 border border-gray-200 text-center align-middle">
-                      {matrix.clean_compromised}
-                    </td>
-                    <td className="px-3 py-2 font-bold border border-gray-200 text-center align-middle">
-                      {rowTotal1}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th className="text-right font-semibold text-gray-700 px-3 py-2 border-r border-gray-200 align-middle">
-                      {first}: Compromised
-                    </th>
-                    <td className="px-3 py-2 bg-red-100 border border-gray-200 text-center align-middle">
-                      {matrix.compromised_clean}
-                    </td>
-                    <td className="px-3 py-2 bg-green-100 border border-gray-200 text-center align-middle">
-                      {matrix.compromised_compromised}
-                    </td>
-                    <td className="px-3 py-2 font-bold border border-gray-200 text-center align-middle">
-                      {rowTotal2}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th className="text-right font-semibold text-gray-700 px-3 py-2 border-r border-gray-200 align-middle">
-                      Col Total
-                    </th>
-                    <td className="px-3 py-2 font-bold border border-gray-200 text-center align-middle">
-                      {colTotal1}
-                    </td>
-                    <td className="px-3 py-2 font-bold border border-gray-200 text-center align-middle">
-                      {colTotal2}
-                    </td>
-                    <td className="px-3 py-2 font-bold border border-gray-200 text-center align-middle">
-                      {grandTotal}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div className="flex-1">
+                <div className="font-extrabold text-lg mb-2 text-center">
+                  {first} vs {second}{' '}
+                  <span className="text-xs text-gray-500">
+                    (n={grandTotal})
+                  </span>
+                </div>
+                <table
+                  className="min-w-[16em] text-xs text-center rounded-lg rounded-bl-none overflow-hidden border-separate border-spacing-0"
+                  style={{ borderCollapse: 'separate', borderSpacing: 0 }}
+                >
+                  <thead>
+                    <tr>
+                      <th
+                        className="bg-gray-300 font-extrabold text-base text-gray-800 border-2 border-gray-400 text-center px-6 py-4"
+                        rowSpan={2}
+                        style={{ minWidth: '5em' }}
+                      >
+                        Total
+                        <div className="text-xs text-gray-600 font-normal mt-1">
+                          {matrix.clean_clean + matrix.clean_compromised} +{' '}
+                          {matrix.compromised_clean +
+                            matrix.compromised_compromised}{' '}
+                          = {grandTotal}
+                        </div>
+                      </th>
+                      <th
+                        className="bg-blue-200 font-extrabold text-base text-gray-800 border-2 border-gray-400 text-center px-6 py-4"
+                        colSpan={2}
+                      >{`Test ${second} Said`}</th>
+                    </tr>
+                    <tr>
+                      <th className="bg-blue-200 font-extrabold text-base text-gray-800 border-2 border-gray-400 text-center px-6 py-4">
+                        Clean
+                      </th>
+                      <th className="bg-blue-200 font-extrabold text-base text-gray-800 border-2 border-gray-400 text-center px-6 py-4">
+                        Compromised
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th className="bg-yellow-200 font-extrabold text-base text-gray-800 border-2 border-gray-400 text-center px-6 py-4">
+                        Clean
+                      </th>
+                      <td
+                        className="bg-green-50 border-2 border-gray-400 text-center font-bold text-base px-4 py-3"
+                        style={{ minWidth: '3em' }}
+                      >
+                        {matrix.clean_clean}
+                      </td>
+                      <td
+                        className="bg-red-50 border-2 border-gray-400 text-center font-bold text-base px-4 py-3"
+                        style={{ minWidth: '3em' }}
+                      >
+                        {matrix.clean_compromised}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th className="bg-yellow-200 font-extrabold text-base text-gray-800 border-2 border-gray-400 text-center px-6 py-4">
+                        Compromised
+                      </th>
+                      <td
+                        className="bg-red-50 border-2 border-gray-400 text-center font-bold text-base px-4 py-3"
+                        style={{ minWidth: '3em' }}
+                      >
+                        {matrix.compromised_clean}
+                      </td>
+                      <td
+                        className="bg-green-50 border-2 border-gray-400 text-center font-bold text-base px-4 py-3"
+                        style={{ minWidth: '3em' }}
+                      >
+                        {matrix.compromised_compromised}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           )
         })}
