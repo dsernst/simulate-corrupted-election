@@ -2,9 +2,9 @@ import { NumberInput } from './NumberInput'
 import { Button } from './Button'
 
 export interface TestResults {
-  gatherA: string
-  gatherB: string
-  gatherC: string
+  testA: string
+  testB: string
+  testC: string
 }
 
 interface RequestTestsProps {
@@ -12,6 +12,24 @@ interface RequestTestsProps {
   onTestResultsChange: (results: TestResults) => void
   onSubmit: () => void
 }
+
+const TESTS = [
+  {
+    key: 'testA' as const,
+    label: 'Test A',
+    description: 'Quick, but less reliable',
+  },
+  {
+    key: 'testB' as const,
+    label: 'Test B',
+    description: 'Balanced cost and reliability',
+  },
+  {
+    key: 'testC' as const,
+    label: 'Test C',
+    description: 'Highest cost, perfect accuracy',
+  },
+] as const
 
 export function RequestTests({
   testResults,
@@ -23,54 +41,22 @@ export function RequestTests({
       <h3 className="text-lg font-semibold mb-4">Request Tests</h3>
       <div className="space-y-4">
         <div className="grid grid-cols-3 gap-4">
-          <div>
-            <div className="mb-2">
-              <span className="text-sm text-gray-600">
-                Quick, but less reliable
-              </span>
+          {TESTS.map(({ key, label, description }) => (
+            <div key={key}>
+              <div className="mb-2">
+                <span className="text-sm text-gray-600">{description}</span>
+              </div>
+              <NumberInput
+                id={key}
+                label={label}
+                value={testResults[key]}
+                onChange={(value) =>
+                  onTestResultsChange({ ...testResults, [key]: value })
+                }
+                placeholder="Enter count"
+              />
             </div>
-            <NumberInput
-              id="gatherA"
-              label="Test A"
-              value={testResults.gatherA}
-              onChange={(value) =>
-                onTestResultsChange({ ...testResults, gatherA: value })
-              }
-              placeholder="Enter count"
-            />
-          </div>
-          <div>
-            <div className="mb-2">
-              <span className="text-sm text-gray-600">
-                Balanced cost and reliability
-              </span>
-            </div>
-            <NumberInput
-              id="gatherB"
-              label="Test B"
-              value={testResults.gatherB}
-              onChange={(value) =>
-                onTestResultsChange({ ...testResults, gatherB: value })
-              }
-              placeholder="Enter count"
-            />
-          </div>
-          <div>
-            <div className="mb-2">
-              <span className="text-sm text-gray-600">
-                Highest cost, perfect accuracy
-              </span>
-            </div>
-            <NumberInput
-              id="gatherC"
-              label="Test C"
-              value={testResults.gatherC}
-              onChange={(value) =>
-                onTestResultsChange({ ...testResults, gatherC: value })
-              }
-              placeholder="Enter count"
-            />
-          </div>
+          ))}
         </div>
         <div className="flex justify-end">
           <Button onClick={onSubmit} className="px-6">
