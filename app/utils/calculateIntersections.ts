@@ -30,6 +30,15 @@ export interface IntersectionStats {
   tested: number
 }
 
+export interface LayeredStat {
+  label: string
+  tested: number
+  compromised: number
+  percentCompromised: number
+  indentLevel?: number
+  bias?: string
+}
+
 export const TEST_TYPES: TestType[] = ['A', 'B', 'C']
 
 export function calculateIntersections(
@@ -209,5 +218,158 @@ export function calculateIntersectionStats(
       }
     })
     return { label, detected, tested }
+  })
+}
+
+// Define a type for the vote object in voteMap
+interface VoteResult {
+  testA: boolean | undefined
+  testB: boolean | undefined
+  testC: boolean | undefined
+  testedA: boolean | undefined
+  testedB: boolean | undefined
+  testedC: boolean | undefined
+}
+
+export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
+  // Build voteMap as before
+  const voteMap = new Map<number, VoteResult>()
+  testRuns.forEach((run) => {
+    Object.entries(run.results.testBreakdown).forEach(([testKey, test]) => {
+      const testType = testKey.slice(-1) as TestType
+      test.voteResults.forEach((vote) => {
+        const existing = voteMap.get(vote.voteId) || {
+          testA: undefined,
+          testB: undefined,
+          testC: undefined,
+          testedA: false,
+          testedB: false,
+          testedC: false,
+        }
+        voteMap.set(vote.voteId, {
+          ...existing,
+          [`test${testType}`]: vote.testResults[`test${testType}`],
+          [`tested${testType}`]: true,
+        })
+      })
+    })
+  })
+
+  // Helper to filter votes by which tests they received
+  function filterVotes(filter: (v: VoteResult) => boolean) {
+    return Array.from(voteMap.values()).filter(
+      (v): v is VoteResult => v !== undefined && filter(v)
+    )
+  }
+
+  // Helper to count compromised (failed) in a set for a given test
+  function countCompromised(votes: VoteResult[], test: 'A' | 'B' | 'C') {
+    // In this simulation, testX === true means detected as compromised
+    return votes.filter((v) => v[`test${test}`] === true).length
+  }
+
+  // Helper to percent
+  function percent(n: number, d: number) {
+    return d === 0 ? 0 : Math.round((n / d) * 1000) / 10
+  }
+
+  // Define all groups
+  const groups: {
+    label: string
+    indentLevel: number
+    bias?: string
+    filter: (v: VoteResult) => boolean
+    test: 'A' | 'B' | 'C' | null
+  }[] = [
+    // Individual
+    {
+      label: 'A: Voter Autonomous',
+      indentLevel: 0,
+      bias: 'high',
+      filter: (v) => v.testedA === true,
+      test: 'A',
+    },
+    {
+      label: 'B: Guided by Auditor',
+      indentLevel: 0,
+      bias: 'medium',
+      filter: (v) => v.testedB === true,
+      test: 'B',
+    },
+    {
+      label: 'C: In-person Paper',
+      indentLevel: 0,
+      bias: 'low',
+      filter: (v) => v.testedC === true,
+      test: 'C',
+    },
+    // Overlaps
+    {
+      label: 'B & A',
+      indentLevel: 0,
+      filter: (v) => v.testedB === true && v.testedA === true,
+      test: 'B',
+    },
+    {
+      label: 'B & not A',
+      indentLevel: 1,
+      filter: (v) => v.testedB === true && v.testedA !== true,
+      test: 'B',
+    },
+    {
+      label: 'C & B',
+      indentLevel: 0,
+      filter: (v) => v.testedC === true && v.testedB === true,
+      test: 'C',
+    },
+    {
+      label: 'C & B & A',
+      indentLevel: 1,
+      filter: (v) =>
+        v.testedC === true && v.testedB === true && v.testedA === true,
+      test: 'C',
+    },
+    {
+      label: 'C & B & not A',
+      indentLevel: 2,
+      filter: (v) =>
+        v.testedC === true && v.testedB === true && v.testedA !== true,
+      test: 'C',
+    },
+    {
+      label: 'C & not B',
+      indentLevel: 0,
+      filter: (v) => v.testedC === true && v.testedB !== true,
+      test: 'C',
+    },
+    {
+      label: 'C & not B & A',
+      indentLevel: 1,
+      filter: (v) =>
+        v.testedC === true && v.testedB !== true && v.testedA === true,
+      test: 'C',
+    },
+    {
+      label: 'C & not B & not A',
+      indentLevel: 2,
+      filter: (v) =>
+        v.testedC === true && v.testedB !== true && v.testedA !== true,
+      test: 'C',
+    },
+  ]
+
+  // Calculate stats for each group
+  return groups.map(({ label, indentLevel, bias, filter, test }) => {
+    const votes = filterVotes(filter)
+    const tested = votes.length
+    const compromised = test && tested > 0 ? countCompromised(votes, test) : 0
+    return {
+      label,
+      tested,
+      compromised,
+      percentCompromised: percent(compromised, tested),
+      indentLevel,
+      bias,
+    }
   })
 }
