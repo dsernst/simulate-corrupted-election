@@ -73,6 +73,19 @@ const TestRunDisplay = ({ run }: { run: TestRun }) => {
     [run.results.testBreakdown]
   )
 
+  // Filter out zero intersections and format the display
+  const nonZeroIntersections = Object.entries(intersections)
+    .filter(([, value]) => value > 0)
+    .map(([key, value]) => ({
+      label: key.replace(' ∩ ', ' & ').replace(' only', ''),
+      value,
+      description: key.includes('only')
+        ? `Detected only by Test ${key[0]}`
+        : `Detected by both Test ${key[0]} and Test ${key[4]}${
+            key.includes('∩ C') ? ' and Test C' : ''
+          }`,
+    }))
+
   return (
     <div className="p-4 bg-blue-50 rounded-lg">
       <div className="flex justify-between items-center mb-2">
@@ -117,19 +130,24 @@ const TestRunDisplay = ({ run }: { run: TestRun }) => {
         </div>
 
         {/* Intersection Results */}
-        <div className="mt-4 pt-4 border-t border-blue-200">
-          <h4 className="font-medium text-blue-800 mb-3">Test Intersections</h4>
-          <div className="grid grid-cols-2 gap-3">
-            {Object.entries(intersections).map(([key, value]) => (
-              <div key={key} className="bg-white p-2 rounded shadow-sm">
-                <p className="text-sm font-medium text-blue-800">{key}</p>
-                <p className="text-sm text-gray-600">
-                  {value.toLocaleString()} votes
-                </p>
-              </div>
-            ))}
+        {nonZeroIntersections.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-blue-200">
+            <h4 className="font-medium text-blue-800 mb-3">
+              Votes Detected as Compromised by Multiple Tests
+            </h4>
+            <div className="grid grid-cols-2 gap-3">
+              {nonZeroIntersections.map(({ label, value, description }) => (
+                <div key={label} className="bg-white p-3 rounded shadow-sm">
+                  <p className="text-sm font-medium text-blue-800">{label}</p>
+                  <p className="text-sm text-gray-600">
+                    {value.toLocaleString()} votes
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">{description}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
