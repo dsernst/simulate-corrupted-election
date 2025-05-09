@@ -31,6 +31,11 @@ function parseNumberInput(input: string): string {
   return input
 }
 
+function formatNumberWithCommas(value: string): string {
+  if (!value) return ''
+  return parseInt(value).toLocaleString()
+}
+
 export function NumberInput({
   id,
   label,
@@ -46,7 +51,7 @@ export function NumberInput({
       <input
         type="text"
         id={id}
-        value={value}
+        value={formatNumberWithCommas(value)}
         onChange={(e) => onChange(parseNumberInput(e.target.value))}
         className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
         placeholder={placeholder}
