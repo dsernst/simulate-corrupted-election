@@ -8,9 +8,18 @@ export interface SimulationResults {
 }
 
 export interface TestEffectiveness {
-  testA: number // 20% effectiveness
-  testB: number // 50% effectiveness
-  testC: number // 100% effectiveness
+  testA: {
+    falseCleanRate: number // Rate of falsely detecting a compromised vote as clean
+    falseCompromisedRate: number // Rate of falsely detecting a clean vote as compromised
+  }
+  testB: {
+    falseCleanRate: number
+    falseCompromisedRate: number
+  }
+  testC: {
+    falseCleanRate: number
+    falseCompromisedRate: number
+  }
 }
 
 export interface TestDetectionResults {
@@ -64,18 +73,20 @@ function sampleVote(compromisedVotes: number, totalVotes: number): boolean {
 
 function runTest(
   testType: 'A' | 'B' | 'C',
-  effectiveness: number,
+  effectiveness: {
+    falseCleanRate: number
+    falseCompromisedRate: number
+  },
   isActuallyCompromised: boolean
 ): boolean {
-  // Determine if the test result is accurate based on effectiveness
-  const isAccurate = Math.random() < effectiveness
+  const random = Math.random()
 
-  if (isAccurate) {
-    // If accurate, return the true state
-    return isActuallyCompromised
+  if (isActuallyCompromised) {
+    // For actually compromised votes, we have a false clean rate
+    return random >= effectiveness.falseCleanRate
   } else {
-    // If inaccurate, return the opposite state
-    return !isActuallyCompromised
+    // For actually clean votes, we have a false compromised rate
+    return random < effectiveness.falseCompromisedRate
   }
 }
 
@@ -85,9 +96,18 @@ export function calculateTestResults(
   totalVotes: number
 ): TestDetectionResults {
   const effectiveness: TestEffectiveness = {
-    testA: 0.2, // 20% effectiveness
-    testB: 0.5, // 50% effectiveness
-    testC: 1.0, // 100% effectiveness
+    testA: {
+      falseCleanRate: 0.4, // 40% chance of missing a compromised vote
+      falseCompromisedRate: 0.1, // 10% chance of false alarm
+    },
+    testB: {
+      falseCleanRate: 0.1, // 10% chance of missing a compromised vote
+      falseCompromisedRate: 0.05, // 5% chance of false alarm
+    },
+    testC: {
+      falseCleanRate: 0, // Perfect detection of compromised votes
+      falseCompromisedRate: 0, // Perfect detection of clean votes
+    },
   }
 
   // Convert string inputs to numbers, defaulting to 0 if empty or invalid
