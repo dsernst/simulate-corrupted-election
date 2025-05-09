@@ -43,18 +43,17 @@ export function SimulationResultsDisplay({
           Total Votes Cast: {results.totalVotes.toLocaleString()}
         </p>
 
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          <Button
-            onClick={onToggleCompromised}
-            variant="outline"
-            className="w-full"
-          >
-            {showCompromised
-              ? 'Hide Compromised Votes'
-              : 'Reveal Compromised Votes'}
-          </Button>
-          {showCompromised && (
-            <div className="mt-2 p-4 bg-red-50 rounded-lg">
+        <div className="mt-4 pt-4 border-t border-gray-200 h-20">
+          {!showCompromised ? (
+            <Button
+              onClick={onToggleCompromised}
+              variant="outline"
+              className="w-full"
+            >
+              Reveal Compromised Votes
+            </Button>
+          ) : (
+            <div className="p-4 bg-red-50 rounded-lg">
               <p className="text-lg text-red-700">
                 Compromised Votes: {results.compromisedVotes.toLocaleString()}
                 <span className="text-red-600 ml-2">
