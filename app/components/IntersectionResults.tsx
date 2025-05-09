@@ -93,7 +93,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
               {first} vs {second}{' '}
               <span className="text-xs text-gray-500">(n={matrix.total})</span>
             </div>
-            <table className="min-w-full text-xs text-center">
+            <table className="min-w-full text-xs text-center rounded-lg overflow-hidden">
               <thead>
                 <tr>
                   <th></th>
@@ -104,15 +104,21 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
               <tbody>
                 <tr>
                   <th className="text-right font-normal">{first}: Clean</th>
-                  <td className="px-2 py-1">{matrix.clean_clean}</td>
-                  <td className="px-2 py-1">{matrix.clean_compromised}</td>
+                  <td className="px-2 py-1 bg-green-50 rounded-tl-lg">
+                    {matrix.clean_clean}
+                  </td>
+                  <td className="px-2 py-1 bg-red-50">
+                    {matrix.clean_compromised}
+                  </td>
                 </tr>
                 <tr>
                   <th className="text-right font-normal">
                     {first}: Compromised
                   </th>
-                  <td className="px-2 py-1">{matrix.compromised_clean}</td>
-                  <td className="px-2 py-1">
+                  <td className="px-2 py-1 bg-red-50">
+                    {matrix.compromised_clean}
+                  </td>
+                  <td className="px-2 py-1 bg-green-50 rounded-br-lg">
                     {matrix.compromised_compromised}
                   </td>
                 </tr>
