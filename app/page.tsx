@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { SimulationResultsDisplay } from './components/SimulationResults'
-import { TestInputs, TestResults } from './components/TestInputs'
+import { TestResults } from './components/RequestTests'
 import { SimulationResults, generateSimulation } from './utils/simulation'
 import { Button } from './components/Button'
 
@@ -25,19 +25,15 @@ export default function Home() {
       {!simulation ? (
         <Button onClick={handleSimulate}>Simulate new Election</Button>
       ) : (
-        <>
-          <SimulationResultsDisplay
-            results={simulation}
-            showCompromised={showCompromised}
-            onToggleCompromised={() => setShowCompromised(!showCompromised)}
-            onStartOver={handleSimulate}
-          />
-          <TestInputs
-            testResults={testResults}
-            onTestResultsChange={setTestResults}
-            onSubmit={handleSimulate}
-          />
-        </>
+        <SimulationResultsDisplay
+          results={simulation}
+          showCompromised={showCompromised}
+          onToggleCompromised={() => setShowCompromised(!showCompromised)}
+          onStartOver={handleSimulate}
+          testResults={testResults}
+          onTestResultsChange={setTestResults}
+          onRunTests={handleSimulate}
+        />
       )}
     </main>
   )

@@ -1,12 +1,16 @@
 import { SimulationResults, calculatePercentage } from '../utils/simulation'
 import { AvailableTests } from './AvailableTests'
 import { RevealStartOverLine } from './RevealStartOverLine'
+import { RequestTests, TestResults } from './RequestTests'
 
 interface SimulationResultsProps {
   results: SimulationResults
   showCompromised: boolean
   onToggleCompromised: () => void
   onStartOver: () => void
+  testResults: TestResults
+  onTestResultsChange: (results: TestResults) => void
+  onRunTests: () => void
 }
 
 export function SimulationResultsDisplay({
@@ -14,6 +18,9 @@ export function SimulationResultsDisplay({
   showCompromised,
   onToggleCompromised,
   onStartOver,
+  testResults,
+  onTestResultsChange,
+  onRunTests,
 }: SimulationResultsProps) {
   return (
     <div className="mt-8 p-6 bg-white shadow-lg rounded-lg w-full max-w-2xl">
@@ -37,6 +44,12 @@ export function SimulationResultsDisplay({
 
         <div className="mt-4 pt-4 border-t border-gray-200">
           <AvailableTests />
+
+          <RequestTests
+            testResults={testResults}
+            onTestResultsChange={onTestResultsChange}
+            onSubmit={onRunTests}
+          />
 
           <RevealStartOverLine
             {...{ results, showCompromised, onToggleCompromised, onStartOver }}
