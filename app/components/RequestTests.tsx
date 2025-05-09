@@ -24,6 +24,11 @@ export function RequestTests({
       <div className="space-y-4">
         <div className="grid grid-cols-3 gap-4">
           <div>
+            <div className="mb-2">
+              <span className="text-sm text-gray-600">
+                Quick, but less reliable
+              </span>
+            </div>
             <NumberInput
               id="gatherA"
               label="Test A"
@@ -35,6 +40,11 @@ export function RequestTests({
             />
           </div>
           <div>
+            <div className="mb-2">
+              <span className="text-sm text-gray-600">
+                Balanced cost and reliability
+              </span>
+            </div>
             <NumberInput
               id="gatherB"
               label="Test B"
@@ -46,6 +56,11 @@ export function RequestTests({
             />
           </div>
           <div>
+            <div className="mb-2">
+              <span className="text-sm text-gray-600">
+                Highest cost, perfect accuracy
+              </span>
+            </div>
             <NumberInput
               id="gatherC"
               label="Test C"

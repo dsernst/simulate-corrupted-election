@@ -1,5 +1,4 @@
 import { SimulationResults, calculatePercentage } from '../utils/simulation'
-import { AvailableTests } from './AvailableTests'
 import { RevealStartOverLine } from './RevealStartOverLine'
 import { RequestTests, TestResults } from './RequestTests'
 
@@ -23,7 +22,7 @@ export function SimulationResultsDisplay({
   onRunTests,
 }: SimulationResultsProps) {
   return (
-    <div className="mt-8 p-6 bg-white shadow-lg rounded-lg w-full max-w-2xl">
+    <div className="mt-8 p-6 bg-white shadow-lg rounded-lg w-full max-w-3xl">
       <h2 className="text-2xl font-bold mb-4">Preliminary Results</h2>
       <div className="space-y-2 mb-6">
         <p className="text-lg">
@@ -43,8 +42,6 @@ export function SimulationResultsDisplay({
         </p>
 
         <div className="mt-4 pt-4 border-t border-gray-200">
-          <AvailableTests />
-
           <RequestTests
             testResults={testResults}
             onTestResultsChange={onTestResultsChange}
