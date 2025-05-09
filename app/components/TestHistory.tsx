@@ -1,9 +1,4 @@
-import { useMemo } from 'react'
-import { TestRun } from '../utils/calculateIntersections'
-import {
-  TEST_TYPES,
-  calculateIntersections,
-} from '../utils/calculateIntersections'
+import { TestRun, TEST_TYPES } from '../utils/calculateIntersections'
 import { TestResultCard } from './TestResultCard'
 import { IntersectionResults } from './IntersectionResults'
 
@@ -35,17 +30,17 @@ const TestRunDisplay = ({ run }: { run: TestRun }) => (
 )
 
 export const TestHistory = ({ testRuns }: { testRuns: TestRun[] }) => {
-  const finalIntersections = useMemo(
-    () => calculateIntersections(testRuns),
-    [testRuns]
-  )
+  // const finalIntersections = useMemo(
+  //   () => calculateIntersections(testRuns),
+  //   [testRuns]
+  // )
 
   return (
     <div className="space-y-6">
       {testRuns.map((run) => (
         <TestRunDisplay key={run.id} run={run} />
       ))}
-      <IntersectionResults intersections={finalIntersections} />
+      <IntersectionResults testRuns={testRuns} />
     </div>
   )
 }

@@ -1,46 +1,48 @@
-import { IntersectionCounts, TestResult } from '../utils/calculateIntersections'
+import {
+  TestRun,
+  calculateIntersectionStats,
+} from '../utils/calculateIntersections'
 
 interface IntersectionResultsProps {
-  intersections: IntersectionCounts
+  testRuns: TestRun[]
 }
 
-function formatIntersectionResults(
-  intersections: IntersectionCounts
-): TestResult[] {
-  return Object.entries(intersections)
-    .filter(([, value]) => value > 0)
-    .map(([key, value]) => ({
-      label: key.replaceAll(' ∩ ', ' & ').replace(' only', ''),
-      value,
-      description: key.includes('only')
-        ? `Detected only by Test ${key[0]}`
-        : `Detected by both Test ${key[0]} and Test ${key[4]}${
-            key.includes('∩ C') ? ' and Test C' : ''
-          }`,
-    }))
-}
-
-export function IntersectionResults({
-  intersections,
-}: IntersectionResultsProps) {
-  const results = formatIntersectionResults(intersections)
-  if (results.length === 0) return null
+export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
+  const results = calculateIntersectionStats(testRuns)
+  if (results.every((r) => r.detected === 0)) return null
 
   return (
     <div className="mt-8 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
       <h3 className="text-xl font-semibold text-gray-800 mb-4">
         Final Results: Votes Detected as Compromised by Multiple Tests
       </h3>
-      <div className="grid grid-cols-2 gap-4">
-        {results.map(({ label, value, description }) => (
-          <div key={label} className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-lg font-medium text-gray-800">{label}</p>
-            <p className="text-base text-gray-600">
-              {value.toLocaleString()} votes
-            </p>
-            <p className="text-sm text-gray-500 mt-1">{description}</p>
-          </div>
-        ))}
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-left text-sm">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2 font-semibold text-gray-700">
+                Detected By
+              </th>
+              <th className="px-4 py-2 font-semibold text-gray-700">
+                Detected
+              </th>
+              <th className="px-4 py-2 font-semibold text-gray-700">Tested</th>
+            </tr>
+          </thead>
+          <tbody>
+            {results.map(({ label, detected, tested }) => (
+              <tr key={label} className="border-t border-gray-200">
+                <td className="px-4 py-2 whitespace-nowrap">{label}</td>
+                <td className="px-4 py-2 whitespace-nowrap">
+                  {detected.toLocaleString()}
+                </td>
+                <td className="px-4 py-2 whitespace-nowrap">
+                  {tested.toLocaleString()}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )

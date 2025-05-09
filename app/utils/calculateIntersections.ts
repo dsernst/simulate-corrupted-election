@@ -24,6 +24,12 @@ export interface TestResult {
   description: string
 }
 
+export interface IntersectionStats {
+  label: string
+  detected: number
+  tested: number
+}
+
 export const TEST_TYPES: TestType[] = ['A', 'B', 'C']
 
 export function calculateIntersections(
@@ -42,7 +48,14 @@ export function calculateIntersections(
   // Create a map of vote IDs to their test results across all runs
   const voteMap = new Map<
     number,
-    Record<`test${TestType}`, boolean | undefined>
+    {
+      testA: boolean | undefined
+      testB: boolean | undefined
+      testC: boolean | undefined
+      testedA: boolean | undefined
+      testedB: boolean | undefined
+      testedC: boolean | undefined
+    }
   >()
 
   // Collect all test results for each vote
@@ -54,10 +67,14 @@ export function calculateIntersections(
           testA: undefined,
           testB: undefined,
           testC: undefined,
+          testedA: false,
+          testedB: false,
+          testedC: false,
         }
         voteMap.set(vote.voteId, {
           ...existing,
           [`test${testType}`]: vote.testResults[`test${testType}`],
+          [`tested${testType}`]: true,
         })
       })
     })
@@ -79,4 +96,118 @@ export function calculateIntersections(
   })
 
   return intersections
+}
+
+export function calculateIntersectionStats(
+  testRuns: TestRun[]
+): IntersectionStats[] {
+  // Define the desired order and labels
+  const order: { key: string; label: string; tests: TestType[] }[] = [
+    { key: 'A only', label: 'A', tests: ['A'] },
+    { key: 'B only', label: 'B', tests: ['B'] },
+    { key: 'C only', label: 'C', tests: ['C'] },
+    { key: 'A ∩ B', label: 'A & B', tests: ['A', 'B'] },
+    { key: 'A ∩ C', label: 'A & C', tests: ['A', 'C'] },
+    { key: 'B ∩ C', label: 'B & C', tests: ['B', 'C'] },
+    { key: 'A ∩ B ∩ C', label: 'A & B & C', tests: ['A', 'B', 'C'] },
+  ]
+
+  // Create a map of vote IDs to their test results across all runs
+  const voteMap = new Map<
+    number,
+    {
+      testA: boolean | undefined
+      testB: boolean | undefined
+      testC: boolean | undefined
+      testedA: boolean | undefined
+      testedB: boolean | undefined
+      testedC: boolean | undefined
+    }
+  >()
+
+  // Collect all test results for each vote
+  testRuns.forEach((run) => {
+    Object.entries(run.results.testBreakdown).forEach(([testKey, test]) => {
+      const testType = testKey.slice(-1) as TestType
+      test.voteResults.forEach((vote) => {
+        const existing = voteMap.get(vote.voteId) || {
+          testA: undefined,
+          testB: undefined,
+          testC: undefined,
+          testedA: false,
+          testedB: false,
+          testedC: false,
+        }
+        voteMap.set(vote.voteId, {
+          ...existing,
+          [`test${testType}`]: vote.testResults[`test${testType}`],
+          [`tested${testType}`]: true,
+        })
+      })
+    })
+  })
+
+  // Helper to check if a vote was tested by a set of tests
+  function wasTestedBy(
+    vote: {
+      testedA: boolean | undefined
+      testedB: boolean | undefined
+      testedC: boolean | undefined
+    },
+    tests: TestType[]
+  ) {
+    return tests.every(
+      (t) => vote[`tested${t}` as 'testedA' | 'testedB' | 'testedC']
+    )
+  }
+  // Helper to check if a vote was tested ONLY by a set of tests
+  function wasTestedOnlyBy(
+    vote: {
+      testedA: boolean | undefined
+      testedB: boolean | undefined
+      testedC: boolean | undefined
+    },
+    tests: TestType[]
+  ) {
+    return (
+      wasTestedBy(vote, tests) &&
+      ['A', 'B', 'C'].every(
+        (t) =>
+          tests.includes(t as TestType) ||
+          !vote[`tested${t}` as 'testedA' | 'testedB' | 'testedC']
+      )
+    )
+  }
+
+  // Calculate stats for each group
+  return order.map(({ key, label, tests }) => {
+    let detected = 0
+    let tested = 0
+    voteMap.forEach((results) => {
+      // Detected logic (same as before)
+      const detectedByA = results.testA
+      const detectedByB = results.testB
+      const detectedByC = results.testC
+      if (
+        (key === 'A ∩ B ∩ C' && detectedByA && detectedByB && detectedByC) ||
+        (key === 'A ∩ B' && detectedByA && detectedByB && !detectedByC) ||
+        (key === 'A ∩ C' && detectedByA && !detectedByB && detectedByC) ||
+        (key === 'B ∩ C' && !detectedByA && detectedByB && detectedByC) ||
+        (key === 'A only' && detectedByA && !detectedByB && !detectedByC) ||
+        (key === 'B only' && !detectedByA && detectedByB && !detectedByC) ||
+        (key === 'C only' && !detectedByA && !detectedByB && detectedByC)
+      ) {
+        detected++
+      }
+      // Tested logic
+      if (
+        key === 'A only' || key === 'B only' || key === 'C only'
+          ? wasTestedOnlyBy(results, tests)
+          : wasTestedBy(results, tests)
+      ) {
+        tested++
+      }
+    })
+    return { label, detected, tested }
+  })
 }
