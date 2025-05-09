@@ -47,6 +47,10 @@ export default function Home() {
     // TODO: Add your submission logic here
   }
 
+  const calculatePercentage = (votes: number, total: number) => {
+    return ((votes / total) * 100).toFixed(1)
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 gap-8">
       {!showSimulation ? (
@@ -67,10 +71,26 @@ export default function Home() {
             <p className="text-lg">
               Winner&apos;s Votes:{' '}
               {simulationResults.winnerVotes.toLocaleString()}
+              <span className="text-gray-600 ml-2">
+                (
+                {calculatePercentage(
+                  simulationResults.winnerVotes,
+                  simulationResults.totalVotes
+                )}
+                %)
+              </span>
             </p>
             <p className="text-lg">
               Runner&apos;s Up Votes:{' '}
               {simulationResults.runnerUpVotes.toLocaleString()}
+              <span className="text-gray-600 ml-2">
+                (
+                {calculatePercentage(
+                  simulationResults.runnerUpVotes,
+                  simulationResults.totalVotes
+                )}
+                %)
+              </span>
             </p>
             <p className="text-lg font-semibold">
               Total Votes Cast: {simulationResults.totalVotes.toLocaleString()}
