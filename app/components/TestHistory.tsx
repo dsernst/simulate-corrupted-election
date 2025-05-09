@@ -17,9 +17,7 @@ interface IntersectionCounts {
   'C only': number
 }
 
-function calculateIntersections(
-  testBreakdown: TestDetectionResults['testBreakdown']
-): IntersectionCounts {
+function calculateIntersections(testRuns: TestRun[]): IntersectionCounts {
   const intersections: IntersectionCounts = {
     'A ∩ B': 0,
     'A ∩ C': 0,
@@ -30,20 +28,22 @@ function calculateIntersections(
     'C only': 0,
   }
 
-  // Create a map of vote IDs to their test results for faster lookup
+  // Create a map of vote IDs to their test results across all runs
   const voteMap = new Map<
     number,
     { testA?: boolean; testB?: boolean; testC?: boolean }
   >()
 
-  // First pass: collect all test results for each vote
-  Object.entries(testBreakdown).forEach(([testKey, test]) => {
-    const testType = testKey.slice(-1) as 'A' | 'B' | 'C'
-    test.voteResults.forEach((vote) => {
-      const existing = voteMap.get(vote.voteId) || {}
-      voteMap.set(vote.voteId, {
-        ...existing,
-        [`test${testType}`]: vote.testResults[`test${testType}`],
+  // First pass: collect all test results for each vote across all runs
+  testRuns.forEach((run) => {
+    Object.entries(run.results.testBreakdown).forEach(([testKey, test]) => {
+      const testType = testKey.slice(-1) as 'A' | 'B' | 'C'
+      test.voteResults.forEach((vote) => {
+        const existing = voteMap.get(vote.voteId) || {}
+        voteMap.set(vote.voteId, {
+          ...existing,
+          [`test${testType}`]: vote.testResults[`test${testType}`],
+        })
       })
     })
   })
@@ -66,18 +66,24 @@ function calculateIntersections(
   return intersections
 }
 
-const TestRunDisplay = ({ run }: { run: TestRun }) => {
-  // Memoize the intersection calculations
+const TestRunDisplay = ({
+  run,
+  allRuns,
+}: {
+  run: TestRun
+  allRuns: TestRun[]
+}) => {
+  // Memoize the intersection calculations for all runs up to and including this one
   const intersections = useMemo(
-    () => calculateIntersections(run.results.testBreakdown),
-    [run.results.testBreakdown]
+    () => calculateIntersections(allRuns.slice(0, allRuns.indexOf(run) + 1)),
+    [allRuns, run]
   )
 
   // Filter out zero intersections and format the display
   const nonZeroIntersections = Object.entries(intersections)
     .filter(([, value]) => value > 0)
     .map(([key, value]) => ({
-      label: key.replace(' ∩ ', ' & ').replace(' only', ''),
+      label: key.replaceAll(' ∩ ', ' & ').replace(' only', ''),
       value,
       description: key.includes('only')
         ? `Detected only by Test ${key[0]}`
@@ -157,7 +163,7 @@ export const TestHistory = ({ testRuns }: { testRuns: TestRun[] }) => {
   return (
     <>
       {testRuns.map((run) => (
-        <TestRunDisplay key={run.id} run={run} />
+        <TestRunDisplay key={run.id} run={run} allRuns={testRuns} />
       ))}
     </>
   )
