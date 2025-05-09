@@ -1,6 +1,6 @@
 import { SimulationResults, calculatePercentage } from '../utils/simulation'
 import { AvailableTests } from './AvailableTests'
-import { Button } from './Button'
+import { RevealStartOverLine } from './RevealStartOverLine'
 
 interface SimulationResultsProps {
   results: SimulationResults
@@ -38,33 +38,9 @@ export function SimulationResultsDisplay({
         <div className="mt-4 pt-4 border-t border-gray-200">
           <AvailableTests />
 
-          <div className="h-20 flex justify-between items-center">
-            {!showCompromised ? (
-              <Button
-                onClick={onToggleCompromised}
-                variant="outline"
-                className="text-sm flex-1 mr-2"
-              >
-                👀 Reveal Compromised Votes
-              </Button>
-            ) : (
-              <div className="p-4 bg-red-50 rounded-lg flex-1 mr-2">
-                <p className="text-lg text-red-700">
-                  Compromised Votes: {results.compromisedVotes.toLocaleString()}
-                  <span className="text-red-600 ml-2">
-                    ({results.compromisedPercentage.toFixed(1)}% of total)
-                  </span>
-                </p>
-              </div>
-            )}
-            <Button
-              onClick={onStartOver}
-              variant="outline"
-              className="text-sm py-2 px-4"
-            >
-              ♻️ Start Over
-            </Button>
-          </div>
+          <RevealStartOverLine
+            {...{ results, showCompromised, onToggleCompromised, onStartOver }}
+          />
         </div>
       </div>
     </div>
