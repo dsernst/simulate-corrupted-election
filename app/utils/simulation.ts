@@ -7,9 +7,20 @@ export interface SimulationResults {
   compromisedPercentage: number
 }
 
+interface VoteTestResult {
+  voteId: number
+  isActuallyCompromised: boolean
+  testResults: {
+    testA?: boolean // true if detected as compromised
+    testB?: boolean
+    testC?: boolean
+  }
+}
+
 interface TestResult {
   count: number
   detectedCompromised: number
+  voteResults: VoteTestResult[]
 }
 
 interface TestEffectivenessRates {
@@ -108,25 +119,63 @@ export function calculateTestResults(
     testC: parseInt(testCounts.testC) || 0,
   }
 
-  // Initialize test breakdown
+  // Initialize test breakdown with vote tracking
   const testBreakdown = {
-    testA: { count: 0, detectedCompromised: 0 },
-    testB: { count: 0, detectedCompromised: 0 },
-    testC: { count: 0, detectedCompromised: 0 },
+    testA: {
+      count: 0,
+      detectedCompromised: 0,
+      voteResults: [] as VoteTestResult[],
+    },
+    testB: {
+      count: 0,
+      detectedCompromised: 0,
+      voteResults: [] as VoteTestResult[],
+    },
+    testC: {
+      count: 0,
+      detectedCompromised: 0,
+      voteResults: [] as VoteTestResult[],
+    },
   }
+
+  // Create a map to track votes across tests
+  const voteMap = new Map<number, VoteTestResult>()
 
   // Run tests for each type
   const testTypes = ['A', 'B', 'C']
   testTypes.forEach((testType) => {
     const testKey = `test${testType}` as keyof typeof testBreakdown
     for (let i = 0; i < counts[testKey]; i++) {
-      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes)
+      // Generate a vote ID (could be random or sequential)
+      const voteId = Math.floor(Math.random() * totalVotes)
+
+      // Get or create the vote result
+      let voteResult = voteMap.get(voteId)
+      if (!voteResult) {
+        const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes)
+        voteResult = {
+          voteId,
+          isActuallyCompromised,
+          testResults: {},
+        }
+        voteMap.set(voteId, voteResult)
+      }
+
+      // Run the test
       const isDetectedCompromised = runTest(
         effectiveness[testKey],
-        isActuallyCompromised
+        voteResult.isActuallyCompromised
       )
+
+      // Update the vote result
+      voteResult.testResults[
+        `test${testType}` as keyof typeof voteResult.testResults
+      ] = isDetectedCompromised
+
+      // Update test breakdown
       testBreakdown[testKey].count++
       if (isDetectedCompromised) testBreakdown[testKey].detectedCompromised++
+      testBreakdown[testKey].voteResults.push(voteResult)
     }
   })
 
