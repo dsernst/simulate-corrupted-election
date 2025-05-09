@@ -302,7 +302,7 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
     // Overlaps
     {
       label: 'B & A',
-      indentLevel: 0,
+      indentLevel: 1,
       filter: (v) => v.testedB === true && v.testedA === true,
       test: 'B',
     },
@@ -314,13 +314,13 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
     },
     {
       label: 'C & B',
-      indentLevel: 0,
+      indentLevel: 1,
       filter: (v) => v.testedC === true && v.testedB === true,
       test: 'C',
     },
     {
       label: 'C & B & A',
-      indentLevel: 1,
+      indentLevel: 2,
       filter: (v) =>
         v.testedC === true && v.testedB === true && v.testedA === true,
       test: 'C',
@@ -334,13 +334,13 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
     },
     {
       label: 'C & not B',
-      indentLevel: 0,
+      indentLevel: 1,
       filter: (v) => v.testedC === true && v.testedB !== true,
       test: 'C',
     },
     {
       label: 'C & not B & A',
-      indentLevel: 1,
+      indentLevel: 2,
       filter: (v) =>
         v.testedC === true && v.testedB !== true && v.testedA === true,
       test: 'C',
