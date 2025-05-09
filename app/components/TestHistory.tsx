@@ -13,7 +13,7 @@ export const TestHistory = ({ testRuns }: { testRuns: TestRun[] }) => {
         <div key={run.id} className="p-4 bg-blue-50 rounded-lg">
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-lg font-semibold text-blue-800">
-              Test Run #{run.id}
+              Test Set #{run.id}
             </h3>
             <span className="text-sm text-gray-500">
               {run.timestamp.toLocaleTimeString()}
@@ -21,9 +21,9 @@ export const TestHistory = ({ testRuns }: { testRuns: TestRun[] }) => {
           </div>
 
           <div className="space-y-4">
-            <p className="text-lg text-blue-700">
+            {/* <p className="text-lg text-blue-700">
               Total Tests Run: {run.results.totalTests.toLocaleString()}
-            </p>
+            </p> */}
 
             <div className="grid grid-cols-3 gap-4">
               {(['A', 'B', 'C'] as const).map((testType) => {
@@ -36,7 +36,9 @@ export const TestHistory = ({ testRuns }: { testRuns: TestRun[] }) => {
                 return (
                   <div
                     key={testType}
-                    className="bg-white p-3 rounded-lg shadow-sm"
+                    className={`bg-white p-3 rounded-lg shadow-sm ${
+                      !test.count && 'opacity-0'
+                    }`}
                   >
                     <h4 className="font-medium text-blue-800 mb-2">
                       Test {testType}
