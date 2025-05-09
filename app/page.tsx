@@ -67,6 +67,15 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 gap-8">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold mb-2">
+          Simulate Corrupted Elections
+        </h1>
+        <p className="text-xl text-gray-600">
+          How efficiently can you detect the compromised votes?
+        </p>
+      </div>
+
       {!simulation ? (
         <div className="italic animate-pulse text-black/50">
           Loading initial simulation...
