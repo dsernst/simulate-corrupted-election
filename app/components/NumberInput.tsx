@@ -3,6 +3,7 @@ interface NumberInputProps {
   label: string
   value: string
   onChange: (value: string) => void
+  onEnterKey?: () => void
   placeholder?: string
 }
 
@@ -41,6 +42,7 @@ export function NumberInput({
   label,
   value,
   onChange,
+  onEnterKey,
   placeholder = 'Enter quantity',
 }: NumberInputProps) {
   return (
@@ -53,6 +55,12 @@ export function NumberInput({
         id={id}
         value={formatNumberWithCommas(value)}
         onChange={(e) => onChange(parseNumberInput(e.target.value))}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && onEnterKey) {
+            e.preventDefault()
+            onEnterKey()
+          }
+        }}
         className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
         placeholder={placeholder}
         pattern="[0-9,kmKM]*"

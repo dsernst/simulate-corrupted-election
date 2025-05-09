@@ -53,6 +53,7 @@ export function RequestTests({
                 onChange={(value) =>
                   onTestResultsChange({ ...testResults, [key]: value })
                 }
+                onEnterKey={onSubmit}
                 placeholder="Enter count"
               />
             </div>
