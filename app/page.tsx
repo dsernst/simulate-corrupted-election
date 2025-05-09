@@ -11,6 +11,12 @@ import {
 } from './utils/simulation'
 import { Button } from './components/Button'
 
+interface TestRun {
+  id: number
+  results: TestDetectionResults
+  timestamp: Date
+}
+
 export default function Home() {
   const [simulation, setSimulation] = useState<SimulationResults | null>(null)
   const [showCompromised, setShowCompromised] = useState(false)
@@ -19,13 +25,14 @@ export default function Home() {
     testB: '',
     testC: '',
   })
-  const [detectionResults, setDetectionResults] =
-    useState<TestDetectionResults | null>(null)
+  const [testRuns, setTestRuns] = useState<TestRun[]>([])
+  const [nextRunId, setNextRunId] = useState(1)
 
   const handleSimulate = () => {
     setSimulation(generateSimulation())
     setShowCompromised(false)
-    setDetectionResults(null)
+    setTestRuns([])
+    setNextRunId(1)
   }
 
   const handleRunTests = () => {
@@ -36,7 +43,24 @@ export default function Home() {
       simulation.compromisedVotes,
       simulation.totalVotes
     )
-    setDetectionResults(results)
+
+    // Add new test run to history
+    setTestRuns((prev) => [
+      ...prev,
+      {
+        id: nextRunId,
+        results,
+        timestamp: new Date(),
+      },
+    ])
+    setNextRunId((prev) => prev + 1)
+
+    // Reset the test request form
+    setTestResults({
+      testA: '',
+      testB: '',
+      testC: '',
+    })
   }
 
   return (
@@ -52,7 +76,7 @@ export default function Home() {
           testResults={testResults}
           onTestResultsChange={setTestResults}
           onRunTests={handleRunTests}
-          detectionResults={detectionResults}
+          testRuns={testRuns}
         />
       )}
     </main>
