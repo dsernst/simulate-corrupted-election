@@ -21,26 +21,34 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
           <thead>
             <tr className="bg-gray-100">
               <th className="px-4 py-2 font-semibold text-gray-700">
-                Detected By
+                Tested by
               </th>
               <th className="px-4 py-2 font-semibold text-gray-700">
-                Detected
+                Compromises Detected
               </th>
-              <th className="px-4 py-2 font-semibold text-gray-700">Tested</th>
+              <th className="px-4 py-2 font-semibold text-gray-700">
+                # Tested
+              </th>
             </tr>
           </thead>
           <tbody>
-            {results.map(({ label, detected, tested }) => (
-              <tr key={label} className="border-t border-gray-200">
-                <td className="px-4 py-2 whitespace-nowrap">{label}</td>
-                <td className="px-4 py-2 whitespace-nowrap">
-                  {detected.toLocaleString()}
-                </td>
-                <td className="px-4 py-2 whitespace-nowrap">
-                  {tested.toLocaleString()}
-                </td>
-              </tr>
-            ))}
+            {results.map(({ label, detected, tested }, idx) => {
+              let displayLabel = label
+              if (idx < 3) displayLabel += ' only'
+              return (
+                <tr key={label} className="border-t border-gray-200">
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    {displayLabel}
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    {detected.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    {tested.toLocaleString()}
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
