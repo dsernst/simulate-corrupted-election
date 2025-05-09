@@ -22,6 +22,18 @@ const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({
     matrix.clean_compromised +
     matrix.compromised_clean +
     matrix.compromised_compromised
+
+  if (grandTotal === 0) {
+    return (
+      <div className="bg-gray-50 rounded-lg p-2 border border-gray-200 flex items-center mx-auto">
+        <p>
+          {first} vs {second}
+          <span className="opacity-30">: No data</span>
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 flex items-center mx-auto">
       {/* Vertical axis label outside the table */}
