@@ -4,7 +4,6 @@ import {
   calculateLayeredStats,
   calculateConfusionMatrix,
 } from '../utils/calculateIntersections'
-import { calculatePercentage } from '../utils/simulation'
 import ConfusionMatrix from './ConfusionMatrix'
 
 interface IntersectionResultsProps {
@@ -94,7 +93,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
           />
         ))}
       </div>
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">
+      {/* <h3 className="text-xl font-semibold text-gray-800 mb-4">
         Intersection Results
       </h3>
       <div className="overflow-x-auto">
@@ -130,7 +129,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
             })}
           </tbody>
         </table>
-      </div>
+      </div> */}
     </div>
   )
 }
