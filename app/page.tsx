@@ -7,14 +7,8 @@ import {
   SimulationResults,
   generateSimulation,
   calculateTestResults,
-  TestDetectionResults,
 } from './utils/simulation'
-
-interface TestRun {
-  id: number
-  results: TestDetectionResults
-  timestamp: Date
-}
+import { TestRun } from './utils/calculateIntersections'
 
 export default function Home() {
   const [simulation, setSimulation] = useState<SimulationResults | null>(null)

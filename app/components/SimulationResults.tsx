@@ -4,7 +4,8 @@ import {
 } from '../utils/simulation'
 import { RevealStartOverLine } from './RevealStartOverLine'
 import { RequestTests, TestResults } from './RequestTests'
-import { TestHistory, TestRun } from './TestHistory'
+import { TestHistory } from './TestHistory'
+import { TestRun } from '../utils/calculateIntersections'
 
 interface SimulationResultsProps {
   results: SimulationResultsType
