@@ -9,6 +9,7 @@ export default function Home() {
   const [simulationResults, setSimulationResults] = useState({
     winnerVotes: 0,
     runnerUpVotes: 0,
+    otherVotes: 0,
     totalVotes: 0,
   })
   const [testResults, setTestResults] = useState({
@@ -21,11 +22,13 @@ export default function Home() {
     // For now, just generate random numbers for demonstration
     const winnerVotes = Math.floor(Math.random() * 1000000)
     const runnerUpVotes = Math.floor(Math.random() * winnerVotes)
-    const totalVotes = winnerVotes + runnerUpVotes
+    const otherVotes = Math.floor(Math.random() * (winnerVotes * 0.2)) // Other votes up to 20% of winner's votes
+    const totalVotes = winnerVotes + runnerUpVotes + otherVotes
 
     setSimulationResults({
       winnerVotes,
       runnerUpVotes,
+      otherVotes,
       totalVotes,
     })
     setShowSimulation(true)
@@ -69,7 +72,7 @@ export default function Home() {
               Runner&apos;s Up Votes:{' '}
               {simulationResults.runnerUpVotes.toLocaleString()}
             </p>
-            <p className="text-lg">
+            <p className="text-lg font-semibold">
               Total Votes Cast: {simulationResults.totalVotes.toLocaleString()}
             </p>
           </div>
