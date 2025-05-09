@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { SimulationResultsDisplay } from './components/SimulationResults'
 import { TestResults } from './components/RequestTests'
 import {
@@ -9,7 +9,6 @@ import {
   calculateTestResults,
   TestDetectionResults,
 } from './utils/simulation'
-import { Button } from './components/Button'
 
 interface TestRun {
   id: number
@@ -34,6 +33,9 @@ export default function Home() {
     setTestRuns([])
     setNextRunId(1)
   }
+
+  // Simulate an election when the page first loads
+  useEffect(() => handleSimulate(), [])
 
   const handleRunTests = () => {
     if (!simulation) return
@@ -66,7 +68,9 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 gap-8">
       {!simulation ? (
-        <Button onClick={handleSimulate}>Simulate new Election</Button>
+        <div className="italic animate-pulse text-black/50">
+          Loading initial simulation...
+        </div>
       ) : (
         <SimulationResultsDisplay
           results={simulation}
