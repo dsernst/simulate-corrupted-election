@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Election Simulator',
-  description: 'Simulate election scenarios',
+  title: 'Simulate Corrupted Elections',
+  description: 'How efficiently can you detect the compromised votes?',
 }
 
 export default function RootLayout({
