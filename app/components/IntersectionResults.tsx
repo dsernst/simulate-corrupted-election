@@ -2,6 +2,7 @@ import {
   TestRun,
   calculateIntersectionStats,
   calculateLayeredStats,
+  calculateConfusionMatrix,
 } from '../utils/calculateIntersections'
 import { calculatePercentage } from '../utils/simulation'
 
@@ -12,6 +13,17 @@ interface IntersectionResultsProps {
 export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
   const layeredStats = calculateLayeredStats(testRuns)
   const results = calculateIntersectionStats(testRuns)
+  // Confusion matrices for all pairs
+  const pairs = [
+    { first: 'A', second: 'B' },
+    { first: 'A', second: 'C' },
+    { first: 'B', second: 'C' },
+  ] as const
+  const confusionMatrices = pairs.map(({ first, second }) => ({
+    first,
+    second,
+    matrix: calculateConfusionMatrix(testRuns, first, second),
+  }))
   if (results.every((r) => r.detected === 0)) return null
 
   return (
@@ -66,6 +78,48 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
             )}
           </tbody>
         </table>
+      </div>
+      {/* Confusion Matrices Section */}
+      <h3 className="text-xl font-semibold text-gray-800 mb-4">
+        Pairwise Confusion Matrices
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {confusionMatrices.map(({ first, second, matrix }) => (
+          <div
+            key={`${first}-${second}`}
+            className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+          >
+            <div className="font-semibold mb-2 text-center">
+              {first} vs {second}{' '}
+              <span className="text-xs text-gray-500">(n={matrix.total})</span>
+            </div>
+            <table className="min-w-full text-xs text-center">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th className="px-2 py-1">{second}: Clean</th>
+                  <th className="px-2 py-1">{second}: Compromised</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th className="text-right font-normal">{first}: Clean</th>
+                  <td className="px-2 py-1">{matrix.clean_clean}</td>
+                  <td className="px-2 py-1">{matrix.clean_compromised}</td>
+                </tr>
+                <tr>
+                  <th className="text-right font-normal">
+                    {first}: Compromised
+                  </th>
+                  <td className="px-2 py-1">{matrix.compromised_clean}</td>
+                  <td className="px-2 py-1">
+                    {matrix.compromised_compromised}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ))}
       </div>
       <h3 className="text-xl font-semibold text-gray-800 mb-4">
         Intersection Results
