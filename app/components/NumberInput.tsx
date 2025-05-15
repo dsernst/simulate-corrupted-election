@@ -5,6 +5,7 @@ interface NumberInputProps {
   onChange: (value: string) => void
   onEnterKey?: () => void
   placeholder?: string
+  autoFocus?: boolean
 }
 
 function parseNumberInput(input: string): string {
@@ -44,6 +45,7 @@ export function NumberInput({
   onChange,
   onEnterKey,
   placeholder = 'Enter quantity',
+  autoFocus,
 }: NumberInputProps) {
   return (
     <div className="flex flex-col gap-2">
@@ -53,6 +55,7 @@ export function NumberInput({
       <input
         type="text"
         id={id}
+        autoFocus={autoFocus}
         value={formatNumberWithCommas(value)}
         onChange={(e) => onChange(parseNumberInput(e.target.value))}
         onKeyDown={(e) => {

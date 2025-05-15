@@ -55,7 +55,7 @@ export function RequestTests({
       <h3 className="text-lg font-semibold mb-4">Request Tests</h3>
       <div className="space-y-4">
         <div className="grid grid-cols-3 gap-4">
-          {TESTS.map(({ key, label, subtitle, description }) => (
+          {TESTS.map(({ key, label, subtitle, description }, index) => (
             <div key={key}>
               <div className="mb-2">
                 <div className="text-xs text-gray-500">{subtitle}</div>
@@ -63,6 +63,7 @@ export function RequestTests({
               </div>
               <NumberInput
                 id={key}
+                autoFocus={index === 0}
                 label={label}
                 value={testResults[key]}
                 onChange={(value) =>
