@@ -35,7 +35,6 @@ export interface TestEffectiveness {
 }
 
 export interface TestDetectionResults {
-  totalTests: number
   testBreakdown: {
     testA: TestResult
     testB: TestResult
@@ -259,7 +258,6 @@ export function calculateTestResults(
   }
 
   return {
-    totalTests: Object.values(counts).reduce((sum, count) => sum + count, 0),
     testBreakdown,
   }
 }
