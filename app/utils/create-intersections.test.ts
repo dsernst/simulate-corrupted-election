@@ -1,5 +1,9 @@
 import { describe, expect, test } from 'bun:test'
-import { getTestsFromKey, getIndentFromKey } from './create-intersections'
+import {
+  getTestsFromKey,
+  getIndentFromKey,
+  getFilterFromKey,
+} from './create-intersections'
 import { TestType } from './calculateIntersections'
 
 type Key = string
@@ -36,5 +40,33 @@ describe('intersection groups', () => {
     testCases.forEach(([key, indent]) => {
       expect(getIndentFromKey(key)).toBe(indent)
     })
+  })
+
+  test('should derive filter function from key correctly', () => {
+    const mockVote = {
+      testedA: true,
+      testedB: true,
+      testedC: true,
+      testA: false,
+      testB: false,
+      testC: false,
+    }
+
+    // Test simple cases
+    expect(getFilterFromKey('A')(mockVote)).toBe(true)
+    expect(getFilterFromKey('AB')(mockVote)).toBe(true)
+    expect(getFilterFromKey('ABC')(mockVote)).toBe(true)
+
+    // Test exclusion cases
+    expect(getFilterFromKey('B!A')({ ...mockVote, testedA: false })).toBe(true)
+    expect(getFilterFromKey('B!A')({ ...mockVote, testedA: true })).toBe(false)
+    expect(getFilterFromKey('BC!A')({ ...mockVote, testedA: false })).toBe(true)
+    expect(getFilterFromKey('BC!A')({ ...mockVote, testedA: true })).toBe(false)
+    expect(
+      getFilterFromKey('C!A!B')({ ...mockVote, testedA: false, testedB: false })
+    ).toBe(true)
+    expect(getFilterFromKey('C!A!B')({ ...mockVote, testedA: true })).toBe(
+      false
+    )
   })
 })

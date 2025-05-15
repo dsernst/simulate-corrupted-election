@@ -16,30 +16,34 @@ export function getIndentFromKey(key: string): number {
   return key.replaceAll('!', '').length - 1
 }
 
+/** Derive filter function from key: 'B!A' -> (v) => v.testedB && !v.testedA */
+export function getFilterFromKey(key: string): (v: VoteResult) => boolean {
+  const included = getTestsFromKey(key)
+
+  // Get all letters in the key
+  const allLetters = key.replaceAll('!', '').split('') as TestType[]
+  // Then subtract `included`, to get `excluded`
+  const excluded = allLetters.filter((letter) => !included.includes(letter))
+
+  return (v: VoteResult) =>
+    included.every((t) => v[`tested${t}`]) &&
+    excluded.every((t) => !v[`tested${t}`])
+}
+
 // Helper to create group objects
-export const createGroup = (
-  key: string,
-  customFilter?: (v: VoteResult) => boolean
-): Group => ({
+export const createGroup = (key: string): Group => ({
   key,
-  filter:
-    customFilter ?? ((v) => getTestsFromKey(key).every((t) => v[`tested${t}`])),
+  filter: getFilterFromKey(key),
 })
 
 // Define all groups with canonical keys
 export const intersectionGroups: Group[] = [
   // Individual tests
-  ...(['A', 'B', 'C'] as const).map((test) => createGroup(test)),
+  ...(['A', 'B', 'C'] as const).map(createGroup),
 
-  // Two test overlaps
-  createGroup('AB'),
-  createGroup('B!A', (v) => Boolean(v.testedB && !v.testedA)),
-  createGroup('BC'),
-  createGroup('C!B', (v) => Boolean(v.testedC && !v.testedB)),
+  // Two test combinations
+  ...['AB', 'B!A', 'BC', 'C!B'].map(createGroup),
 
-  // Three test overlaps
-  createGroup('ABC'),
-  createGroup('BC!A', (v) => Boolean(v.testedB && v.testedC && !v.testedA)),
-  createGroup('AC!B', (v) => Boolean(v.testedA && v.testedC && !v.testedB)),
-  createGroup('C!A!B', (v) => Boolean(v.testedC && !v.testedA && !v.testedB)),
+  // Three test combinations
+  ...['ABC', 'BC!A', 'AC!B', 'C!A!B'].map(createGroup),
 ]
