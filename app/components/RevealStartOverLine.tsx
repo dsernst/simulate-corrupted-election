@@ -1,6 +1,7 @@
 import { Button } from './Button'
 import { SimulationResults } from '../utils/simulation'
 import { IoChevronDown, IoChevronUp, IoDiceOutline } from 'react-icons/io5'
+import { useEffect, useState } from 'react'
 
 export const RevealStartOverLine = ({
   showCompromised,
@@ -10,7 +11,6 @@ export const RevealStartOverLine = ({
   seed,
   showSeedInput,
   onToggleSeedInput,
-  onSeedChange,
 }: {
   showCompromised: boolean
   onToggleCompromised: () => void
@@ -19,17 +19,13 @@ export const RevealStartOverLine = ({
   seed: number
   showSeedInput: boolean
   onToggleSeedInput: () => void
-  onSeedChange: (newSeed: number) => void
 }) => {
-  const handleSeedSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const form = e.currentTarget
-    const input = form.elements.namedItem('seed') as HTMLInputElement
-    const newSeed = parseInt(input.value, 10)
-    if (!isNaN(newSeed)) {
-      onSeedChange(newSeed)
-    }
-  }
+  const [inputSeed, setInputSeed] = useState(seed)
+
+  // Sync inputSeed with seed prop when menu opens or seed changes
+  useEffect(() => {
+    if (showSeedInput) setInputSeed(seed)
+  }, [showSeedInput, seed])
 
   return (
     <div className="space-y-2">
@@ -71,9 +67,10 @@ export const RevealStartOverLine = ({
               <IoChevronDown size={20} />
             )}
           </button>
+
+          {/* Seed input */}
           {showSeedInput && (
-            <form
-              onSubmit={handleSeedSubmit}
+            <div
               className="absolute right-3 top-12 bg-white border border-gray-200 rounded shadow-md flex gap-2 items-center px-3 py-2 z-10"
               style={{ minWidth: 0 }}
             >
@@ -81,22 +78,22 @@ export const RevealStartOverLine = ({
                 size={18}
                 className="absolute left-5 text-purple-500"
               />
-
               <input
                 type="number"
                 name="seed"
-                defaultValue={seed}
+                value={inputSeed}
+                onChange={(e) => setInputSeed(Number(e.target.value))}
                 className="pl-8 px-3 py-2 border border-gray-400 rounded text-sm w-32"
                 placeholder="Enter seed"
               />
               <Button
-                onClick={() => onStartOver(seed)}
+                onClick={() => onStartOver(inputSeed)}
                 variant="outline"
                 className="!px-3 !py-2 text-xs whitespace-nowrap"
               >
                 ♻️ Start Over w/ Seed
               </Button>
-            </form>
+            </div>
           )}
         </div>
       </div>

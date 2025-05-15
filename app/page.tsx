@@ -98,7 +98,6 @@ export default function Home() {
           seed={seed}
           showSeedInput={showSeedInput}
           onToggleSeedInput={() => setShowSeedInput(!showSeedInput)}
-          onSeedChange={(newSeed) => handleSimulate(newSeed)}
         />
       )}
     </main>

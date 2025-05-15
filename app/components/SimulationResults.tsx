@@ -19,7 +19,6 @@ interface SimulationResultsProps {
   seed: number
   showSeedInput: boolean
   onToggleSeedInput: () => void
-  onSeedChange: (newSeed: number) => void
 }
 
 export function SimulationResultsDisplay({
@@ -34,7 +33,6 @@ export function SimulationResultsDisplay({
   seed,
   showSeedInput,
   onToggleSeedInput,
-  onSeedChange,
 }: SimulationResultsProps) {
   return (
     <div className="mt-8 p-6 bg-white shadow-lg rounded-lg w-full max-w-3xl">
@@ -77,7 +75,6 @@ export function SimulationResultsDisplay({
                 seed,
                 showSeedInput,
                 onToggleSeedInput,
-                onSeedChange,
               }}
             />
           </div>
