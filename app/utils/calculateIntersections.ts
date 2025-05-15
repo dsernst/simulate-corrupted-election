@@ -432,3 +432,18 @@ export function calculateConfusionMatrix(
     total,
   }
 }
+
+// Utility: Count detection signatures for a set of votes and test types
+export function countCompromisedSignatures(
+  votes: VoteResult[],
+  tests: ('A' | 'B' | 'C')[]
+) {
+  const counts: Record<string, number> = {}
+  for (const v of votes) {
+    const detected = tests.filter((t) => v[`test${t}`] === true)
+    if (detected.length === 0) continue // skip if none detected
+    const key = detected.join('')
+    counts[key] = (counts[key] || 0) + 1
+  }
+  return counts
+}
