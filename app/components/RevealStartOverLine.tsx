@@ -52,7 +52,7 @@ export const RevealStartOverLine = ({
           <Button
             onClick={() => onStartOver()}
             variant="outline"
-            className="text-sm py-2 px-4 rounded-r-none pr-3"
+            className="text-sm py-2 !px-3.5 rounded-r-none"
           >
             ♻️ Start Over
           </Button>
