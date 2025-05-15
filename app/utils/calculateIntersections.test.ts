@@ -2,7 +2,10 @@ import { expect, describe, test } from 'bun:test'
 import { calculateLayeredStats, TestRun } from './calculateIntersections'
 import { calculateTestResults } from './simulation'
 import { MT19937 } from './mt19937'
-import { countCompromisedSignatures } from './calculateIntersections'
+import {
+  countCompromisedSignatures,
+  toDisplayLabelFromKey,
+} from './calculateIntersections'
 
 // Helper to create a TestResult
 function makeTestResult(
@@ -420,5 +423,17 @@ describe('countCompromisedSignatures', () => {
       BC: 1,
       ABC: 1,
     })
+  })
+})
+
+describe('toDisplayLabelFromKey', () => {
+  test('converts canonical keys to display labels', () => {
+    expect(toDisplayLabelFromKey('A')).toBe('A')
+    expect(toDisplayLabelFromKey('B')).toBe('B')
+    expect(toDisplayLabelFromKey('AB')).toBe('A & B')
+    expect(toDisplayLabelFromKey('ABC')).toBe('A & B & C')
+    expect(toDisplayLabelFromKey('B!A')).toBe('B & not A')
+    expect(toDisplayLabelFromKey('C!A!B')).toBe('C & not A & not B')
+    expect(toDisplayLabelFromKey('AC!B')).toBe('A & C & not B')
   })
 })

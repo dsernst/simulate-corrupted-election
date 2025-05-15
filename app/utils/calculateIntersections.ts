@@ -449,3 +449,12 @@ export function countCompromisedSignatures(
   }
   return counts
 }
+
+/** Utility: Convert canonical group key to display label */
+export function toDisplayLabelFromKey(key: string): string {
+  // Match either ![A-Z] or [A-Z]
+  const parts = key.match(/!?[A-Z]/g) || []
+  return parts
+    .map((part) => (part.startsWith('!') ? `not ${part[1]}` : part))
+    .join(' & ')
+}
