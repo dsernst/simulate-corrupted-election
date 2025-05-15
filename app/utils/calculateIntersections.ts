@@ -13,14 +13,15 @@ export interface TestRun {
   timestamp: Date
 }
 
+type Compromised = number | undefined
+
 export interface LayeredStat {
   key: string
   label: string
   tested: number
-  compromised: number
   percentCompromised: number
   bias?: string
-  signatures: Record<string, number>
+  signatures: [Compromised, Compromised, Compromised]
 }
 
 // Define a type for the vote object in voteMap
@@ -86,7 +87,6 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
       key,
       label: key, // For now, label is an alias to key
       tested,
-      compromised,
       percentCompromised: percent(compromised, tested),
       signatures: countCompromisedSignatures(votes, tests),
     }
@@ -169,7 +169,7 @@ export function countCompromisedSignatures(
     const key = detected.join('')
     counts[key] = (counts[key] || 0) + 1
   }
-  return counts
+  return [counts['A'], counts['B'], counts['C']] as LayeredStat['signatures']
 }
 
 /** Utility: Convert canonical group key to display label */

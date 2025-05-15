@@ -27,6 +27,8 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
     matrix: calculateConfusionMatrix(testRuns, first, second),
   }))
 
+  console.log(layeredStats)
+
   return (
     <div className="mt-8 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
       <h3 className="text-xl font-semibold text-gray-800 mb-4">
@@ -44,7 +46,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
           </thead>
           <tbody>
             {layeredStats.map(
-              ({ key, label, tested, compromised, percentCompromised }) => (
+              ({ key, label, tested, percentCompromised, signatures }) => (
                 <tr
                   key={label}
                   className={`${
@@ -66,7 +68,10 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
                     {percentCompromised}%
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap">
-                    {compromised.toLocaleString()}
+                    {signatures
+                      .filter((s) => s !== undefined)
+                      .map((s) => s.toLocaleString())
+                      .join(' | ')}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap">
                     {tested.toLocaleString()}
@@ -77,6 +82,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
           </tbody>
         </table>
       </div>
+
       {/* Confusion Matrices Section */}
       <h3 className="text-xl font-semibold text-gray-800 mb-4">
         Pairwise Confusion Matrices

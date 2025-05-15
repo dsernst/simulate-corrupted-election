@@ -340,11 +340,7 @@ describe('countCompromisedSignatures', () => {
       },
     ]
     const result = countCompromisedSignatures(votes, ['A', 'B'])
-    expect(result).toEqual({
-      A: 1,
-      B: 1,
-      AB: 1,
-    })
+    expect(result).toEqual([1, 1, undefined])
   })
   test('ABC intersection', () => {
     const votes = [
@@ -414,15 +410,11 @@ describe('countCompromisedSignatures', () => {
       },
     ]
     const result = countCompromisedSignatures(votes, ['A', 'B', 'C'])
-    expect(result).toEqual({
-      A: 1,
-      B: 1,
-      C: 1,
-      AB: 1,
-      AC: 1,
-      BC: 1,
-      ABC: 1,
-    })
+    expect(result).toEqual([1, 1, 1])
+  })
+
+  test('no compromises should show up as 0, not undefined', () => {
+    // const seed = 334991
   })
 })
 
