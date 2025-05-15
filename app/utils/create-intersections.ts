@@ -35,8 +35,8 @@ export const intersectionGroups = [
   ...['A', 'B', 'C'],
 
   // Two test combinations
-  ...['AB', 'B!A', 'BC', 'C!B'],
+  ...['AB', 'BC', 'AC', 'A!B', 'A!C', 'B!A', 'B!C', 'C!A', 'C!B'],
 
   // Three test combinations
-  ...['ABC', 'BC!A', 'AC!B', 'C!A!B'],
+  ...['ABC', 'BC!A', 'AC!B', 'C!A!B', 'AB!C', 'A!B!C'],
 ]
