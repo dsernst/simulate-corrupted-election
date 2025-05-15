@@ -1,3 +1,5 @@
+import { MT19937 } from './mt19937'
+
 export interface SimulationResults {
   winnerVotes: number
   runnerUpVotes: number
@@ -5,6 +7,7 @@ export interface SimulationResults {
   totalVotes: number
   compromisedVotes: number
   compromisedPercentage: number
+  seed: number
 }
 
 interface VoteTestResult {
@@ -47,14 +50,19 @@ export function calculatePercentage(votes: number, total: number): string {
   return ((votes / total) * 100).toFixed(1)
 }
 
-export function generateSimulation(): SimulationResults {
-  const winnerVotes = Math.floor(Math.random() * 1000000)
-  const runnerUpVotes = Math.floor(Math.random() * winnerVotes)
-  const otherVotes = Math.floor(Math.random() * (winnerVotes * 0.2)) // Other votes up to 20% of winner's votes
+function generateRandomSeed(): number {
+  return Math.floor(Math.random() * 0x100000000)
+}
+
+export function generateSimulation(seed?: number): SimulationResults {
+  const mt = new MT19937(seed ?? generateRandomSeed())
+  const winnerVotes = Math.floor(mt.random() * 1000000)
+  const runnerUpVotes = Math.floor(mt.random() * winnerVotes)
+  const otherVotes = Math.floor(mt.random() * (winnerVotes * 0.2)) // Other votes up to 20% of winner's votes
   const totalVotes = winnerVotes + runnerUpVotes + otherVotes
 
   // Generate random compromised percentage between 0 and 100
-  const compromisedPercentage = Math.random() * 100
+  const compromisedPercentage = mt.random() * 100
   const compromisedVotes = Math.floor(
     (compromisedPercentage / 100) * totalVotes
   )
@@ -66,12 +74,17 @@ export function generateSimulation(): SimulationResults {
     totalVotes,
     compromisedVotes,
     compromisedPercentage,
+    seed: seed ?? generateRandomSeed(), // Store the actual seed value
   }
 }
 
-function sampleVote(compromisedVotes: number, totalVotes: number): boolean {
+function sampleVote(
+  compromisedVotes: number,
+  totalVotes: number,
+  mt: MT19937
+): boolean {
   // Randomly select a vote and determine if it's compromised
-  return Math.random() < compromisedVotes / totalVotes
+  return mt.random() < compromisedVotes / totalVotes
 }
 
 function runTest(
@@ -79,9 +92,10 @@ function runTest(
     falseCleanRate: number
     falseCompromisedRate: number
   },
-  isActuallyCompromised: boolean
+  isActuallyCompromised: boolean,
+  mt: MT19937
 ): boolean {
-  const random = Math.random()
+  const random = mt.random()
 
   if (isActuallyCompromised) {
     // For actually compromised votes, we have a false clean rate
@@ -95,7 +109,8 @@ function runTest(
 export function calculateTestResults(
   testCounts: { testA: string; testB: string; testC: string },
   compromisedVotes: number,
-  totalVotes: number
+  totalVotes: number,
+  mt: MT19937 // Change to accept MT19937 instance instead of seed
 ): TestDetectionResults {
   const effectiveness: TestEffectiveness = {
     testA: {
@@ -148,9 +163,9 @@ export function calculateTestResults(
       .map(([id]) => id)
 
     if (untestedVotes.length > 0) {
-      return untestedVotes[Math.floor(Math.random() * untestedVotes.length)]
+      return untestedVotes[Math.floor(mt.random() * untestedVotes.length)]
     }
-    return Math.floor(Math.random() * totalVotes)
+    return Math.floor(mt.random() * totalVotes)
   }
 
   // Helper function to get a random vote that has been tested by a specific test
@@ -160,17 +175,17 @@ export function calculateTestResults(
       .map(([id]) => id)
 
     if (testedVotes.length > 0) {
-      return testedVotes[Math.floor(Math.random() * testedVotes.length)]
+      return testedVotes[Math.floor(mt.random() * testedVotes.length)]
     }
-    return Math.floor(Math.random() * totalVotes)
+    return Math.floor(mt.random() * totalVotes)
   }
 
   // Run test A first
   for (let i = 0; i < counts.testA; i++) {
-    const voteId = Math.floor(Math.random() * totalVotes)
+    const voteId = Math.floor(mt.random() * totalVotes)
     let voteResult = voteMap.get(voteId)
     if (!voteResult) {
-      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes)
+      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes, mt)
       voteResult = {
         voteId,
         isActuallyCompromised,
@@ -181,7 +196,8 @@ export function calculateTestResults(
 
     const isDetectedCompromised = runTest(
       effectiveness.testA,
-      voteResult.isActuallyCompromised
+      voteResult.isActuallyCompromised,
+      mt
     )
     voteResult.testResults.testA = isDetectedCompromised
 
@@ -197,7 +213,7 @@ export function calculateTestResults(
 
     let voteResult = voteMap.get(voteId)
     if (!voteResult) {
-      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes)
+      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes, mt)
       voteResult = {
         voteId,
         isActuallyCompromised,
@@ -208,7 +224,8 @@ export function calculateTestResults(
 
     const isDetectedCompromised = runTest(
       effectiveness.testB,
-      voteResult.isActuallyCompromised
+      voteResult.isActuallyCompromised,
+      mt
     )
     voteResult.testResults.testB = isDetectedCompromised
 
@@ -231,13 +248,13 @@ export function calculateTestResults(
         case 3: // not B & not A
           return getUntestedVote('B')
         default:
-          return Math.floor(Math.random() * totalVotes)
+          return Math.floor(mt.random() * totalVotes)
       }
     })()
 
     let voteResult = voteMap.get(voteId)
     if (!voteResult) {
-      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes)
+      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes, mt)
       voteResult = {
         voteId,
         isActuallyCompromised,
@@ -248,7 +265,8 @@ export function calculateTestResults(
 
     const isDetectedCompromised = runTest(
       effectiveness.testC,
-      voteResult.isActuallyCompromised
+      voteResult.isActuallyCompromised,
+      mt
     )
     voteResult.testResults.testC = isDetectedCompromised
 
