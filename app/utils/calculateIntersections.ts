@@ -1,5 +1,5 @@
 import { TestDetectionResults } from './simulation'
-import { intersectionGroups } from './create-intersections'
+import { getTestsFromKey, intersectionGroups } from './create-intersections'
 
 export type TestType = 'A' | 'B' | 'C'
 
@@ -65,11 +65,12 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
   }
 
   // Calculate stats for each group
-  return intersectionGroups.map(({ key, indentLevel, tests, filter }) => {
+  return intersectionGroups.map(({ key, indentLevel, filter }) => {
     // Filter votes by which tests were run on them
     const votes = Array.from(voteMap.values()).filter((v) => !!v && filter(v))
 
     const tested = votes.length
+    const tests = getTestsFromKey(key)
 
     // For single-test groups, compromised is just that test; for intersections, we can use signatures for breakdown
     const compromised =
