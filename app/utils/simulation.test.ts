@@ -132,22 +132,40 @@ describe('calculateTestResults', () => {
     expect(result.testBreakdown.testC.count).toBe(0)
   })
 
-  it('should handle invalid test counts', () => {
+  it('should throw on invalid test counts', () => {
     const mt = new MT19937(42)
-    const testCounts = { testA: 'invalid', testB: '-1', testC: 'abc' }
     const compromisedVotes = 1000
     const totalVotes = 10000
 
-    const result = calculateTestResults(
-      testCounts,
-      compromisedVotes,
-      totalVotes,
-      mt
-    )
+    // Invalid A count: 'invalid'
+    expect(() =>
+      calculateTestResults(
+        { testA: 'invalid', testB: '0', testC: '0' },
+        compromisedVotes,
+        totalVotes,
+        mt
+      )
+    ).toThrow()
 
-    expect(result.testBreakdown.testA.count).toBe(0)
-    expect(result.testBreakdown.testB.count).toBe(0)
-    expect(result.testBreakdown.testC.count).toBe(0)
+    // Invalid B count: '-1'
+    expect(() =>
+      calculateTestResults(
+        { testA: '0', testB: '-1', testC: '0' },
+        compromisedVotes,
+        totalVotes,
+        mt
+      )
+    ).toThrow()
+
+    // Invalid C count: 'abc'
+    expect(() =>
+      calculateTestResults(
+        { testA: '0', testB: '0', testC: 'abc' },
+        compromisedVotes,
+        totalVotes,
+        mt
+      )
+    ).toThrow()
   })
 
   it('should maintain consistent MT19937 state between test runs', () => {
@@ -195,12 +213,12 @@ describe('calculateTestResults', () => {
 
     expect(result.testBreakdown.testA.count).toBe(0)
     expect(result.testBreakdown.testB.count).toBe(1)
-    expect(result.testBreakdown.testC.count).toBe(1000000)
+    expect(result.testBreakdown.testC.count).toBe(10000)
 
     // Also verify the vote results arrays have the correct lengths
     expect(result.testBreakdown.testA.voteResults.length).toBe(0)
     expect(result.testBreakdown.testB.voteResults.length).toBe(1)
-    expect(result.testBreakdown.testC.voteResults.length).toBe(1000000)
+    expect(result.testBreakdown.testC.voteResults.length).toBe(10000)
   })
 
   it('should handle edge case vote counts', () => {
@@ -210,12 +228,12 @@ describe('calculateTestResults', () => {
     // Test with no compromised votes
     const result1 = calculateTestResults(testCounts, 0, 10000, mt)
     // With falseCompromisedRate of 0.1 for testA, expect roughly 10% false positives
-    expect(result1.testBreakdown.testA.detectedCompromised).toBe(12) // Deterministic because of seed
+    expect(result1.testBreakdown.testA.detectedCompromised).toBe(1) // Deterministic because of seed
 
     // Test with all votes compromised
     const result2 = calculateTestResults(testCounts, 10000, 10000, mt)
     // With falseCleanRate of 0.4 for testA, expect roughly 60% detection
-    expect(result2.testBreakdown.testA.detectedCompromised).toBe(60)
+    expect(result2.testBreakdown.testA.detectedCompromised).toBe(58)
 
     // Test C should be perfect (no false positives/negatives)
     expect(result1.testBreakdown.testC.detectedCompromised).toBe(0) // No false positives

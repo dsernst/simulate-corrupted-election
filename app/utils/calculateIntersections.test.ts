@@ -182,46 +182,58 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     const totalVotes = 2000
     const compromisedVotes = 500
     const mt = new MT19937(12345)
-    // 400 A tests, 1194 B tests
+    // Use a global voteMap
+    const globalVoteMap = new Map()
+    // 400 A tests, 1194 B tests (batch 1)
     const testCountsA = { testA: '400', testB: '0', testC: '0' }
     const testCountsB = { testA: '0', testB: '1194', testC: '0' }
     const resultsA = calculateTestResults(
       testCountsA,
       compromisedVotes,
       totalVotes,
-      mt
+      mt,
+      globalVoteMap
     )
-    // Re-seed for B to simulate independent runs (or use same mt for sequential, as in real app)
-    // Here, we use the same mt to match real simulation's advancing state
     const resultsB = calculateTestResults(
       testCountsB,
       compromisedVotes,
       totalVotes,
-      mt
+      mt,
+      globalVoteMap
     )
+    // Now run a second batch of 100 A and 100 B
+    const testCountsA2 = { testA: '100', testB: '0', testC: '0' }
+    const testCountsB2 = { testA: '0', testB: '100', testC: '0' }
+    const resultsA2 = calculateTestResults(
+      testCountsA2,
+      compromisedVotes,
+      totalVotes,
+      mt,
+      globalVoteMap
+    )
+    const resultsB2 = calculateTestResults(
+      testCountsB2,
+      compromisedVotes,
+      totalVotes,
+      mt,
+      globalVoteMap
+    )
+    // Collect all test runs
     const testRuns = [
       { id: 1, results: resultsA, timestamp: new Date() },
       { id: 2, results: resultsB, timestamp: new Date() },
+      { id: 3, results: resultsA2, timestamp: new Date() },
+      { id: 4, results: resultsB2, timestamp: new Date() },
     ]
     const stats = calculateLayeredStats(testRuns)
     const get = (label: string) => stats.find((g) => g.label === label)
-    // Log for debugging
-    console.log(
-      'A',
-      get('A')?.tested,
-      'B',
-      get('B')?.tested,
-      'B & A',
-      get('B & A')?.tested,
-      'B & not A',
-      get('B & not A')?.tested
-    )
-    // The sum of B & A and B & not A should equal total B
-    expect(get('B')?.tested).toBe(1194)
+    // The number of unique votes tested by A should be 400 + 100 = 500
+    expect(get('A')?.tested).toBe(500)
+    // The number of unique votes tested by B should be 1194 + 100 = 1294
+    expect(get('B')?.tested).toBe(1294)
+    // The sum of B & A and B & not A should equal total unique B
     expect((get('B & A')?.tested ?? 0) + (get('B & not A')?.tested ?? 0)).toBe(
-      1194
+      1294
     )
-    // A should be 400
-    expect(get('A')?.tested).toBe(400)
   })
 })
