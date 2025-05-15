@@ -29,7 +29,7 @@ interface VoteResult {
 }
 
 export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
-  // Build voteMap as before
+  // Build voteMap
   const voteMap = new Map<number, VoteResult>()
   testRuns.forEach((run) => {
     Object.entries(run.results.testBreakdown).forEach(([testKey, test]) => {
@@ -52,16 +52,9 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
     })
   })
 
-  // Helper to filter votes by which tests they received
-  function filterVotes(filter: (v: VoteResult) => boolean) {
-    return Array.from(voteMap.values()).filter(
-      (v): v is VoteResult => v !== undefined && filter(v)
-    )
-  }
-
-  // Helper to count compromised (failed) in a set for a given test
+  // Helper to count compromised in a set for a given test
   function countCompromised(votes: VoteResult[], test: 'A' | 'B' | 'C') {
-    // In this simulation, testX === true means detected as compromised
+    // testX === true means detected compromise
     return votes.filter((v) => v[`test${test}`] === true).length
   }
 
@@ -149,12 +142,15 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
 
   // Calculate stats for each group
   return groups.map(({ key, indentLevel, tests, filter }) => {
-    const votes = filterVotes(filter)
+    // Filter votes by which tests were run on them
+    const votes = Array.from(voteMap.values()).filter((v) => !!v && filter(v))
+
     const tested = votes.length
-    // For single-test groups, compromised is just that test; for intersections, you can use signatures for breakdown
+
+    // For single-test groups, compromised is just that test; for intersections, we can use signatures for breakdown
     const compromised =
       tests.length === 1 ? countCompromised(votes, tests[0]) : 0
-    const signatures = countCompromisedSignatures(votes, tests)
+
     return {
       key,
       label: key, // For now, label is the canonical key; UI can prettify
@@ -162,7 +158,7 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
       compromised,
       percentCompromised: percent(compromised, tested),
       indentLevel,
-      signatures,
+      signatures: countCompromisedSignatures(votes, tests),
     }
   })
 }
