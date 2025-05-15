@@ -1,5 +1,7 @@
 import { expect, describe, test } from 'bun:test'
 import { calculateLayeredStats, TestRun } from './calculateIntersections'
+import { calculateTestResults } from './simulation'
+import { MT19937 } from './mt19937'
 
 // Helper to create a TestResult
 function makeTestResult(
@@ -172,5 +174,54 @@ describe('calculateLayeredStats - overlap scenarios', () => {
     expect((get('B & A')?.tested ?? 0) + (get('B & not A')?.tested ?? 0)).toBe(
       1194
     )
+  })
+})
+
+describe('calculateLayeredStats - with calculateTestResults', () => {
+  test('realistic simulation with calculateTestResults and seeded MT19937', () => {
+    const totalVotes = 2000
+    const compromisedVotes = 500
+    const mt = new MT19937(12345)
+    // 400 A tests, 1194 B tests
+    const testCountsA = { testA: '400', testB: '0', testC: '0' }
+    const testCountsB = { testA: '0', testB: '1194', testC: '0' }
+    const resultsA = calculateTestResults(
+      testCountsA,
+      compromisedVotes,
+      totalVotes,
+      mt
+    )
+    // Re-seed for B to simulate independent runs (or use same mt for sequential, as in real app)
+    // Here, we use the same mt to match real simulation's advancing state
+    const resultsB = calculateTestResults(
+      testCountsB,
+      compromisedVotes,
+      totalVotes,
+      mt
+    )
+    const testRuns = [
+      { id: 1, results: resultsA, timestamp: new Date() },
+      { id: 2, results: resultsB, timestamp: new Date() },
+    ]
+    const stats = calculateLayeredStats(testRuns)
+    const get = (label: string) => stats.find((g) => g.label === label)
+    // Log for debugging
+    console.log(
+      'A',
+      get('A')?.tested,
+      'B',
+      get('B')?.tested,
+      'B & A',
+      get('B & A')?.tested,
+      'B & not A',
+      get('B & not A')?.tested
+    )
+    // The sum of B & A and B & not A should equal total B
+    expect(get('B')?.tested).toBe(1194)
+    expect((get('B & A')?.tested ?? 0) + (get('B & not A')?.tested ?? 0)).toBe(
+      1194
+    )
+    // A should be 400
+    expect(get('A')?.tested).toBe(400)
   })
 })
