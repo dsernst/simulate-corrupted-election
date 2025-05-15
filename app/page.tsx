@@ -9,10 +9,17 @@ import {
   calculateTestResults,
 } from './utils/simulation'
 import { TestRun } from './utils/calculateIntersections'
+import { MT19937 } from './utils/mt19937'
+
+function getRandomSeed() {
+  return Math.floor(Math.random() * 1000000)
+}
 
 export default function Home() {
   const [simulation, setSimulation] = useState<SimulationResults | null>(null)
   const [showCompromised, setShowCompromised] = useState(false)
+  const [seed, setSeed] = useState<number>(getRandomSeed())
+  const [showSeedInput, setShowSeedInput] = useState(false)
   const [testResults, setTestResults] = useState<TestResults>({
     testA: '',
     testB: '',
@@ -21,8 +28,10 @@ export default function Home() {
   const [testRuns, setTestRuns] = useState<TestRun[]>([])
   const [nextRunId, setNextRunId] = useState(1)
 
-  const handleSimulate = () => {
-    setSimulation(generateSimulation())
+  const handleSimulate = (newSeed?: number) => {
+    const seedToUse = newSeed || getRandomSeed()
+    setSeed(seedToUse)
+    setSimulation(generateSimulation(seedToUse))
     setShowCompromised(false)
     setTestRuns([])
     setNextRunId(1)
@@ -34,10 +43,12 @@ export default function Home() {
   const handleRunTests = () => {
     if (!simulation) return
 
+    const mt = new MT19937(simulation.seed)
     const results = calculateTestResults(
       testResults,
       simulation.compromisedVotes,
-      simulation.totalVotes
+      simulation.totalVotes,
+      mt
     )
 
     // Add new test run to history
@@ -79,11 +90,15 @@ export default function Home() {
           results={simulation}
           showCompromised={showCompromised}
           onToggleCompromised={() => setShowCompromised(!showCompromised)}
-          onStartOver={handleSimulate}
+          onStartOver={() => handleSimulate()}
           testResults={testResults}
           onTestResultsChange={setTestResults}
           onRunTests={handleRunTests}
           testRuns={testRuns}
+          seed={seed}
+          showSeedInput={showSeedInput}
+          onToggleSeedInput={() => setShowSeedInput(!showSeedInput)}
+          onSeedChange={(newSeed) => handleSimulate(newSeed)}
         />
       )}
     </main>

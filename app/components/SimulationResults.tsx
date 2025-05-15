@@ -11,11 +11,15 @@ interface SimulationResultsProps {
   results: SimulationResultsType
   showCompromised: boolean
   onToggleCompromised: () => void
-  onStartOver: () => void
+  onStartOver: (newSeed?: number) => void
   testResults: TestResults
   onTestResultsChange: (results: TestResults) => void
   onRunTests: () => void
   testRuns: TestRun[]
+  seed: number
+  showSeedInput: boolean
+  onToggleSeedInput: () => void
+  onSeedChange: (newSeed: number) => void
 }
 
 export function SimulationResultsDisplay({
@@ -27,6 +31,10 @@ export function SimulationResultsDisplay({
   onTestResultsChange,
   onRunTests,
   testRuns,
+  seed,
+  showSeedInput,
+  onToggleSeedInput,
+  onSeedChange,
 }: SimulationResultsProps) {
   return (
     <div className="mt-8 p-6 bg-white shadow-lg rounded-lg w-full max-w-3xl">
@@ -66,6 +74,10 @@ export function SimulationResultsDisplay({
                 showCompromised,
                 onToggleCompromised,
                 onStartOver,
+                seed,
+                showSeedInput,
+                onToggleSeedInput,
+                onSeedChange,
               }}
             />
           </div>
