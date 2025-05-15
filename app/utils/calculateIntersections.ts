@@ -1,4 +1,5 @@
 import { TestDetectionResults } from './simulation'
+import { intersectionGroups } from './create-intersections'
 
 export type TestType = 'A' | 'B' | 'C'
 
@@ -19,7 +20,7 @@ export interface LayeredStat {
 }
 
 // Define a type for the vote object in voteMap
-interface VoteResult {
+export interface VoteResult {
   testA: boolean | undefined
   testB: boolean | undefined
   testC: boolean | undefined
@@ -63,85 +64,8 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
     return d === 0 ? 0 : Math.round((n / d) * 1000) / 10
   }
 
-  // Define all groups with canonical keys
-  const groups: {
-    key: string
-    indentLevel: number
-    tests: ('A' | 'B' | 'C')[]
-    filter: (v: VoteResult) => boolean
-  }[] = [
-    // Individual
-    {
-      key: 'A',
-      indentLevel: 0,
-      tests: ['A'],
-      filter: (v) => !!v.testedA,
-    },
-    {
-      key: 'B',
-      indentLevel: 0,
-      tests: ['B'],
-      filter: (v) => !!v.testedB,
-    },
-    {
-      key: 'C',
-      indentLevel: 0,
-      tests: ['C'],
-      filter: (v) => !!v.testedC,
-    },
-    // Overlaps
-    {
-      key: 'AB',
-      indentLevel: 1,
-      tests: ['A', 'B'],
-      filter: (v) => !!v.testedA && !!v.testedB,
-    },
-    {
-      key: 'B!A',
-      indentLevel: 1,
-      tests: ['B'],
-      filter: (v) => !!v.testedB && !v.testedA,
-    },
-    {
-      key: 'BC',
-      indentLevel: 1,
-      tests: ['B', 'C'],
-      filter: (v) => !!v.testedB && !!v.testedC,
-    },
-    {
-      key: 'ABC',
-      indentLevel: 2,
-      tests: ['A', 'B', 'C'],
-      filter: (v) => !!v.testedA && !!v.testedB && !!v.testedC,
-    },
-    {
-      key: 'BC!A',
-      indentLevel: 2,
-      tests: ['B', 'C'],
-      filter: (v) => !!v.testedB && !!v.testedC && !v.testedA,
-    },
-    {
-      key: 'C!B',
-      indentLevel: 1,
-      tests: ['C'],
-      filter: (v) => !!v.testedC && !v.testedB,
-    },
-    {
-      key: 'AC!B',
-      indentLevel: 2,
-      tests: ['A', 'C'],
-      filter: (v) => !!v.testedA && !!v.testedC && !v.testedB,
-    },
-    {
-      key: 'C!A!B',
-      indentLevel: 2,
-      tests: ['C'],
-      filter: (v) => !!v.testedC && !v.testedA && !v.testedB,
-    },
-  ]
-
   // Calculate stats for each group
-  return groups.map(({ key, indentLevel, tests, filter }) => {
+  return intersectionGroups.map(({ key, indentLevel, tests, filter }) => {
     // Filter votes by which tests were run on them
     const votes = Array.from(voteMap.values()).filter((v) => !!v && filter(v))
 
