@@ -164,101 +164,52 @@ export function calculateTestResults(
   // Use provided voteMap or create a new one
   const globalVoteMap = voteMap ?? new Map<number, VoteTestResult>()
 
-  // Helper to get a shuffled array of unique vote IDs from a pool
-  function getUniqueVoteIdsFromPool(pool: number[], count: number): number[] {
-    const ids = [...pool]
-    // Fisher-Yates shuffle using mt
-    for (let i = ids.length - 1; i > 0; i--) {
-      const j = Math.floor(mt.random() * (i + 1))
-      ;[ids[i], ids[j]] = [ids[j], ids[i]]
+  // For each test type, run tests on unique, randomly selected votes
+  function runUniqueTests(
+    testType: 'A' | 'B' | 'C',
+    count: number,
+    effectivenessRates: TestEffectivenessRates
+  ) {
+    let tested = 0
+    let attempts = 0
+    const maxAttempts = totalVotes * 10 // Prevent infinite loop in pathological cases
+    while (tested < count && attempts < maxAttempts) {
+      attempts++
+      const voteId = Math.floor(mt.random() * totalVotes)
+      let voteResult = globalVoteMap.get(voteId)
+      if (!voteResult) {
+        const isActuallyCompromised = sampleVote(
+          compromisedVotes,
+          totalVotes,
+          mt
+        )
+        voteResult = {
+          voteId,
+          isActuallyCompromised,
+          testResults: {},
+        }
+        globalVoteMap.set(voteId, voteResult)
+      }
+      if (voteResult.testResults[`test${testType}`] !== undefined) {
+        continue // Already tested by this type
+      }
+      const isDetectedCompromised = runTest(
+        effectivenessRates,
+        voteResult.isActuallyCompromised,
+        mt
+      )
+      voteResult.testResults[`test${testType}`] = isDetectedCompromised
+      testBreakdown[`test${testType}`].count++
+      if (isDetectedCompromised)
+        testBreakdown[`test${testType}`].detectedCompromised++
+      testBreakdown[`test${testType}`].voteResults.push(voteResult)
+      tested++
     }
-    return ids.slice(0, Math.min(count, ids.length))
   }
 
-  // For each test type, build a pool of vote IDs that have NOT been tested by that type
-  // Test A
-  const poolA = Array.from({ length: totalVotes }, (_, i) => i).filter(
-    (id) => !globalVoteMap.get(id)?.testResults.testA
-  )
-  const voteIdsA = getUniqueVoteIdsFromPool(poolA, counts.testA)
-  for (let i = 0; i < voteIdsA.length; i++) {
-    const voteId = voteIdsA[i]
-    let voteResult = globalVoteMap.get(voteId)
-    if (!voteResult) {
-      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes, mt)
-      voteResult = {
-        voteId,
-        isActuallyCompromised,
-        testResults: {},
-      }
-      globalVoteMap.set(voteId, voteResult)
-    }
-    const isDetectedCompromised = runTest(
-      effectiveness.testA,
-      voteResult.isActuallyCompromised,
-      mt
-    )
-    voteResult.testResults.testA = isDetectedCompromised
-    testBreakdown.testA.count++
-    if (isDetectedCompromised) testBreakdown.testA.detectedCompromised++
-    testBreakdown.testA.voteResults.push(voteResult)
-  }
-
-  // Test B
-  const poolB = Array.from({ length: totalVotes }, (_, i) => i).filter(
-    (id) => !globalVoteMap.get(id)?.testResults.testB
-  )
-  const voteIdsB = getUniqueVoteIdsFromPool(poolB, counts.testB)
-  for (let i = 0; i < voteIdsB.length; i++) {
-    const voteId = voteIdsB[i]
-    let voteResult = globalVoteMap.get(voteId)
-    if (!voteResult) {
-      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes, mt)
-      voteResult = {
-        voteId,
-        isActuallyCompromised,
-        testResults: {},
-      }
-      globalVoteMap.set(voteId, voteResult)
-    }
-    const isDetectedCompromised = runTest(
-      effectiveness.testB,
-      voteResult.isActuallyCompromised,
-      mt
-    )
-    voteResult.testResults.testB = isDetectedCompromised
-    testBreakdown.testB.count++
-    if (isDetectedCompromised) testBreakdown.testB.detectedCompromised++
-    testBreakdown.testB.voteResults.push(voteResult)
-  }
-
-  // Test C
-  const poolC = Array.from({ length: totalVotes }, (_, i) => i).filter(
-    (id) => !globalVoteMap.get(id)?.testResults.testC
-  )
-  const voteIdsC = getUniqueVoteIdsFromPool(poolC, counts.testC)
-  for (let i = 0; i < voteIdsC.length; i++) {
-    const voteId = voteIdsC[i]
-    let voteResult = globalVoteMap.get(voteId)
-    if (!voteResult) {
-      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes, mt)
-      voteResult = {
-        voteId,
-        isActuallyCompromised,
-        testResults: {},
-      }
-      globalVoteMap.set(voteId, voteResult)
-    }
-    const isDetectedCompromised = runTest(
-      effectiveness.testC,
-      voteResult.isActuallyCompromised,
-      mt
-    )
-    voteResult.testResults.testC = isDetectedCompromised
-    testBreakdown.testC.count++
-    if (isDetectedCompromised) testBreakdown.testC.detectedCompromised++
-    testBreakdown.testC.voteResults.push(voteResult)
-  }
+  runUniqueTests('A', counts.testA, effectiveness.testA)
+  runUniqueTests('B', counts.testB, effectiveness.testB)
+  runUniqueTests('C', counts.testC, effectiveness.testC)
 
   return {
     testBreakdown,
