@@ -62,7 +62,7 @@ export const RevealStartOverLine = ({
           </Button>
           <button
             onClick={onToggleSeedInput}
-            className="p-1 hover:bg-gray-100 rounded"
+            className="p-1 hover:bg-gray-100 rounded cursor-pointer"
             aria-label={showSeedInput ? 'Hide seed input' : 'Show seed input'}
           >
             {showSeedInput ? (
@@ -74,7 +74,7 @@ export const RevealStartOverLine = ({
           {showSeedInput && (
             <form
               onSubmit={handleSeedSubmit}
-              className="absolute right-0 top-12 bg-white border border-gray-200 rounded shadow-md flex gap-2 items-center px-3 py-2 z-10"
+              className="absolute right-3 top-12 bg-white border border-gray-200 rounded shadow-md flex gap-2 items-center px-3 py-2 z-10"
               style={{ minWidth: 0 }}
             >
               <IoDiceOutline
@@ -94,7 +94,7 @@ export const RevealStartOverLine = ({
                 variant="outline"
                 className="!px-3 !py-2 text-xs whitespace-nowrap"
               >
-                Start Over with Seed
+                ♻️ Start Over w/ Seed
               </Button>
             </form>
           )}
