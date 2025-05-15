@@ -3,6 +3,7 @@ import {
   calculateIntersectionStats,
   calculateLayeredStats,
   calculateConfusionMatrix,
+  toDisplayLabelFromKey,
 } from '../utils/calculateIntersections'
 import ConfusionMatrix from './ConfusionMatrix'
 
@@ -62,7 +63,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
                       paddingLeft: `${indentLevel ? indentLevel * 2 : 0}em`,
                     }}
                   >
-                    {label}
+                    {toDisplayLabelFromKey(label)}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap">
                     {percentCompromised}%
