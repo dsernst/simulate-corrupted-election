@@ -10,11 +10,11 @@ export interface TestRun {
 }
 
 export interface LayeredStat {
+  key: string
   label: string
   tested: number
   compromised: number
   percentCompromised: number
-  indentLevel?: number
   bias?: string
   signatures: Record<string, number>
 }
@@ -65,7 +65,7 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
   }
 
   // Calculate stats for each group
-  return intersectionGroups.map(({ key, indentLevel, filter }) => {
+  return intersectionGroups.map(({ key, filter }) => {
     // Filter votes by which tests were run on them
     const votes = Array.from(voteMap.values()).filter((v) => !!v && filter(v))
 
@@ -78,11 +78,10 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
 
     return {
       key,
-      label: key, // For now, label is the canonical key; UI can prettify
+      label: key, // For now, label is an alias to key
       tested,
       compromised,
       percentCompromised: percent(compromised, tested),
-      indentLevel,
       signatures: countCompromisedSignatures(votes, tests),
     }
   })

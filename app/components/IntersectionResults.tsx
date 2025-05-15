@@ -4,6 +4,7 @@ import {
   calculateConfusionMatrix,
   toDisplayLabelFromKey,
 } from '../utils/calculateIntersections'
+import { getIndentFromKey } from '../utils/create-intersections'
 import ConfusionMatrix from './ConfusionMatrix'
 
 interface IntersectionResultsProps {
@@ -43,13 +44,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
           </thead>
           <tbody>
             {layeredStats.map(
-              ({
-                label,
-                tested,
-                compromised,
-                percentCompromised,
-                indentLevel,
-              }) => (
+              ({ key, label, tested, compromised, percentCompromised }) => (
                 <tr
                   key={label}
                   className={`${
@@ -59,7 +54,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
                   <td
                     className="px-4 py-2 whitespace-nowrap text-left"
                     style={{
-                      paddingLeft: `${indentLevel ? indentLevel * 2 : 0}em`,
+                      paddingLeft: `${getIndentFromKey(key) * 2}em`,
                     }}
                   >
                     {toDisplayLabelFromKey(label)}

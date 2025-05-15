@@ -2,7 +2,6 @@ import { TestType, VoteResult } from './calculateIntersections'
 
 export interface Group {
   key: string
-  indentLevel: number
   filter: (v: VoteResult) => boolean
 }
 
@@ -12,14 +11,17 @@ export function getTestsFromKey(key: string): TestType[] {
   return key.replace(/![A-Z]/g, '').split('') as TestType[]
 }
 
+/** Derive indent level from key: 'A' -> 0, 'AB' -> 1, 'AB!C' -> 2 */
+export function getIndentFromKey(key: string): number {
+  return key.replaceAll('!', '').length - 1
+}
+
 // Helper to create group objects
 export const createGroup = (
   key: string,
-  indentLevel: number,
   customFilter?: (v: VoteResult) => boolean
 ): Group => ({
   key,
-  indentLevel,
   filter:
     customFilter ?? ((v) => getTestsFromKey(key).every((t) => v[`tested${t}`])),
 })
@@ -27,19 +29,17 @@ export const createGroup = (
 // Define all groups with canonical keys
 export const intersectionGroups: Group[] = [
   // Individual tests
-  ...(['A', 'B', 'C'] as const).map((test) => createGroup(test, 0)),
+  ...(['A', 'B', 'C'] as const).map((test) => createGroup(test)),
 
   // Two test overlaps
-  createGroup('AB', 1),
-  createGroup('B!A', 1, (v) => Boolean(v.testedB && !v.testedA)),
-  createGroup('BC', 1),
-  createGroup('C!B', 1, (v) => Boolean(v.testedC && !v.testedB)),
+  createGroup('AB'),
+  createGroup('B!A', (v) => Boolean(v.testedB && !v.testedA)),
+  createGroup('BC'),
+  createGroup('C!B', (v) => Boolean(v.testedC && !v.testedB)),
 
   // Three test overlaps
-  createGroup('ABC', 2),
-  createGroup('BC!A', 2, (v) => Boolean(v.testedB && v.testedC && !v.testedA)),
-  createGroup('AC!B', 2, (v) => Boolean(v.testedA && v.testedC && !v.testedB)),
-  createGroup('C!A!B', 2, (v) =>
-    Boolean(v.testedC && !v.testedA && !v.testedB)
-  ),
+  createGroup('ABC'),
+  createGroup('BC!A', (v) => Boolean(v.testedB && v.testedC && !v.testedA)),
+  createGroup('AC!B', (v) => Boolean(v.testedA && v.testedC && !v.testedB)),
+  createGroup('C!A!B', (v) => Boolean(v.testedC && !v.testedA && !v.testedB)),
 ]
