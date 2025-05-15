@@ -48,7 +48,6 @@ export function generateIntersectingGroups(tests: TestType[]): string[] {
   function generateCombinations<T>(items: T[], k: number): T[][] {
     if (k === 0) return [[]]
     if (items.length === 0) return []
-
     const [first, ...rest] = items
     // Include first item in combinations of size k-1
     const withFirst = generateCombinations(rest, k - 1).map((combo) => [
@@ -57,7 +56,6 @@ export function generateIntersectingGroups(tests: TestType[]): string[] {
     ])
     // Exclude first item and get combinations of size k
     const withoutFirst = generateCombinations(rest, k)
-
     return [...withFirst, ...withoutFirst]
   }
 
@@ -70,17 +68,14 @@ export function generateIntersectingGroups(tests: TestType[]): string[] {
    */
   function generateNegations(tests: TestType[]): string[] {
     const negations: string[] = []
-
     // Generate all possible subsets of tests to negate
     // For each subset size from 1 to n-1
     for (let i = 1; i < tests.length; i++) {
       const subsets = generateCombinations(tests, i)
-
       for (const subset of subsets) {
         // Split tests into positive and negative
         const positive = tests.filter((test) => !subset.includes(test))
         const negative = subset
-
         // Combine them with positive tests first, then negative
         const result = [
           ...positive,
@@ -89,36 +84,26 @@ export function generateIntersectingGroups(tests: TestType[]): string[] {
         negations.push(result)
       }
     }
-
     return negations
   }
 
   const groups: string[] = []
-
-  // Generate combinations of increasing size (1 to n tests)
+  // For each group size, add all-positives first, then all negatives
   for (let i = 1; i <= tests.length; i++) {
-    // Get all possible combinations of i tests
     const combinations = generateCombinations(tests, i)
-
-    for (const combination of combinations) {
-      // Add the positive combination (e.g., 'AB' for tests A and B)
-      groups.push(combination.join(''))
-
-      // For combinations of 2 or more tests, generate negative variations
-      // e.g., for 'AB' we generate 'A!B' and 'B!A'
-      if (i >= 2) {
+    // Collect all-positives
+    const positives = combinations.map((combination) => combination.join(''))
+    groups.push(...positives)
+    // Collect all negatives (for i >= 2)
+    if (i >= 2) {
+      for (const combination of combinations) {
         const negations = generateNegations(combination)
         groups.push(...negations)
       }
     }
   }
-
   return groups
 }
 
 // Define all groups with canonical keys
-export const intersectionGroups = generateIntersectingGroups([
-  'A',
-  'B',
-  'C',
-] as TestType[])
+export const intersectionGroups = generateIntersectingGroups(['A', 'B', 'C'])
