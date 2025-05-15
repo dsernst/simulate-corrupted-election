@@ -10,7 +10,7 @@ export interface SimulationResults {
   seed: number
 }
 
-interface VoteTestResult {
+export interface VoteTestResult {
   voteId: number
   isActuallyCompromised: boolean
   testResults: {

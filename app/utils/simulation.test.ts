@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'bun:test'
-import { generateSimulation, calculateTestResults } from './simulation'
+import {
+  generateSimulation,
+  calculateTestResults,
+  type VoteTestResult,
+} from './simulation'
 import { MT19937 } from './mt19937'
 
 describe('generateSimulation', () => {
@@ -39,6 +43,29 @@ describe('generateSimulation', () => {
     expect(result.compromisedVotes).toBeLessThanOrEqual(result.totalVotes)
     expect(result.compromisedPercentage).toBeGreaterThanOrEqual(0)
     expect(result.compromisedPercentage).toBeLessThanOrEqual(100)
+  })
+
+  it('should generate results within reasonable bounds', () => {
+    const result = generateSimulation(42)
+
+    // Test that vote counts are reasonable
+    expect(result.winnerVotes).toBeLessThan(1000000) // Max is 1M
+    expect(result.runnerUpVotes).toBeGreaterThan(0)
+    expect(result.otherVotes).toBeGreaterThan(0)
+
+    // Test that percentages make sense
+    const winnerPercentage = (result.winnerVotes / result.totalVotes) * 100
+    expect(winnerPercentage).toBeGreaterThan(33) // Winner should have >33% of votes
+  })
+
+  it('should handle edge case seeds', () => {
+    // Test with 0 seed
+    const result1 = generateSimulation(0)
+    expect(result1.seed).toBe(0)
+
+    // Test with max 32-bit integer seed
+    const result2 = generateSimulation(0xffffffff)
+    expect(result2.seed).toBe(0xffffffff)
   })
 })
 
@@ -121,5 +148,103 @@ describe('calculateTestResults', () => {
     expect(result.testBreakdown.testA.count).toBe(0)
     expect(result.testBreakdown.testB.count).toBe(0)
     expect(result.testBreakdown.testC.count).toBe(0)
+  })
+
+  it('should maintain consistent MT19937 state between test runs', () => {
+    const mt = new MT19937(12345)
+    const testCounts = { testA: '10', testB: '10', testC: '10' }
+    const compromisedVotes = 1000
+    const totalVotes = 10000
+
+    // Run first test
+    const result1 = calculateTestResults(
+      testCounts,
+      compromisedVotes,
+      totalVotes,
+      mt
+    )
+
+    // Run second test with same MT instance
+    const result2 = calculateTestResults(
+      testCounts,
+      compromisedVotes,
+      totalVotes,
+      mt
+    )
+
+    // Results should be different because MT state has advanced
+    expect(result1).not.toEqual(result2)
+  })
+
+  it('should handle boundary test counts', () => {
+    const mt = new MT19937(42)
+    const testCounts = {
+      testA: '0',
+      testB: '1',
+      testC: '1000000',
+    }
+    const compromisedVotes = 1000
+    const totalVotes = 10000
+
+    const result = calculateTestResults(
+      testCounts,
+      compromisedVotes,
+      totalVotes,
+      mt
+    )
+
+    expect(result.testBreakdown.testA.count).toBe(0)
+    expect(result.testBreakdown.testB.count).toBe(1)
+    expect(result.testBreakdown.testC.count).toBe(1000000)
+
+    // Also verify the vote results arrays have the correct lengths
+    expect(result.testBreakdown.testA.voteResults.length).toBe(0)
+    expect(result.testBreakdown.testB.voteResults.length).toBe(1)
+    expect(result.testBreakdown.testC.voteResults.length).toBe(1000000)
+  })
+
+  it('should handle edge case vote counts', () => {
+    const mt = new MT19937(42)
+    const testCounts = { testA: '100', testB: '100', testC: '100' }
+
+    // Test with no compromised votes
+    const result1 = calculateTestResults(testCounts, 0, 10000, mt)
+    expect(result1.testBreakdown.testA.detectedCompromised).toBe(0)
+
+    // Test with all votes compromised
+    const result2 = calculateTestResults(testCounts, 10000, 10000, mt)
+    expect(result2.testBreakdown.testA.detectedCompromised).toBeGreaterThan(0)
+  })
+
+  it('should maintain vote consistency across tests', () => {
+    const mt = new MT19937(42)
+    const testCounts = { testA: '100', testB: '100', testC: '100' }
+    const compromisedVotes = 1000
+    const totalVotes = 10000
+
+    const result = calculateTestResults(
+      testCounts,
+      compromisedVotes,
+      totalVotes,
+      mt
+    )
+
+    // Check that each vote maintains consistent test results
+    const voteResults = new Map<number, VoteTestResult>()
+
+    // Collect all vote results
+    for (const test of ['A', 'B', 'C'] as const) {
+      for (const vote of result.testBreakdown[`test${test}`].voteResults) {
+        if (!voteResults.has(vote.voteId)) {
+          voteResults.set(vote.voteId, vote)
+        } else {
+          // If we've seen this vote before, its properties should match
+          const existingVote = voteResults.get(vote.voteId)!
+          expect(vote.isActuallyCompromised).toBe(
+            existingVote.isActuallyCompromised
+          )
+        }
+      }
+    }
   })
 })
