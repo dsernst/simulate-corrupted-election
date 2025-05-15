@@ -3,6 +3,7 @@ import {
   getTestsFromKey,
   getIndentFromKey,
   getFilterFromKey,
+  generateIntersectingGroups,
 } from './create-intersections'
 import { TestType, VoteResult } from './calculateIntersections'
 
@@ -80,5 +81,48 @@ describe('intersection groups', () => {
       const mockVote = mockVoteFromWasTested(wasTested)
       expect(filterFunc(mockVote), label).toBe(shouldPass)
     }
+  })
+})
+
+describe('generateIntersectionGroups', () => {
+  test('generates all expected combinations', () => {
+    const groups = generateIntersectingGroups(['A', 'B', 'C'] as TestType[])
+
+    // Single tests
+    const singleTests = ['A', 'B', 'C']
+    singleTests.forEach((test) => {
+      expect(groups).toContain(test)
+    })
+
+    // Two tests (both positive)
+    const twoTests = ['AB', 'BC', 'AC']
+    twoTests.forEach((test) => {
+      expect(groups).toContain(test)
+    })
+
+    // Two tests (one negative)
+    const twoTestsNegated = ['A!B', 'A!C', 'B!A', 'B!C', 'C!A', 'C!B']
+    twoTestsNegated.forEach((test) => {
+      expect(groups).toContain(test)
+    })
+
+    // Three tests (all positive)
+    expect(groups).toContain('ABC')
+
+    // Three tests (one negative)
+    const threeTestsNegated = ['AB!C', 'AC!B', 'BC!A']
+    threeTestsNegated.forEach((test) => {
+      expect(groups).toContain(test)
+    })
+
+    // Three tests (two negative)
+    const threeTestsTwoNegated = ['A!B!C', 'B!A!C', 'C!A!B']
+    threeTestsTwoNegated.forEach((test) => {
+      expect(groups).toContain(test)
+    })
+
+    // Verify we have the expected number of combinations
+    // 3 single + 3 double positive + 6 double negative + 1 triple positive + 3 triple one negative + 3 triple two negative
+    expect(groups.length).toBe(19)
   })
 })
