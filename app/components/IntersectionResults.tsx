@@ -54,7 +54,10 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
                   <td
                     className="px-4 py-2 whitespace-nowrap text-left"
                     style={{
-                      paddingLeft: `${getIndentFromKey(key) * 2}em`,
+                      paddingLeft: `${Math.max(
+                        getIndentFromKey(key) * 2,
+                        0.5
+                      )}em`,
                     }}
                   >
                     {toDisplayLabelFromKey(label)}
