@@ -30,7 +30,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
   return (
     <div className="mt-8 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
       <h3 className="text-xl font-semibold text-gray-800 mb-4">
-        Multi-Layered Audit Results
+        Intersection Results
       </h3>
       <div className="overflow-x-auto mb-8">
         <table className="min-w-full text-sm text-center">
