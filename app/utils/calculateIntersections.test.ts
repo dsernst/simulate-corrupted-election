@@ -87,3 +87,90 @@ describe('calculateLayeredStats', () => {
     expect(get('C & not B & not A')?.tested).toBe(1) // vote 6
   })
 })
+
+describe('calculateLayeredStats - overlap scenarios', () => {
+  test('all B tests are also A tests (full overlap)', () => {
+    // 400 A, 400 B, all on same votes
+    const votes = Array.from({ length: 400 }, (_, i) => ({
+      id: i + 1,
+      c: false,
+      r: true,
+    }))
+    const testRuns: TestRun[] = [makeTestRun({ A: votes, B: votes })]
+    const stats = calculateLayeredStats(testRuns)
+    const get = (label: string) => stats.find((g) => g.label === label)
+    expect(get('A')?.tested).toBe(400)
+    expect(get('B')?.tested).toBe(400)
+    expect(get('B & A')?.tested).toBe(400)
+    expect(get('B & not A')?.tested).toBe(0)
+  })
+
+  test('no overlap between A and B', () => {
+    // 400 A (1-400), 400 B (401-800)
+    const votesA = Array.from({ length: 400 }, (_, i) => ({
+      id: i + 1,
+      c: false,
+      r: true,
+    }))
+    const votesB = Array.from({ length: 400 }, (_, i) => ({
+      id: i + 401,
+      c: false,
+      r: true,
+    }))
+    const testRuns: TestRun[] = [makeTestRun({ A: votesA, B: votesB })]
+    const stats = calculateLayeredStats(testRuns)
+    const get = (label: string) => stats.find((g) => g.label === label)
+    expect(get('A')?.tested).toBe(400)
+    expect(get('B')?.tested).toBe(400)
+    expect(get('B & A')?.tested).toBe(0)
+    expect(get('B & not A')?.tested).toBe(400)
+  })
+
+  test('partial overlap between A and B', () => {
+    // 400 A (1-400), 400 B (201-600)
+    const votesA = Array.from({ length: 400 }, (_, i) => ({
+      id: i + 1,
+      c: false,
+      r: true,
+    }))
+    const votesB = Array.from({ length: 400 }, (_, i) => ({
+      id: i + 201,
+      c: false,
+      r: true,
+    }))
+    const testRuns: TestRun[] = [makeTestRun({ A: votesA, B: votesB })]
+    const stats = calculateLayeredStats(testRuns)
+    const get = (label: string) => stats.find((g) => g.label === label)
+    expect(get('A')?.tested).toBe(400)
+    expect(get('B')?.tested).toBe(400)
+    expect(get('B & A')?.tested).toBe(200) // 201-400
+    expect(get('B & not A')?.tested).toBe(200) // 401-600
+  })
+
+  test('B tests much more numerous than A, with some overlap', () => {
+    // 400 A (1-400), 1194 B (201-1394)
+    const votesA = Array.from({ length: 400 }, (_, i) => ({
+      id: i + 1,
+      c: false,
+      r: true,
+    }))
+    const votesB = Array.from({ length: 1194 }, (_, i) => ({
+      id: i + 201,
+      c: false,
+      r: true,
+    }))
+    const testRuns: TestRun[] = [makeTestRun({ A: votesA, B: votesB })]
+    const stats = calculateLayeredStats(testRuns)
+    const get = (label: string) => stats.find((g) => g.label === label)
+    expect(get('A')?.tested).toBe(400)
+    expect(get('B')?.tested).toBe(1194)
+    // Overlap is 201-400 (200 votes)
+    expect(get('B & A')?.tested).toBe(200)
+    // Not A is 401-1394 (994 votes)
+    expect(get('B & not A')?.tested).toBe(994)
+    // Sum should equal total B
+    expect((get('B & A')?.tested ?? 0) + (get('B & not A')?.tested ?? 0)).toBe(
+      1194
+    )
+  })
+})
