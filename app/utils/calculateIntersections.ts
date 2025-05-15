@@ -37,6 +37,7 @@ export interface LayeredStat {
   percentCompromised: number
   indentLevel?: number
   bias?: string
+  signatures: Record<string, number>
 }
 
 export const TEST_TYPES: TestType[] = ['A', 'B', 'C']
@@ -273,98 +274,99 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
     return d === 0 ? 0 : Math.round((n / d) * 1000) / 10
   }
 
-  // Define all groups
+  // Define all groups with canonical keys
   const groups: {
-    label: string
+    key: string
     indentLevel: number
+    tests: ('A' | 'B' | 'C')[]
     filter: (v: VoteResult) => boolean
-    test: 'A' | 'B' | 'C' | null
   }[] = [
     // Individual
     {
-      label: 'A',
+      key: 'A',
       indentLevel: 0,
-      filter: (v) => v.testedA === true,
-      test: 'A',
+      tests: ['A'],
+      filter: (v) => !!v.testedA,
     },
     {
-      label: 'B',
+      key: 'B',
       indentLevel: 0,
-      filter: (v) => v.testedB === true,
-      test: 'B',
+      tests: ['B'],
+      filter: (v) => !!v.testedB,
     },
     {
-      label: 'C',
+      key: 'C',
       indentLevel: 0,
-      filter: (v) => v.testedC === true,
-      test: 'C',
+      tests: ['C'],
+      filter: (v) => !!v.testedC,
     },
     // Overlaps
     {
-      label: 'B & A',
+      key: 'AB',
       indentLevel: 1,
-      filter: (v) => v.testedB === true && v.testedA === true,
-      test: 'B',
+      tests: ['A', 'B'],
+      filter: (v) => !!v.testedA && !!v.testedB,
     },
     {
-      label: 'B & not A',
+      key: 'B!A',
       indentLevel: 1,
-      filter: (v) => v.testedB === true && v.testedA !== true,
-      test: 'B',
+      tests: ['B'],
+      filter: (v) => !!v.testedB && !v.testedA,
     },
     {
-      label: 'C & B',
+      key: 'BC',
       indentLevel: 1,
-      filter: (v) => v.testedC === true && v.testedB === true,
-      test: 'C',
+      tests: ['B', 'C'],
+      filter: (v) => !!v.testedB && !!v.testedC,
     },
     {
-      label: 'C & B & A',
+      key: 'ABC',
       indentLevel: 2,
-      filter: (v) =>
-        v.testedC === true && v.testedB === true && v.testedA === true,
-      test: 'C',
+      tests: ['A', 'B', 'C'],
+      filter: (v) => !!v.testedA && !!v.testedB && !!v.testedC,
     },
     {
-      label: 'C & B & not A',
+      key: 'BC!A',
       indentLevel: 2,
-      filter: (v) =>
-        v.testedC === true && v.testedB === true && v.testedA !== true,
-      test: 'C',
+      tests: ['B', 'C'],
+      filter: (v) => !!v.testedB && !!v.testedC && !v.testedA,
     },
     {
-      label: 'C & not B',
+      key: 'C!B',
       indentLevel: 1,
-      filter: (v) => v.testedC === true && v.testedB !== true,
-      test: 'C',
+      tests: ['C'],
+      filter: (v) => !!v.testedC && !v.testedB,
     },
     {
-      label: 'C & not B & A',
+      key: 'AC!B',
       indentLevel: 2,
-      filter: (v) =>
-        v.testedC === true && v.testedB !== true && v.testedA === true,
-      test: 'C',
+      tests: ['A', 'C'],
+      filter: (v) => !!v.testedA && !!v.testedC && !v.testedB,
     },
     {
-      label: 'C & not B & not A',
+      key: 'C!A!B',
       indentLevel: 2,
-      filter: (v) =>
-        v.testedC === true && v.testedB !== true && v.testedA !== true,
-      test: 'C',
+      tests: ['C'],
+      filter: (v) => !!v.testedC && !v.testedA && !v.testedB,
     },
   ]
 
   // Calculate stats for each group
-  return groups.map(({ label, indentLevel, filter, test }) => {
+  return groups.map(({ key, indentLevel, tests, filter }) => {
     const votes = filterVotes(filter)
     const tested = votes.length
-    const compromised = test && tested > 0 ? countCompromised(votes, test) : 0
+    // For single-test groups, compromised is just that test; for intersections, you can use signatures for breakdown
+    const compromised =
+      tests.length === 1 ? countCompromised(votes, tests[0]) : 0
+    const signatures = countCompromisedSignatures(votes, tests)
     return {
-      label,
+      key,
+      label: key, // For now, label is the canonical key; UI can prettify
       tested,
       compromised,
       percentCompromised: percent(compromised, tested),
       indentLevel,
+      signatures,
     }
   })
 }

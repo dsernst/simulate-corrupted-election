@@ -22,7 +22,10 @@ function makeTestResult(
 
 let id = 0
 
-// Helper to create a TestRun
+/**  Helper to create a TestRun
+ * c = compromised (actual)
+ * r = result (detected)
+ */
 function makeTestRun(run: {
   A?: { id: number; c: boolean; r: boolean }[]
   B?: { id: number; c: boolean; r: boolean }[]
@@ -55,8 +58,8 @@ describe('calculateLayeredStats', () => {
 
     expect(get('A')?.tested).toBe(2)
     expect(get('B')?.tested).toBe(2)
-    expect(get('B & A')?.tested).toBe(1)
-    expect(get('B & not A')?.tested).toBe(1)
+    expect(get('AB')?.tested).toBe(1)
+    expect(get('B!A')?.tested).toBe(1)
   })
 
   test('correctly groups votes for all A/B/C combinations', () => {
@@ -80,14 +83,14 @@ describe('calculateLayeredStats', () => {
     expect(get('A')?.tested).toBe(3) // votes 1,2,4
     expect(get('B')?.tested).toBe(4) // votes 1,2,3,5
     expect(get('C')?.tested).toBe(3) // votes 1,3,6
-    expect(get('B & A')?.tested).toBe(2) // votes 1,2
-    expect(get('B & not A')?.tested).toBe(2) // votes 3,5
-    expect(get('C & B')?.tested).toBe(2) // votes 1,3
-    expect(get('C & B & A')?.tested).toBe(1) // vote 1
-    expect(get('C & B & not A')?.tested).toBe(1) // vote 3
-    expect(get('C & not B')?.tested).toBe(1) // vote 6
-    expect(get('C & not B & A')?.tested).toBe(0) // none
-    expect(get('C & not B & not A')?.tested).toBe(1) // vote 6
+    expect(get('AB')?.tested).toBe(2) // votes 1,2
+    expect(get('B!A')?.tested).toBe(2) // votes 3,5
+    expect(get('BC')?.tested).toBe(2) // votes 1,3
+    expect(get('ABC')?.tested).toBe(1) // vote 1
+    expect(get('BC!A')?.tested).toBe(1) // vote 3
+    expect(get('C!B')?.tested).toBe(1) // vote 6
+    expect(get('AC!B')?.tested).toBe(0) // none
+    expect(get('C!A!B')?.tested).toBe(1) // vote 6
   })
 })
 
@@ -104,8 +107,8 @@ describe('calculateLayeredStats - overlap scenarios', () => {
     const get = (label: string) => stats.find((g) => g.label === label)
     expect(get('A')?.tested).toBe(400)
     expect(get('B')?.tested).toBe(400)
-    expect(get('B & A')?.tested).toBe(400)
-    expect(get('B & not A')?.tested).toBe(0)
+    expect(get('AB')?.tested).toBe(400)
+    expect(get('B!A')?.tested).toBe(0)
   })
 
   test('no overlap between A and B', () => {
@@ -125,8 +128,8 @@ describe('calculateLayeredStats - overlap scenarios', () => {
     const get = (label: string) => stats.find((g) => g.label === label)
     expect(get('A')?.tested).toBe(400)
     expect(get('B')?.tested).toBe(400)
-    expect(get('B & A')?.tested).toBe(0)
-    expect(get('B & not A')?.tested).toBe(400)
+    expect(get('AB')?.tested).toBe(0)
+    expect(get('B!A')?.tested).toBe(400)
   })
 
   test('partial overlap between A and B', () => {
@@ -146,8 +149,8 @@ describe('calculateLayeredStats - overlap scenarios', () => {
     const get = (label: string) => stats.find((g) => g.label === label)
     expect(get('A')?.tested).toBe(400)
     expect(get('B')?.tested).toBe(400)
-    expect(get('B & A')?.tested).toBe(200) // 201-400
-    expect(get('B & not A')?.tested).toBe(200) // 401-600
+    expect(get('AB')?.tested).toBe(200) // 201-400
+    expect(get('B!A')?.tested).toBe(200) // 401-600
   })
 
   test('B tests much more numerous than A, with some overlap', () => {
@@ -168,13 +171,11 @@ describe('calculateLayeredStats - overlap scenarios', () => {
     expect(get('A')?.tested).toBe(400)
     expect(get('B')?.tested).toBe(1194)
     // Overlap is 201-400 (200 votes)
-    expect(get('B & A')?.tested).toBe(200)
+    expect(get('AB')?.tested).toBe(200)
     // Not A is 401-1394 (994 votes)
-    expect(get('B & not A')?.tested).toBe(994)
+    expect(get('B!A')?.tested).toBe(994)
     // Sum should equal total B
-    expect((get('B & A')?.tested ?? 0) + (get('B & not A')?.tested ?? 0)).toBe(
-      1194
-    )
+    expect((get('AB')?.tested ?? 0) + (get('B!A')?.tested ?? 0)).toBe(1194)
   })
 })
 
@@ -233,9 +234,7 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     // The number of unique votes tested by B should be 1194 + 100 = 1294
     expect(get('B')?.tested).toBe(1294)
     // The sum of B & A and B & not A should equal total unique B
-    expect((get('B & A')?.tested ?? 0) + (get('B & not A')?.tested ?? 0)).toBe(
-      1294
-    )
+    expect((get('AB')?.tested ?? 0) + (get('B!A')?.tested ?? 0)).toBe(1294)
   })
 
   test('accumulates unique tested votes for A across multiple test runs (A=1000, then A=500)', () => {
