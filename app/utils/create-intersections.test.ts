@@ -126,9 +126,9 @@ describe('generateIntersectionGroups', () => {
     expect(groups.length).toBe(19)
   })
 
+  const getIndex = (name: string) => groups.indexOf(name)
   test('orders all-positive before negative for two-test and three-test groups', () => {
     // Helper to get indices for group names
-    const getIndex = (name: string) => groups.indexOf(name)
 
     // Two-test groups
     const twoPositives = ['AB', 'AC', 'BC'].map(getIndex)
@@ -148,5 +148,15 @@ describe('generateIntersectionGroups', () => {
       'C!A!B',
     ].map(getIndex)
     expect(threePositive).toBeLessThan(Math.min(...threeNegatives))
+  })
+
+  test('orders negatives alphabetically', () => {
+    // Expected order for two test negations
+    expect(getIndex('A!B')).toBeLessThan(getIndex('B!A'))
+    expect(getIndex('A!C')).toBeLessThan(getIndex('C!A'))
+    expect(getIndex('B!C')).toBeLessThan(getIndex('C!B'))
+
+    // And for three-test groups
+    expect(getIndex('B!A!C')).toBeLessThan(getIndex('C!A!B'))
   })
 })
