@@ -85,9 +85,9 @@ describe('intersection groups', () => {
 })
 
 describe('generateIntersectionGroups', () => {
-  test('generates all expected combinations', () => {
-    const groups = generateIntersectingGroups(['A', 'B', 'C'] as TestType[])
+  const groups = generateIntersectingGroups(['A', 'B', 'C'] as TestType[])
 
+  test('generates all expected combinations', () => {
     // Single tests
     const singleTests = ['A', 'B', 'C']
     singleTests.forEach((test) => {
@@ -124,5 +124,29 @@ describe('generateIntersectionGroups', () => {
     // Verify we have the expected number of combinations
     // 3 single + 3 double positive + 6 double negative + 1 triple positive + 3 triple one negative + 3 triple two negative
     expect(groups.length).toBe(19)
+  })
+
+  test('orders all-positive before negative for two-test and three-test groups', () => {
+    // Helper to get indices for group names
+    const getIndex = (name: string) => groups.indexOf(name)
+
+    // Two-test groups
+    const twoPositives = ['AB', 'AC', 'BC'].map(getIndex)
+    const twoNegatives = ['A!B', 'A!C', 'B!A', 'B!C', 'C!A', 'C!B'].map(
+      getIndex
+    )
+    expect(Math.max(...twoPositives)).toBeLessThan(Math.min(...twoNegatives))
+
+    // Three-test groups
+    const threePositive = getIndex('ABC')
+    const threeNegatives = [
+      'AB!C',
+      'AC!B',
+      'BC!A',
+      'A!B!C',
+      'B!A!C',
+      'C!A!B',
+    ].map(getIndex)
+    expect(threePositive).toBeLessThan(Math.min(...threeNegatives))
   })
 })
