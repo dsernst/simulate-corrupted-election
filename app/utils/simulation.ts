@@ -165,17 +165,37 @@ export function calculateTestResults(
   const globalVoteMap = voteMap ?? new Map<number, VoteTestResult>()
 
   // For each test type, run tests on unique, randomly selected votes
+  //
   function runUniqueTests(
     testType: 'A' | 'B' | 'C',
     count: number,
     effectivenessRates: TestEffectivenessRates
   ) {
-    let tested = 0
-    let attempts = 0
-    const maxAttempts = totalVotes * 10 // Prevent infinite loop in pathological cases
-    while (tested < count && attempts < maxAttempts) {
-      attempts++
-      const voteId = Math.floor(mt.random() * totalVotes)
+    // We efficiently sample unique votes without replacement
+    // by (1) building an array of all eligible vote IDs, (2) shuffling, and (3) taking the first N
+    // This is efficient (O(N)), robust, and avoids infinite loops or off-by-one errors
+
+    // First, build an `eligible` array of all vote IDs that have NOT been tested by this type
+    const eligible: number[] = []
+    for (let i = 0; i < totalVotes; i++) {
+      const voteResult = globalVoteMap.get(i)
+      if (
+        !voteResult ||
+        voteResult.testResults[`test${testType}`] === undefined
+      ) {
+        eligible.push(i)
+      }
+    }
+
+    // Shuffle eligible vote IDs using Fisher-Yates and the provided PRNG
+    for (let i = eligible.length - 1; i > 0; i--) {
+      const j = Math.floor(mt.random() * (i + 1))
+      ;[eligible[i], eligible[j]] = [eligible[j], eligible[i]]
+    }
+    // Take up to 'count' unique votes
+    const samples = Math.min(count, eligible.length)
+    for (let k = 0; k < samples; k++) {
+      const voteId = eligible[k]
       let voteResult = globalVoteMap.get(voteId)
       if (!voteResult) {
         const isActuallyCompromised = sampleVote(
@@ -190,9 +210,6 @@ export function calculateTestResults(
         }
         globalVoteMap.set(voteId, voteResult)
       }
-      if (voteResult.testResults[`test${testType}`] !== undefined) {
-        continue // Already tested by this type
-      }
       const isDetectedCompromised = runTest(
         effectivenessRates,
         voteResult.isActuallyCompromised,
@@ -203,7 +220,6 @@ export function calculateTestResults(
       if (isDetectedCompromised)
         testBreakdown[`test${testType}`].detectedCompromised++
       testBreakdown[`test${testType}`].voteResults.push(voteResult)
-      tested++
     }
   }
 

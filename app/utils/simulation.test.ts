@@ -228,12 +228,12 @@ describe('calculateTestResults', () => {
     // Test with no compromised votes
     const result1 = calculateTestResults(testCounts, 0, 10000, mt)
     // With falseCompromisedRate of 0.1 for testA, expect roughly 10% false positives
-    expect(result1.testBreakdown.testA.detectedCompromised).toBe(12) // Deterministic because of seed
+    expect(result1.testBreakdown.testA.detectedCompromised).toBe(1) // Deterministic because of seed
 
     // Test with all votes compromised
     const result2 = calculateTestResults(testCounts, 10000, 10000, mt)
     // With falseCleanRate of 0.4 for testA, expect roughly 60% detection
-    expect(result2.testBreakdown.testA.detectedCompromised).toBe(67)
+    expect(result2.testBreakdown.testA.detectedCompromised).toBe(58)
 
     // Test C should be perfect (no false positives/negatives)
     expect(result1.testBreakdown.testC.detectedCompromised).toBe(0) // No false positives
