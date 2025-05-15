@@ -1,6 +1,6 @@
 import { Button } from './Button'
 import { SimulationResults } from '../utils/simulation'
-import { IoChevronDown, IoChevronUp } from 'react-icons/io5'
+import { IoChevronDown, IoChevronUp, IoDiceOutline } from 'react-icons/io5'
 
 export const RevealStartOverLine = ({
   showCompromised,
@@ -77,11 +77,16 @@ export const RevealStartOverLine = ({
               className="absolute right-0 top-12 bg-white border border-gray-200 rounded shadow-md flex gap-2 items-center px-3 py-2 z-10"
               style={{ minWidth: 0 }}
             >
+              <IoDiceOutline
+                size={18}
+                className="absolute left-5 text-purple-500"
+              />
+
               <input
                 type="number"
                 name="seed"
                 defaultValue={seed}
-                className="px-3 py-2 border rounded text-sm w-28"
+                className="pl-8 px-3 py-2 border border-gray-400 rounded text-sm w-32"
                 placeholder="Enter seed"
               />
               <Button
