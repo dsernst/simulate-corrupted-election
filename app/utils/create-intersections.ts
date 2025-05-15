@@ -2,7 +2,6 @@ import { TestType, VoteResult } from './calculateIntersections'
 
 export interface Group {
   key: string
-  filter: (v: VoteResult) => boolean
 }
 
 /** Derive tests from key: 'AB!C' -> ['A', 'B'] */
@@ -30,20 +29,14 @@ export function getFilterFromKey(key: string): (v: VoteResult) => boolean {
     excluded.every((t) => !v[`tested${t}`])
 }
 
-// Helper to create group objects
-export const createGroup = (key: string): Group => ({
-  key,
-  filter: getFilterFromKey(key),
-})
-
 // Define all groups with canonical keys
-export const intersectionGroups: Group[] = [
+export const intersectionGroups = [
   // Individual tests
-  ...(['A', 'B', 'C'] as const).map(createGroup),
+  ...['A', 'B', 'C'],
 
   // Two test combinations
-  ...['AB', 'B!A', 'BC', 'C!B'].map(createGroup),
+  ...['AB', 'B!A', 'BC', 'C!B'],
 
   // Three test combinations
-  ...['ABC', 'BC!A', 'AC!B', 'C!A!B'].map(createGroup),
+  ...['ABC', 'BC!A', 'AC!B', 'C!A!B'],
 ]

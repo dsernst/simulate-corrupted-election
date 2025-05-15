@@ -1,5 +1,9 @@
 import { TestDetectionResults } from './simulation'
-import { getTestsFromKey, intersectionGroups } from './create-intersections'
+import {
+  getFilterFromKey,
+  getTestsFromKey,
+  intersectionGroups,
+} from './create-intersections'
 
 export type TestType = 'A' | 'B' | 'C'
 
@@ -65,9 +69,11 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
   }
 
   // Calculate stats for each group
-  return intersectionGroups.map(({ key, filter }) => {
+  return intersectionGroups.map((key) => {
     // Filter votes by which tests were run on them
-    const votes = Array.from(voteMap.values()).filter((v) => !!v && filter(v))
+    const votes = Array.from(voteMap.values()).filter(
+      (v) => !!v && getFilterFromKey(key)(v)
+    )
 
     const tested = votes.length
     const tests = getTestsFromKey(key)
