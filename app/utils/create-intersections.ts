@@ -88,7 +88,7 @@ export function generateIntersectingGroups(tests: TestType[]): string[] {
   }
 
   const groups: string[] = []
-  // For each group size, add all-positives first, then all negatives
+  // For each group size, add all-positives first, then all negatives (sorted alphabetically)
   for (let i = 1; i <= tests.length; i++) {
     const combinations = generateCombinations(tests, i)
     // Collect all-positives
@@ -96,10 +96,13 @@ export function generateIntersectingGroups(tests: TestType[]): string[] {
     groups.push(...positives)
     // Collect all negatives (for i >= 2)
     if (i >= 2) {
+      const allNegations: string[] = []
       for (const combination of combinations) {
         const negations = generateNegations(combination)
-        groups.push(...negations)
+        allNegations.push(...negations)
       }
+      allNegations.sort() // Sort alphabetically
+      groups.push(...allNegations)
     }
   }
   return groups
