@@ -36,7 +36,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
         <table className="min-w-full text-sm text-center">
           <thead>
             <tr className="bg-gray-100 font-semibold text-gray-700">
-              <th className="px-4 py-2 text-left">Group</th>
+              <th className="px-4 py-2 text-left">Tested By</th>
               <th className="px-4 py-2">% Compromised</th>
               <th className="px-4 py-2"># Compromised</th>
               <th className="px-4 py-2"># Tested</th>
