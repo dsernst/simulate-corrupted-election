@@ -48,30 +48,31 @@ export const RevealStartOverLine = ({
             </p>
           </div>
         )}
-        <div className="flex items-center gap-2 relative">
+        <div className="flex items-center relative">
           <Button
             onClick={() => onStartOver()}
             variant="outline"
-            className="text-sm py-2 px-4"
+            className="text-sm py-2 px-4 rounded-r-none pr-3"
           >
             ♻️ Start Over
           </Button>
-          <button
+          <Button
             onClick={onToggleSeedInput}
-            className="p-1 hover:bg-gray-100 rounded cursor-pointer"
+            variant="outline"
+            className="!py-3.5 !px-1 !ml-0 rounded-l-none relative right-0.5"
             aria-label={showSeedInput ? 'Hide seed input' : 'Show seed input'}
           >
             {showSeedInput ? (
-              <IoChevronUp size={20} />
+              <IoChevronUp size={16} />
             ) : (
-              <IoChevronDown size={20} />
+              <IoChevronDown size={16} />
             )}
-          </button>
+          </Button>
 
           {/* Seed input */}
           {showSeedInput && (
             <div
-              className="absolute right-3 top-12 bg-white border border-gray-200 rounded shadow-md flex gap-2 items-center px-3 py-2 z-10"
+              className="absolute -right-3 top-12 bg-white border border-gray-200 rounded shadow-md flex gap-2 items-center px-3 py-2 z-10"
               style={{ minWidth: 0 }}
             >
               <IoDiceOutline
