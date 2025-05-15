@@ -1,7 +1,19 @@
-import { TestRun, TEST_TYPES } from '../utils/calculateIntersections'
+import { TestRun, type TestType } from '../utils/calculateIntersections'
 import { TestResultCard } from './TestResultCard'
 import { IntersectionResults } from './IntersectionResults'
 
+export const TestHistory = ({ testRuns }: { testRuns: TestRun[] }) => {
+  return (
+    <div className="space-y-6">
+      {testRuns.map((run) => (
+        <TestRunDisplay key={run.id} run={run} />
+      ))}
+      <IntersectionResults testRuns={testRuns} />
+    </div>
+  )
+}
+
+const TEST_TYPES: TestType[] = ['A', 'B', 'C']
 const TestRunDisplay = ({ run }: { run: TestRun }) => (
   <div className="p-4 bg-blue-50 rounded-lg">
     <div className="flex justify-between items-center mb-2">
@@ -28,19 +40,3 @@ const TestRunDisplay = ({ run }: { run: TestRun }) => (
     </div>
   </div>
 )
-
-export const TestHistory = ({ testRuns }: { testRuns: TestRun[] }) => {
-  // const finalIntersections = useMemo(
-  //   () => calculateIntersections(testRuns),
-  //   [testRuns]
-  // )
-
-  return (
-    <div className="space-y-6">
-      {testRuns.map((run) => (
-        <TestRunDisplay key={run.id} run={run} />
-      ))}
-      <IntersectionResults testRuns={testRuns} />
-    </div>
-  )
-}
