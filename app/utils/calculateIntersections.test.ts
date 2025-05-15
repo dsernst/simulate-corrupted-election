@@ -267,4 +267,34 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     const get = (label: string) => stats.find((g) => g.label === label)
     expect(get('A')?.tested).toBe(1500)
   })
+
+  test('correctly aggregates unique tested votes for A across independent runs (UI-style, no shared voteMap)', () => {
+    const seed = 389518
+    const totalVotes = 2000
+    const compromisedVotes = 500
+    // First test run: A=1000, B=2000
+    const mt1 = new MT19937(seed)
+    const results1 = calculateTestResults(
+      { testA: '1000', testB: '2000', testC: '0' },
+      compromisedVotes,
+      totalVotes,
+      mt1
+    )
+    // Second test run: A=500
+    const mt2 = new MT19937(seed + 1) // Use a different PRNG state for realism
+    const results2 = calculateTestResults(
+      { testA: '500', testB: '0', testC: '0' },
+      compromisedVotes,
+      totalVotes,
+      mt2
+    )
+    // Pass both runs to calculateLayeredStats
+    const testRuns = [
+      { id: 1, results: results1, timestamp: new Date() },
+      { id: 2, results: results2, timestamp: new Date() },
+    ]
+    const stats = calculateLayeredStats(testRuns)
+    const get = (label: string) => stats.find((g) => g.label === label)
+    expect(get('A')?.tested).toBe(1500)
+  })
 })
