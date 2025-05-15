@@ -236,4 +236,35 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
       1294
     )
   })
+
+  test('accumulates unique tested votes for A across multiple test runs (A=1000, then A=500)', () => {
+    const totalVotes = 2000
+    const compromisedVotes = 500
+    const mt = new MT19937(389518)
+    const globalVoteMap = new Map()
+    // First test run: A=1000
+    const resultsA1 = calculateTestResults(
+      { testA: '1000', testB: '0', testC: '0' },
+      compromisedVotes,
+      totalVotes,
+      mt,
+      globalVoteMap
+    )
+    // Second test run: A=500 (A again)
+    const resultsA2 = calculateTestResults(
+      { testA: '500', testB: '0', testC: '0' },
+      compromisedVotes,
+      totalVotes,
+      mt,
+      globalVoteMap
+    )
+    // Pass both runs to calculateLayeredStats
+    const testRuns = [
+      { id: 1, results: resultsA1, timestamp: new Date() },
+      { id: 2, results: resultsA2, timestamp: new Date() },
+    ]
+    const stats = calculateLayeredStats(testRuns)
+    const get = (label: string) => stats.find((g) => g.label === label)
+    expect(get('A')?.tested).toBe(1500)
+  })
 })
