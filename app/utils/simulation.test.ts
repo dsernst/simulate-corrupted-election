@@ -271,4 +271,34 @@ describe('calculateTestResults', () => {
       }
     }
   })
+
+  it('should accumulate tested votes for repeated test sets (A=1000, then A=500)', () => {
+    const seed = 389518
+    const mt = new MT19937(seed)
+    // Simulate a realistic election
+    const sim = generateSimulation(seed)
+    // First test set: A=1000, B=2000
+    const voteMap = new Map()
+    calculateTestResults(
+      { testA: '1000', testB: '2000', testC: '0' },
+      sim.compromisedVotes,
+      sim.totalVotes,
+      mt,
+      voteMap
+    )
+    // Second test set: A=500 (A again)
+    calculateTestResults(
+      { testA: '500', testB: '0', testC: '0' },
+      sim.compromisedVotes,
+      sim.totalVotes,
+      mt,
+      voteMap
+    )
+    // Now count how many unique votes have been tested by A
+    let testedA = 0
+    for (const v of voteMap.values()) {
+      if (v.testResults.testA !== undefined) testedA++
+    }
+    expect(testedA).toBe(1500)
+  })
 })
