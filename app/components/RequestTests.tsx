@@ -1,5 +1,6 @@
 import { NumberInput } from './NumberInput'
 import { Button } from './Button'
+import { calculateTotalCost, formatCost } from '../utils/costCalculation'
 
 export interface TestResults {
   testA: string
@@ -46,6 +47,8 @@ export function RequestTests({
     (value) => parseInt(value) > 0
   )
 
+  const totalCost = calculateTotalCost(testResults)
+
   const handleSubmit = () => {
     if (hasValidTests) onSubmit()
   }
@@ -75,7 +78,11 @@ export function RequestTests({
             </div>
           ))}
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center">
+          <div className="text-sm text-gray-600">
+            Total Cost:{' '}
+            <span className="font-semibold">{formatCost(totalCost)}</span>
+          </div>
           <Button
             onClick={handleSubmit}
             className="px-6"
