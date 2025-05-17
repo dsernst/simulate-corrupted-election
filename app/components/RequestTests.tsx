@@ -16,6 +16,7 @@ interface RequestTestsProps {
   testResults: TestResults
   onTestResultsChange: (results: TestResults) => void
   onSubmit: () => void
+  totalVotes: number
 }
 
 const TESTS = [
@@ -49,6 +50,7 @@ export function RequestTests({
   testResults,
   onTestResultsChange,
   onSubmit,
+  totalVotes,
 }: RequestTestsProps) {
   const hasValidTests = Object.values(testResults).some(
     (value) => parseInt(value) > 0
@@ -62,7 +64,12 @@ export function RequestTests({
 
   return (
     <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-      <h3 className="text-lg font-semibold mb-4">Request Tests</h3>
+      <h3 className="text-lg font-semibold mb-4">
+        Request Tests{' '}
+        <span className="text-gray-500 text-xs ml-2 font-normal">
+          (Total Votes: {totalVotes.toLocaleString()})
+        </span>
+      </h3>
       <div className="space-y-4">
         <div className="grid grid-cols-3 gap-4">
           {TESTS.map(({ key, label, subtitle, description, cost }, index) => (

@@ -62,6 +62,7 @@ export function SimulationResultsDisplay({
             {/* Test Request Form */}
             <RequestTests
               testResults={testResults}
+              totalVotes={results.totalVotes}
               onTestResultsChange={onTestResultsChange}
               onSubmit={onRunTests}
             />
