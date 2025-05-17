@@ -110,3 +110,51 @@ describe('Even test distribution', () => {
     expect(Math.abs(onlyC - expectedPerQuadrant)).toBeLessThanOrEqual(tolerance)
   })
 })
+
+describe('C test distribution edge cases', () => {
+  test('should not throw or hang when testC is not divisible by 4', () => {
+    const mt = new MT19937(42)
+    const compromisedVotes = 100
+    const totalVotes = 1000
+    // Try a range of C test counts not divisible by 4
+    for (let c = 1; c <= 20; c++) {
+      const testCounts = { testA: '10', testB: '10', testC: String(c) }
+      expect(() => {
+        const result = calculateTestResults(
+          testCounts,
+          compromisedVotes,
+          totalVotes,
+          mt
+        )
+        // The total number of C tests should match the request or be capped by available votes
+        expect(result.testBreakdown.testC.count).toBeLessThanOrEqual(c)
+      }).not.toThrow()
+    }
+  })
+
+  test('should distribute all C tests even if not divisible by 4', () => {
+    const mt = new MT19937(123)
+    const compromisedVotes = 50
+    const totalVotes = 100
+    const testCounts = { testA: '30', testB: '30', testC: '19' }
+    const result = calculateTestResults(
+      testCounts,
+      compromisedVotes,
+      totalVotes,
+      mt
+    )
+
+    // Get the intersection counts for C tests
+    // const testRuns = [{ id: 1, results: result, timestamp: new Date() }]
+    // const stats = calculateLayeredStats(testRuns)
+    // const get = (label: string) => stats.find((g) => g.label === label)
+    // const allThree = get('ABC')?.tested ?? 0
+    // const aAndC = get('AC!B')?.tested ?? 0
+    // const bAndC = get('BC!A')?.tested ?? 0
+    // const onlyC = get('C!A!B')?.tested ?? 0
+    // console.log({ allThree, aAndC, bAndC, onlyC })
+
+    // Should not hang and should assign all 7 C tests
+    expect(result.testBreakdown.testC.count).toBe(19)
+  })
+})
