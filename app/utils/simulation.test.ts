@@ -277,7 +277,11 @@ describe('calculateTestResults', () => {
     const seed = 389518
     const mt = new MT19937(seed)
     // Simulate a realistic election
-    const sim = generateSimulation(seed)
+    const sim = {
+      ...generateSimulation(seed),
+      totalVotes: 2000,
+      compromisedVotes: 500,
+    }
     // First test set: A=1000, B=2000
     const voteMap = new Map()
     calculateTestResults(
