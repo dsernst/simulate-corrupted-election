@@ -15,7 +15,7 @@ describe('costCalculation', () => {
     }
 
     const totalCost = calculateTotalCost(testCounts)
-    expect(totalCost).toBe(400) // $100 + $100 + $200 = $400
+    expect(totalCost).toBe(430)
   })
 
   test('calculates total cost with custom costs', () => {
@@ -67,7 +67,7 @@ describe('costCalculation', () => {
     }
 
     const runCost = calculateTestRunCost(testRun)
-    expect(runCost).toBe(400) // $100 + $100 + $200 = $400
+    expect(runCost).toBe(430)
   })
 
   test('calculates cost of a test run with custom costs', () => {
@@ -112,7 +112,7 @@ describe('costCalculation', () => {
     ]
 
     const totalCost = calculateTotalTestRunsCost(testRuns)
-    expect(totalCost).toBe(600) // ($100 + $100 + $200) + ($50 + $50 + $100) = $600
+    expect(totalCost).toBe(645)
   })
 
   test('calculates total cost of all test runs with custom costs', () => {
