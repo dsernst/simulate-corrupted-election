@@ -89,12 +89,12 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
       </h3>
       <div className="grid grid-cols-1 gap-8 mb-8">
         {confusionMatrices.map(({ first, second, matrix }) => (
-          <ConfusionMatrix
+          <div
+            className="overflow-x-auto max-w-full"
             key={`${first}-${second}`}
-            first={first}
-            second={second}
-            matrix={matrix}
-          />
+          >
+            <ConfusionMatrix first={first} second={second} matrix={matrix} />
+          </div>
         ))}
       </div>
     </div>
