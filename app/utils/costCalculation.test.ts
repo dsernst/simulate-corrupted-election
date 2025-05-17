@@ -32,7 +32,7 @@ describe('costCalculation', () => {
     }
 
     const totalCost = calculateTotalCost(testCounts, customCosts)
-    expect(totalCost).toBe(1030) // (1000 * $0.03) + (100 * $2.00) + (10 * $50.00) = $1,030
+    expect(totalCost).toBe(730) // (1000 * $0.03) + (100 * $2.00) + (10 * $50.00) = $730
   })
 
   test('handles empty or invalid test counts', () => {
@@ -86,7 +86,7 @@ describe('costCalculation', () => {
     }
 
     const runCost = calculateTestRunCost(testRun, customCosts)
-    expect(runCost).toBe(1030) // (1000 * $0.03) + (100 * $2.00) + (10 * $50.00) = $1,030
+    expect(runCost).toBe(730) // (1000 * $0.03) + (100 * $2.00) + (10 * $50.00) = $730
   })
 
   test('calculates total cost of all test runs', () => {
@@ -144,6 +144,6 @@ describe('costCalculation', () => {
     }
 
     const totalCost = calculateTotalTestRunsCost(testRuns, customCosts)
-    expect(totalCost).toBe(1545) // ($30 + $200 + $500) + ($15 + $100 + $250) = $1,545
+    expect(totalCost).toBe(1095) // ($30 + $200 + $500) + ($15 + $100 + $250) = $1,095
   })
 })
