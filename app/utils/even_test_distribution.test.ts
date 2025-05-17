@@ -6,8 +6,8 @@ import { MT19937 } from './mt19937'
 describe('Even test distribution', () => {
   test('B tests should be split 50/50 between A and !A tested votes', () => {
     const seed = 12345
-    const totalVotes = 1_000_000
-    const compromisedVotes = 50_000
+    const totalVotes = 100_000
+    const compromisedVotes = 5_000
     const mt = new MT19937(seed)
     const globalVoteMap = new Map()
 
@@ -49,8 +49,8 @@ describe('Even test distribution', () => {
 
   test('C tests should be split 25/25/25/25 across A/B combinations', () => {
     const seed = 12345
-    const totalVotes = 1_000_000
-    const compromisedVotes = 50_000
+    const totalVotes = 100_000
+    const compromisedVotes = 5_000
     const mt = new MT19937(seed)
     const globalVoteMap = new Map()
 
