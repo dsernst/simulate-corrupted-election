@@ -1,6 +1,10 @@
 import { NumberInput } from './NumberInput'
 import { Button } from './Button'
-import { calculateTotalCost, formatCost } from '../utils/costCalculation'
+import {
+  calculateTotalCost,
+  formatCost,
+  DEFAULT_TEST_COSTS,
+} from '../utils/costCalculation'
 
 export interface TestResults {
   testA: string
@@ -21,6 +25,7 @@ const TESTS = [
     subtitle: 'Voter Autonomous',
     description: 'Easiest, but least reliable',
     bias: 'High',
+    cost: DEFAULT_TEST_COSTS.testA,
   },
   {
     key: 'testB' as const,
@@ -28,6 +33,7 @@ const TESTS = [
     subtitle: 'Guided by Auditor',
     description: 'Medium cost & reliability',
     bias: 'Medium',
+    cost: DEFAULT_TEST_COSTS.testB,
   },
   {
     key: 'testC' as const,
@@ -35,6 +41,7 @@ const TESTS = [
     subtitle: 'Against In-person Paper',
     description: 'Highest cost, perfect accuracy',
     bias: 'Low',
+    cost: DEFAULT_TEST_COSTS.testC,
   },
 ] as const
 
@@ -58,11 +65,18 @@ export function RequestTests({
       <h3 className="text-lg font-semibold mb-4">Request Tests</h3>
       <div className="space-y-4">
         <div className="grid grid-cols-3 gap-4">
-          {TESTS.map(({ key, label, subtitle, description }, index) => (
+          {TESTS.map(({ key, label, subtitle, description, cost }, index) => (
             <div key={key}>
               <div className="mb-2">
                 <div className="text-xs text-gray-500">{subtitle}</div>
-                <div className="text-sm text-gray-600">{description}</div>
+                <div className="text-sm text-gray-600">
+                  {description}
+                  <div className="mt-2">
+                    <span className="border-2 border-green-600/40 p-1 text-gray-500 rounded-lg">
+                      {formatCost(cost)} / vote
+                    </span>
+                  </div>
+                </div>
               </div>
               <NumberInput
                 id={key}

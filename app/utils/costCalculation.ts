@@ -5,7 +5,7 @@ export interface TestCosts {
 }
 
 // Default cost function based on the example provided
-const DEFAULT_TEST_COSTS: TestCosts = {
+export const DEFAULT_TEST_COSTS: TestCosts = {
   testA: 0.1, // $0.10 per A test
   testB: 1.0, // $1.00 per B test
   testC: 20.0, // $20.00 per C test
