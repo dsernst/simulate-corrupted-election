@@ -28,7 +28,7 @@ export default function Home() {
   const [testRuns, setTestRuns] = useState<TestRun[]>([])
   const [nextRunId, setNextRunId] = useState(1)
 
-  const handleSimulate = (newSeed?: number) => {
+  const onStartOver = (newSeed?: number) => {
     const seedToUse = newSeed || getRandomSeed()
     setSeed(seedToUse)
     setSimulation(generateSimulation(seedToUse))
@@ -38,7 +38,7 @@ export default function Home() {
   }
 
   // Simulate an election when the page first loads
-  useEffect(() => handleSimulate(), [])
+  useEffect(() => onStartOver(), [])
 
   const handleRunTests = () => {
     if (!simulation) return
@@ -90,7 +90,7 @@ export default function Home() {
           results={simulation}
           showCompromised={showCompromised}
           onToggleCompromised={() => setShowCompromised(!showCompromised)}
-          onStartOver={() => handleSimulate()}
+          onStartOver={onStartOver}
           testResults={testResults}
           onTestResultsChange={setTestResults}
           onRunTests={handleRunTests}
