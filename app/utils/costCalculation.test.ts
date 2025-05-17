@@ -1,5 +1,10 @@
 import { describe, expect, test } from 'bun:test'
-import { calculateTotalCost, formatCost } from './costCalculation'
+import {
+  calculateTotalCost,
+  formatCost,
+  calculateTestRunCost,
+  calculateTotalTestRunsCost,
+} from './costCalculation'
 
 describe('costCalculation', () => {
   test('calculates total cost with default costs', () => {
@@ -50,5 +55,95 @@ describe('costCalculation', () => {
     expect(formatCost(1)).toBe('$1')
     expect(formatCost(1.5)).toBe('$1.50')
     expect(formatCost(1.05)).toBe('$1.05')
+  })
+
+  test('calculates cost of a test run', () => {
+    const testRun = {
+      testBreakdown: {
+        testA: { count: 1000 },
+        testB: { count: 100 },
+        testC: { count: 10 },
+      },
+    }
+
+    const runCost = calculateTestRunCost(testRun)
+    expect(runCost).toBe(400) // $100 + $100 + $200 = $400
+  })
+
+  test('calculates cost of a test run with custom costs', () => {
+    const testRun = {
+      testBreakdown: {
+        testA: { count: 1000 },
+        testB: { count: 100 },
+        testC: { count: 10 },
+      },
+    }
+
+    const customCosts = {
+      testA: 0.03, // $0.03 per A test
+      testB: 2.0, // $2.00 per B test
+      testC: 50.0, // $50.00 per C test
+    }
+
+    const runCost = calculateTestRunCost(testRun, customCosts)
+    expect(runCost).toBe(1030) // (1000 * $0.03) + (100 * $2.00) + (10 * $50.00) = $1,030
+  })
+
+  test('calculates total cost of all test runs', () => {
+    const testRuns = [
+      {
+        results: {
+          testBreakdown: {
+            testA: { count: 1000 },
+            testB: { count: 100 },
+            testC: { count: 10 },
+          },
+        },
+      },
+      {
+        results: {
+          testBreakdown: {
+            testA: { count: 500 },
+            testB: { count: 50 },
+            testC: { count: 5 },
+          },
+        },
+      },
+    ]
+
+    const totalCost = calculateTotalTestRunsCost(testRuns)
+    expect(totalCost).toBe(600) // ($100 + $100 + $200) + ($50 + $50 + $100) = $600
+  })
+
+  test('calculates total cost of all test runs with custom costs', () => {
+    const testRuns = [
+      {
+        results: {
+          testBreakdown: {
+            testA: { count: 1000 },
+            testB: { count: 100 },
+            testC: { count: 10 },
+          },
+        },
+      },
+      {
+        results: {
+          testBreakdown: {
+            testA: { count: 500 },
+            testB: { count: 50 },
+            testC: { count: 5 },
+          },
+        },
+      },
+    ]
+
+    const customCosts = {
+      testA: 0.03, // $0.03 per A test
+      testB: 2.0, // $2.00 per B test
+      testC: 50.0, // $50.00 per C test
+    }
+
+    const totalCost = calculateTotalTestRunsCost(testRuns, customCosts)
+    expect(totalCost).toBe(1545) // ($30 + $200 + $500) + ($15 + $100 + $250) = $1,545
   })
 })

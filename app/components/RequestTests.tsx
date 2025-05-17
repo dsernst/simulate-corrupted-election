@@ -94,7 +94,7 @@ export function RequestTests({
         </div>
         <div className="flex justify-between items-center">
           <div className="text-sm text-gray-600">
-            Total Cost:{' '}
+            Costs:{' '}
             <span className="font-semibold">{formatCost(totalCost)}</span>
           </div>
           <Button

@@ -39,6 +39,26 @@ export function calculateTotalCost(
 }
 
 /**
+ * Calculate the cost of a single test run
+ * @param testRun The test run results containing the number of tests run
+ * @param costs Optional custom costs per test type. If not provided, uses DEFAULT_TEST_COSTS
+ * @returns The cost of this test run
+ */
+export function calculateTestRunCost(
+  testRun: { testBreakdown: { [key: string]: { count: number } } },
+  costs: TestCosts = DEFAULT_TEST_COSTS
+): number {
+  let runCost = 0
+
+  for (const [testType, test] of Object.entries(testRun.testBreakdown)) {
+    const cost = costs[testType as keyof TestCosts]
+    runCost += test.count * cost
+  }
+
+  return runCost
+}
+
+/**
  * Format a cost as a currency string
  * @param cost The cost to format
  * @returns Formatted cost string (e.g. "$1,234" or "$1,234.56")
@@ -52,4 +72,24 @@ export function formatCost(cost: number): string {
     minimumFractionDigits: hasDecimals ? 2 : 0,
     maximumFractionDigits: 2,
   }).format(cost)
+}
+
+/**
+ * Calculate the total cost of all test runs
+ * @param testRuns Array of test runs
+ * @param costs Optional custom costs per test type. If not provided, uses DEFAULT_TEST_COSTS
+ * @returns The total cost of all test runs
+ */
+export function calculateTotalTestRunsCost(
+  testRuns: {
+    results: { testBreakdown: { [key: string]: { count: number } } }
+  }[],
+  costs: TestCosts = DEFAULT_TEST_COSTS
+): number {
+  return testRuns.reduce((total, run) => {
+    return (
+      total +
+      calculateTestRunCost({ testBreakdown: run.results.testBreakdown }, costs)
+    )
+  }, 0)
 }

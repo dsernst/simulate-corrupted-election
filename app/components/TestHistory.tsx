@@ -1,10 +1,25 @@
 import { TestRun, type TestType } from '../utils/calculateIntersections'
 import { TestResultCard } from './TestResultCard'
 import { IntersectionResults } from './IntersectionResults'
+import {
+  calculateTotalTestRunsCost,
+  formatCost,
+} from '../utils/costCalculation'
 
 export const TestHistory = ({ testRuns }: { testRuns: TestRun[] }) => {
+  if (!testRuns.length) return null
+
+  const totalCost = calculateTotalTestRunsCost(testRuns)
+
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">Test History</h3>
+        <div className="text-sm text-gray-600">
+          Total Cost:{' '}
+          <span className="font-semibold">{formatCost(totalCost)}</span>
+        </div>
+      </div>
       {testRuns.map((run) => (
         <TestRunDisplay key={run.id} run={run} />
       ))}
