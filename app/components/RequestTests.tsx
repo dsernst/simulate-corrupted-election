@@ -72,7 +72,7 @@ export function RequestTests({
                 <div className="text-sm text-gray-600">
                   {description}
                   <div className="mt-2">
-                    <span className="border-2 border-green-600/40 p-1 text-gray-500 rounded-lg">
+                    <span className="border-2 border-green-600/40 px-1 py-0.5 text-gray-500 rounded-lg">
                       {formatCost(cost)} / vote
                     </span>
                   </div>
