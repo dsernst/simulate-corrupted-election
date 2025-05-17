@@ -2,10 +2,7 @@ import { expect, describe, test } from 'bun:test'
 import { calculateLayeredStats, TestRun } from './calculateIntersections'
 import { calculateTestResults } from './simulation'
 import { MT19937 } from './mt19937'
-import {
-  countCompromisedSignatures,
-  toDisplayLabelFromKey,
-} from './calculateIntersections'
+import { toDisplayLabelFromKey } from './calculateIntersections'
 
 // Helper to create a TestResult
 function makeTestResult(
@@ -300,121 +297,6 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     const get = (label: string) => stats.find((g) => g.label === label)
     expect(get('A')?.tested).toBeGreaterThan(1000)
     expect(get('A')?.tested).toBeLessThan(1500)
-  })
-})
-
-describe('countCompromisedSignatures', () => {
-  test('AB intersection', () => {
-    const votes = [
-      {
-        testA: true,
-        testB: false,
-        testC: undefined,
-        testedA: true,
-        testedB: true,
-        testedC: false,
-      },
-      {
-        testA: false,
-        testB: true,
-        testC: undefined,
-        testedA: true,
-        testedB: true,
-        testedC: false,
-      },
-      {
-        testA: true,
-        testB: true,
-        testC: undefined,
-        testedA: true,
-        testedB: true,
-        testedC: false,
-      },
-      {
-        testA: false,
-        testB: false,
-        testC: undefined,
-        testedA: true,
-        testedB: true,
-        testedC: false,
-      },
-    ]
-    const result = countCompromisedSignatures(votes, ['A', 'B'])
-    expect(result).toEqual([1, 1, undefined])
-  })
-  test('ABC intersection', () => {
-    const votes = [
-      {
-        testA: true,
-        testB: false,
-        testC: false,
-        testedA: true,
-        testedB: true,
-        testedC: true,
-      },
-      {
-        testA: false,
-        testB: true,
-        testC: false,
-        testedA: true,
-        testedB: true,
-        testedC: true,
-      },
-      {
-        testA: false,
-        testB: false,
-        testC: true,
-        testedA: true,
-        testedB: true,
-        testedC: true,
-      },
-      {
-        testA: true,
-        testB: true,
-        testC: false,
-        testedA: true,
-        testedB: true,
-        testedC: true,
-      },
-      {
-        testA: true,
-        testB: false,
-        testC: true,
-        testedA: true,
-        testedB: true,
-        testedC: true,
-      },
-      {
-        testA: false,
-        testB: true,
-        testC: true,
-        testedA: true,
-        testedB: true,
-        testedC: true,
-      },
-      {
-        testA: true,
-        testB: true,
-        testC: true,
-        testedA: true,
-        testedB: true,
-        testedC: true,
-      },
-      {
-        testA: false,
-        testB: false,
-        testC: false,
-        testedA: true,
-        testedB: true,
-        testedC: true,
-      },
-    ]
-    const result = countCompromisedSignatures(votes, ['A', 'B', 'C'])
-    expect(result).toEqual([1, 1, 1])
-  })
-
-  test('no compromises should show up as 0, not undefined', () => {
-    // const seed = 334991
   })
 })
 

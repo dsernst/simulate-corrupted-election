@@ -13,20 +13,14 @@ export interface TestRun {
   timestamp: Date
 }
 
-type Compromised = number | undefined
-
 export interface LayeredStat {
   key: string
   label: string
   tested: number
   percentCompromised: number
   bias?: string
-  signatures: [Compromised, Compromised, Compromised]
-  percentSignatures: [
-    number | undefined,
-    number | undefined,
-    number | undefined
-  ]
+  signatures: (number | undefined)[]
+  percentSignatures: (number | undefined)[]
 }
 
 // Define a type for the vote object in voteMap
@@ -37,6 +31,25 @@ export interface VoteResult {
   testedA: boolean | undefined
   testedB: boolean | undefined
   testedC: boolean | undefined
+}
+
+// Utility: Marginal count for each test (votes where test detected compromise, regardless of others)
+export function getMarginalCompromisedCounts(
+  votes: VoteResult[],
+  tests: ('A' | 'B' | 'C')[]
+) {
+  return tests.map((t) => votes.filter((v) => v[`test${t}`] === true).length)
+}
+
+export function getMarginalCompromisedPercents(
+  votes: VoteResult[],
+  tests: ('A' | 'B' | 'C')[]
+) {
+  const total = votes.length
+  if (total === 0) return tests.map(() => undefined)
+  return getMarginalCompromisedCounts(votes, tests).map(
+    (count) => Math.round((count / total) * 1000) / 10
+  )
 }
 
 export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
@@ -84,17 +97,25 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
     const tested = votes.length
     const tests = getTestsFromKey(key)
 
-    // For single-test groups, compromised is just that test; for intersections, we can use signatures for breakdown
-    const compromised =
-      tests.length === 1 ? countCompromised(votes, tests[0]) : 0
+    // For single-test groups, compromised is just that test; for intersections, use marginal counts
+    let signatures: (number | undefined)[]
+    let percentSignatures: (number | undefined)[]
+    if (tests.length === 1) {
+      const c = countCompromised(votes, tests[0])
+      signatures = [c]
+      percentSignatures = [percent(c, tested)]
+    } else {
+      signatures = getMarginalCompromisedCounts(votes, tests)
+      percentSignatures = getMarginalCompromisedPercents(votes, tests)
+    }
 
     return {
       key,
       label: key, // For now, label is an alias to key
       tested,
-      percentCompromised: percent(compromised, tested),
-      signatures: countCompromisedSignatures(votes, tests),
-      percentSignatures: percentCompromisedSignatures(votes, tests),
+      percentCompromised: percentSignatures[0] ?? 0,
+      signatures,
+      percentSignatures,
     }
   })
 }
@@ -161,42 +182,6 @@ export function calculateConfusionMatrix(
     compromised_compromised,
     total,
   }
-}
-
-// Utility: Count detection signatures for a set of votes and test types
-export function countCompromisedSignatures(
-  votes: VoteResult[],
-  tests: ('A' | 'B' | 'C')[]
-) {
-  const counts: Record<string, number> = {}
-  for (const v of votes) {
-    const detected = tests.filter((t) => v[`test${t}`] === true)
-    if (detected.length === 0) continue // skip if none detected
-    const key = detected.join('')
-    counts[key] = (counts[key] || 0) + 1
-  }
-  return [counts['A'], counts['B'], counts['C']] as LayeredStat['signatures']
-}
-
-// Utility: Percent for each detection signature
-export function percentCompromisedSignatures(
-  votes: VoteResult[],
-  tests: ('A' | 'B' | 'C')[]
-) {
-  const total = votes.length
-  if (total === 0)
-    return [undefined, undefined, undefined] as [
-      number | undefined,
-      number | undefined,
-      number | undefined
-    ]
-  const counts = countCompromisedSignatures(votes, tests)
-  // Always return a tuple of length 3
-  return [0, 1, 2].map((i) =>
-    counts[i] === undefined
-      ? undefined
-      : Math.round((counts[i]! / total) * 1000) / 10
-  ) as [number | undefined, number | undefined, number | undefined]
 }
 
 /** Utility: Convert canonical group key to display label */

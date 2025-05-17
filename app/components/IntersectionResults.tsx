@@ -46,50 +46,45 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
           </thead>
           <tbody>
             {layeredStats.map(
-              ({
-                key,
-                label,
-                tested,
-                percentCompromised,
-                signatures,
-                percentSignatures,
-              }) => (
-                <tr
-                  key={label}
-                  className={`${
-                    tested === 0 && 'opacity-30'
-                  } border-t border-gray-200`}
-                >
-                  <td
-                    className="px-4 py-2 whitespace-nowrap text-left"
-                    style={{
-                      paddingLeft: `${Math.max(
-                        getIndentFromKey(key) * 2,
-                        0.5
-                      )}em`,
-                    }}
+              ({ key, label, tested, signatures, percentSignatures }) => {
+                return (
+                  <tr
+                    key={label}
+                    className={`${
+                      tested === 0 && 'opacity-30'
+                    } border-t border-gray-200`}
                   >
-                    {toDisplayLabelFromKey(label)}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    {percentSignatures.filter((s) => s !== undefined).length > 1
-                      ? percentSignatures
-                          .filter((s) => s !== undefined)
-                          .map((s) => `${s}%`)
-                          .join(' | ')
-                      : `${percentCompromised}%`}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    {signatures
-                      .filter((s) => s !== undefined)
-                      .map((s) => s.toLocaleString())
-                      .join(' | ')}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    {tested.toLocaleString()}
-                  </td>
-                </tr>
-              )
+                    <td
+                      className="px-4 py-2 whitespace-nowrap text-left"
+                      style={{
+                        paddingLeft: `${Math.max(
+                          getIndentFromKey(key) * 2,
+                          0.5
+                        )}em`,
+                      }}
+                    >
+                      {toDisplayLabelFromKey(label)}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {percentSignatures
+                        .map((s) => (s !== undefined ? `${s}%` : null))
+                        .filter(Boolean)
+                        .join(' | ')}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {signatures
+                        .map((s) =>
+                          s !== undefined ? s.toLocaleString() : null
+                        )
+                        .filter(Boolean)
+                        .join(' | ')}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {tested.toLocaleString()}
+                    </td>
+                  </tr>
+                )
+              }
             )}
           </tbody>
         </table>
