@@ -41,11 +41,15 @@ export function calculateTotalCost(
 /**
  * Format a cost as a currency string
  * @param cost The cost to format
- * @returns Formatted cost string (e.g. "$1,234.56")
+ * @returns Formatted cost string (e.g. "$1,234" or "$1,234.56")
  */
 export function formatCost(cost: number): string {
+  // If the number has any decimal places, show exactly 2
+  const hasDecimals = cost % 1 !== 0
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
+    minimumFractionDigits: hasDecimals ? 2 : 0,
+    maximumFractionDigits: 2,
   }).format(cost)
 }
