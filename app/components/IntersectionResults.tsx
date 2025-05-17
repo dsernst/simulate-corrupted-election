@@ -12,8 +12,9 @@ interface IntersectionResultsProps {
 }
 
 export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
+  if (!ranAtLeastTwoTypes(testRuns)) return null
+
   const layeredStats = calculateLayeredStats(testRuns)
-  if (layeredStats.every((r) => r.tested === 0)) return null
 
   // Confusion matrices for all pairs
   const pairs = [
@@ -27,7 +28,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
     matrix: calculateConfusionMatrix(testRuns, first, second),
   }))
 
-  console.log(layeredStats)
+  // console.log(layeredStats)
 
   return (
     <div className="mt-8 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
@@ -106,4 +107,18 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
       </div>
     </div>
   )
+}
+
+/** At least two different types of tests need to have run, to show results */
+function ranAtLeastTwoTypes(testRuns: TestRun[]) {
+  let sawA = false
+  let sawB = false
+  let sawC = false
+  for (const r of testRuns) {
+    if (r.results.testBreakdown.testA.count > 0) sawA = true
+    if (r.results.testBreakdown.testB.count > 0) sawB = true
+    if (r.results.testBreakdown.testC.count > 0) sawC = true
+  }
+  const typesSeen = [sawA, sawB, sawC].filter(Boolean).length
+  return typesSeen >= 2
 }
