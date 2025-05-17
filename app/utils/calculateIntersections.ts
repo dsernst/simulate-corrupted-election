@@ -22,6 +22,11 @@ export interface LayeredStat {
   percentCompromised: number
   bias?: string
   signatures: [Compromised, Compromised, Compromised]
+  percentSignatures: [
+    number | undefined,
+    number | undefined,
+    number | undefined
+  ]
 }
 
 // Define a type for the vote object in voteMap
@@ -89,6 +94,7 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
       tested,
       percentCompromised: percent(compromised, tested),
       signatures: countCompromisedSignatures(votes, tests),
+      percentSignatures: percentCompromisedSignatures(votes, tests),
     }
   })
 }
@@ -170,6 +176,27 @@ export function countCompromisedSignatures(
     counts[key] = (counts[key] || 0) + 1
   }
   return [counts['A'], counts['B'], counts['C']] as LayeredStat['signatures']
+}
+
+// Utility: Percent for each detection signature
+export function percentCompromisedSignatures(
+  votes: VoteResult[],
+  tests: ('A' | 'B' | 'C')[]
+) {
+  const total = votes.length
+  if (total === 0)
+    return [undefined, undefined, undefined] as [
+      number | undefined,
+      number | undefined,
+      number | undefined
+    ]
+  const counts = countCompromisedSignatures(votes, tests)
+  // Always return a tuple of length 3
+  return [0, 1, 2].map((i) =>
+    counts[i] === undefined
+      ? undefined
+      : Math.round((counts[i]! / total) * 1000) / 10
+  ) as [number | undefined, number | undefined, number | undefined]
 }
 
 /** Utility: Convert canonical group key to display label */
