@@ -43,7 +43,7 @@ describe('Even test distribution', () => {
     const totalB = bAndA + bAndNotA
 
     // Verify B tests are split roughly 50/50
-    console.log({ bAndA, bAndNotA, totalB })
+    // console.log({ bAndA, bAndNotA, totalB })
     expect(Math.abs(bAndA - bAndNotA)).toBeLessThanOrEqual(totalB * 0.1) // Allow 10% deviation
   })
 
@@ -100,7 +100,7 @@ describe('Even test distribution', () => {
     // Each quadrant should be roughly 25%
     const expectedPerQuadrant = totalC * 0.25
     const tolerance = totalC * 0.1 // Allow 10% deviation
-    console.log({ allThree, aAndC, bAndC, onlyC })
+    // console.log({ allThree, aAndC, bAndC, onlyC })
 
     expect(Math.abs(allThree - expectedPerQuadrant)).toBeLessThanOrEqual(
       tolerance
