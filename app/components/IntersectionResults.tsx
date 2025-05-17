@@ -2,10 +2,10 @@ import {
   TestRun,
   calculateLayeredStats,
   calculateConfusionMatrix,
-  toDisplayLabelFromKey,
 } from '../utils/calculateIntersections'
 import { getIndentFromKey } from '../utils/create-intersections'
 import ConfusionMatrix from './ConfusionMatrix'
+import { IntersectionResultsLabel } from './IntersectionResultsLabel'
 
 interface IntersectionResultsProps {
   testRuns: TestRun[]
@@ -63,7 +63,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
                         )}em`,
                       }}
                     >
-                      {toDisplayLabelFromKey(label)}
+                      <IntersectionResultsLabel label={label} />
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap">
                       {percentSignatures
