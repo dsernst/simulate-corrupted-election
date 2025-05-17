@@ -113,6 +113,16 @@ function parseCount(val: string, label: string): number {
   return n
 }
 
+function getRandomSample<T>(arr: T[], n: number, mt: MT19937): T[] {
+  // Fisher-Yates shuffle for reproducible random sampling
+  const a = arr.slice()
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(mt.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a.slice(0, n)
+}
+
 export function calculateTestResults(
   testCounts: { testA: string; testB: string; testC: string },
   compromisedVotes: number,
@@ -165,7 +175,6 @@ export function calculateTestResults(
   const globalVoteMap = voteMap ?? new Map<number, VoteTestResult>()
 
   // For each test type, run tests on unique, randomly selected votes
-  //
   function runUniqueTests(
     testType: 'A' | 'B' | 'C',
     count: number,
@@ -182,63 +191,46 @@ export function calculateTestResults(
         )
         voteResult = {
           voteId,
-          isActuallyCompromised,
           testResults: {},
+          isActuallyCompromised,
         }
         globalVoteMap.set(voteId, voteResult)
       }
-      const isDetectedCompromised = runTest(
-        effectivenessRates,
-        voteResult.isActuallyCompromised,
-        mt
-      )
-      voteResult.testResults[`test${testType}`] = isDetectedCompromised
-      testBreakdown[`test${testType}`].count++
-      if (isDetectedCompromised)
-        testBreakdown[`test${testType}`].detectedCompromised++
-      testBreakdown[`test${testType}`].voteResults.push(voteResult)
-    }
 
-    // First, build an `eligible` array of all vote IDs that have NOT been tested by this type
-    const eligible: number[] = []
-    for (let i = 0; i < totalVotes; i++) {
-      const voteResult = globalVoteMap.get(i)
-      if (
-        !voteResult ||
-        voteResult.testResults[`test${testType}`] === undefined
-      ) {
-        eligible.push(i)
+      // Only run the test if it hasn't been run before
+      if (voteResult.testResults[`test${testType}`] === undefined) {
+        const isDetectedCompromised = runTest(
+          effectivenessRates,
+          voteResult.isActuallyCompromised,
+          mt
+        )
+        voteResult.testResults[`test${testType}`] = isDetectedCompromised
+
+        testBreakdown[`test${testType}`].count++
+        if (isDetectedCompromised) {
+          testBreakdown[`test${testType}`].detectedCompromised++
+        }
+        testBreakdown[`test${testType}`].voteResults.push(voteResult)
       }
-    }
-
-    // Shuffle eligible vote IDs using Fisher-Yates and the provided PRNG
-    for (let i = eligible.length - 1; i > 0; i--) {
-      const j = Math.floor(mt.random() * (i + 1))
-      ;[eligible[i], eligible[j]] = [eligible[j], eligible[i]]
     }
 
     // For B tests, we need to split 50/50 between A-tested and A-untested votes
     if (testType === 'B') {
       const aTested: number[] = []
       const aUntested: number[] = []
-
-      // Split eligible votes into A-tested and A-untested
-      for (const voteId of eligible) {
-        const voteResult = globalVoteMap.get(voteId)
+      for (let i = 1; i <= totalVotes; i++) {
+        const voteResult = globalVoteMap.get(i)
+        if (voteResult?.testResults.testB !== undefined) continue
         if (voteResult?.testResults.testA !== undefined) {
-          aTested.push(voteId)
+          aTested.push(i)
         } else {
-          aUntested.push(voteId)
+          aUntested.push(i)
         }
       }
-
-      // Take half from each group, but ensure we get the full count
       const halfCount = Math.floor(count / 2)
       let aTestedCount = Math.min(halfCount, aTested.length)
       let aUntestedCount = Math.min(halfCount, aUntested.length)
       let remainingCount = count - aTestedCount - aUntestedCount
-
-      // If we couldn't get enough from either group, take more from the other group
       if (remainingCount > 0) {
         if (aTested.length > aTestedCount) {
           const additionalFromA = Math.min(
@@ -257,85 +249,104 @@ export function calculateTestResults(
           remainingCount -= additionalFromNotA
         }
       }
-
-      // Take votes from A-tested group
-      for (let i = 0; i < aTestedCount; i++) {
-        runTestOnVote(aTested[i])
-      }
-
-      // Take votes from A-untested group
-      for (let i = 0; i < aUntestedCount; i++) {
-        runTestOnVote(aUntested[i])
-      }
-
-      // If we still have remaining votes, take them from whichever group has more
+      const aTestedSample = getRandomSample(aTested, aTestedCount, mt)
+      const aUntestedSample = getRandomSample(aUntested, aUntestedCount, mt)
+      for (const id of aTestedSample) runTestOnVote(id)
+      for (const id of aUntestedSample) runTestOnVote(id)
       if (remainingCount > 0) {
         const remainingGroup =
           aTested.length > aUntested.length ? aTested : aUntested
-        const startIndex =
-          aTested.length > aUntested.length ? aTestedCount : aUntestedCount
-        for (let i = 0; i < remainingCount; i++) {
-          runTestOnVote(remainingGroup[startIndex + i])
-        }
+        const remainingSample = getRandomSample(
+          remainingGroup.filter(
+            (id) => ![...aTestedSample, ...aUntestedSample].includes(id)
+          ),
+          remainingCount,
+          mt
+        )
+        for (const id of remainingSample) runTestOnVote(id)
       }
     }
     // For C tests, we need to split evenly across all A/B combinations
     else if (testType === 'C') {
       const quadrants: { [key: string]: number[] } = {
-        'A&B': [], // A tested, B tested
-        'A&!B': [], // A tested, B untested
-        '!A&B': [], // A untested, B tested
-        '!A&!B': [], // A untested, B untested
+        'A&B': [],
+        'A&!B': [],
+        '!A&B': [],
+        '!A&!B': [],
       }
-
-      // Split eligible votes into quadrants
-      for (const voteId of eligible) {
-        const voteResult = globalVoteMap.get(voteId)
+      for (let i = 1; i <= totalVotes; i++) {
+        const voteResult = globalVoteMap.get(i)
+        if (voteResult?.testResults.testC !== undefined) continue
         const aTested = voteResult?.testResults.testA !== undefined
         const bTested = voteResult?.testResults.testB !== undefined
         const key = `${aTested ? 'A' : '!A'}&${bTested ? 'B' : '!B'}`
-        quadrants[key].push(voteId)
+        quadrants[key].push(i)
       }
-
-      // Take equal number from each quadrant
       const perQuadrant = Math.floor(count / 4)
       const remainingCount = count - perQuadrant * 4
-
-      // Take votes from each quadrant
+      const quadrantSamples: number[][] = []
       for (const quadrant of Object.values(quadrants)) {
-        const quadrantCount = Math.min(perQuadrant, quadrant.length)
-        for (let i = 0; i < quadrantCount; i++) {
-          runTestOnVote(quadrant[i])
-        }
+        quadrantSamples.push(
+          getRandomSample(quadrant, Math.min(perQuadrant, quadrant.length), mt)
+        )
       }
-
-      // Distribute remaining votes across quadrants that have capacity
+      for (const sample of quadrantSamples) {
+        for (const id of sample) runTestOnVote(id)
+      }
       if (remainingCount > 0) {
         const availableQuadrants = Object.values(quadrants).filter(
           (q) => q.length > perQuadrant
         )
-        for (let i = 0; i < remainingCount; i++) {
-          const quadrant = availableQuadrants[i % availableQuadrants.length]
-          runTestOnVote(
-            quadrant[perQuadrant + Math.floor(i / availableQuadrants.length)]
-          )
+        const usedIds = quadrantSamples.flat()
+        const extraIds: number[] = []
+        for (const q of availableQuadrants) {
+          extraIds.push(...q.filter((id) => !usedIds.includes(id)))
         }
+        const extraSample = getRandomSample(extraIds, remainingCount, mt)
+        for (const id of extraSample) runTestOnVote(id)
       }
     }
-    // For A tests, just take the first N votes (random sampling)
+    // For A tests, randomly sample from eligible votes
     else {
-      const samples = Math.min(count, eligible.length)
-      for (let k = 0; k < samples; k++) {
-        runTestOnVote(eligible[k])
+      const eligible: number[] = []
+      for (let i = 1; i <= totalVotes; i++) {
+        const voteResult = globalVoteMap.get(i)
+        if (voteResult?.testResults.testA !== undefined) continue
+        eligible.push(i)
       }
+      const samples = Math.min(count, eligible.length)
+      const sampleIds = getRandomSample(eligible, samples, mt)
+      for (const id of sampleIds) runTestOnVote(id)
     }
   }
 
+  // Run tests in order A, B, C to maintain proper distribution
   runUniqueTests('A', counts.testA, effectiveness.testA)
   runUniqueTests('B', counts.testB, effectiveness.testB)
   runUniqueTests('C', counts.testC, effectiveness.testC)
 
-  return {
-    testBreakdown,
+  // Update test breakdown with all votes that have been tested
+  for (const [voteId, voteResult] of globalVoteMap.entries()) {
+    for (const testType of ['A', 'B', 'C'] as const) {
+      if (voteResult.testResults[`test${testType}`] !== undefined) {
+        const testKey = `test${testType}` as const
+        if (
+          !testBreakdown[testKey].voteResults.some((v) => v.voteId === voteId)
+        ) {
+          testBreakdown[testKey].voteResults.push(voteResult)
+        }
+      }
+    }
   }
+
+  // Update counts based on vote results
+  for (const testType of ['A', 'B', 'C'] as const) {
+    const testKey = `test${testType}` as const
+    testBreakdown[testKey].count = testBreakdown[testKey].voteResults.length
+    testBreakdown[testKey].detectedCompromised = testBreakdown[
+      testKey
+    ].voteResults.filter((v) => v.testResults[testKey] === true).length
+  }
+
+  return { testBreakdown }
 }
