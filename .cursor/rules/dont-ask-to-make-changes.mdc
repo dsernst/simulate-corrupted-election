@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+When I ask, "can we do X?" to the codebase, and you (the Agent) have a good idea for how to accomplish it, don't end by asking me "Would you like me to make this change in your code?". Just go ahead and do it. If I didn't want code changes, I would have used Ask mode, not Agent mode.
