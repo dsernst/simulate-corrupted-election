@@ -87,10 +87,10 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
       <h3 className="text-xl font-semibold text-gray-800 mb-4">
         Pairwise Confusion Matrices
       </h3>
-      <div className="grid grid-cols-1 gap-8 mb-8">
+      <div className="flex flex-col items-center">
         {confusionMatrices.map(({ first, second, matrix }) => (
           <div
-            className="overflow-x-auto max-w-full"
+            className="overflow-x-auto max-w-full mb-8"
             key={`${first}-${second}`}
           >
             <ConfusionMatrix first={first} second={second} matrix={matrix} />

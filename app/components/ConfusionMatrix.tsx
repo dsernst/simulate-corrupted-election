@@ -37,7 +37,7 @@ const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({
   const topRightColor = 'bg-blue-200/65'
 
   return (
-    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 flex items-center mx-auto font-bold text-gray-800">
+    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 flex items-center font-bold text-gray-800">
       {/* Vertical axis label outside the table */}
       <div
         className="text-base mr-2 border border-gray-400/70 relative top-[76px] left-2 h-29 text-center bg-yellow-100 rotate-180"
