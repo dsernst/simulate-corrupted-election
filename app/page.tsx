@@ -3,66 +3,76 @@
 import { useState, useEffect } from 'react'
 import { SimulationResultsDisplay } from './components/SimulationResults'
 import { TestResults } from './components/RequestTests'
-import {
-  SimulationResults,
-  generateSimulation,
-  calculateTestResults,
-} from './utils/simulation'
+import { SimulationResults, generateSimulation } from './utils/simulation'
 import { TestRun } from './utils/calculateIntersections'
 import { MT19937 } from './utils/mt19937'
-
-function getRandomSeed() {
-  return Math.floor(Math.random() * 1000000)
-}
+import { useSearchParams, useRouter } from 'next/navigation'
+import {
+  getInitialState,
+  createUrlParams,
+  generateTestRuns,
+  type TestRequest,
+} from './utils/urlState'
 
 export default function Home() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const [simulation, setSimulation] = useState<SimulationResults | null>(null)
   const [showCompromised, setShowCompromised] = useState(false)
-  const [seed, setSeed] = useState<number>(getRandomSeed())
   const [showSeedInput, setShowSeedInput] = useState(false)
   const [testResults, setTestResults] = useState<TestResults>({
     testA: '',
     testB: '',
     testC: '',
   })
+
+  // Initialize state from URL
+  const { seed: initialSeed, testRequests: initialTestRequests } =
+    getInitialState(searchParams)
+  const [seed, setSeed] = useState<number>(initialSeed)
+  const [testRequests, setTestRequests] =
+    useState<TestRequest[]>(initialTestRequests)
   const [testRuns, setTestRuns] = useState<TestRun[]>([])
-  const [nextRunId, setNextRunId] = useState(1)
   const [mtState, setMtState] = useState<MT19937 | null>(null)
 
+  // Update URL when seed or testRequests change
+  useEffect(() => {
+    const params = createUrlParams(seed, testRequests)
+    router.replace(`?${params.toString()}`)
+  }, [seed, testRequests, router])
+
+  // Initialize simulation and MT state
+  useEffect(() => {
+    setSimulation(generateSimulation(seed))
+    setMtState(new MT19937(seed))
+  }, [seed])
+
+  // Regenerate test runs when simulation or test requests change
+  useEffect(() => {
+    if (!simulation) {
+      setTestRuns([])
+      return
+    }
+    setTestRuns(generateTestRuns(testRequests, simulation, seed))
+  }, [simulation, testRequests, seed])
+
   const onStartOver = (newSeed?: number) => {
-    const seedToUse = newSeed || getRandomSeed()
+    const seedToUse = newSeed || Math.floor(Math.random() * 1000000)
     setSeed(seedToUse)
     setSimulation(generateSimulation(seedToUse))
     setShowCompromised(false)
+    setTestRequests([])
     setTestRuns([])
-    setNextRunId(1)
     setMtState(new MT19937(seedToUse))
   }
-
-  // Simulate an election when the page first loads
-  useEffect(() => onStartOver(), [])
 
   const handleRunTests = () => {
     if (!simulation) return alert('Simulation not initialized')
     if (!mtState) return alert('MT state not initialized')
 
-    const results = calculateTestResults(
-      testResults,
-      simulation.compromisedVotes,
-      simulation.totalVotes,
-      mtState
-    )
-
-    // Add new test run to history
-    setTestRuns((prev) => [
-      ...prev,
-      {
-        id: nextRunId,
-        results,
-        timestamp: new Date(),
-      },
-    ])
-    setNextRunId((prev) => prev + 1)
+    // Add new test request
+    const newTestRequests = [...testRequests, testResults]
+    setTestRequests(newTestRequests)
 
     // Reset the test request form
     setTestResults({
@@ -85,7 +95,7 @@ export default function Home() {
 
       {!simulation ? (
         <div className="italic animate-pulse text-black/50">
-          Loading initial simulation...
+          Loading simulation...
         </div>
       ) : (
         <SimulationResultsDisplay
