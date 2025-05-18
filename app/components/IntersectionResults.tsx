@@ -52,7 +52,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
                   <tr
                     key={label}
                     className={`${
-                      tested === 0 && 'opacity-30'
+                      !tested && 'opacity-20'
                     } border-t border-gray-200`}
                   >
                     <td
@@ -64,7 +64,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
                         )}em`,
                       }}
                     >
-                      <IntersectionResultsLabel label={label} />
+                      <IntersectionResultsLabel label={label} tested={tested} />
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap">
                       {percentSignatures

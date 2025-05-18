@@ -6,7 +6,13 @@ import { toDisplayLabelFromKey } from '../utils/calculateIntersections'
  * Displays a label like "A & not B" with the "& not B" part faded.
  * Used for the "Tested By" column in intersection results tables.
  */
-export const IntersectionResultsLabel = ({ label }: { label: string }) => {
+export const IntersectionResultsLabel = ({
+  label,
+  tested,
+}: {
+  label: string
+  tested: number
+}) => {
   // Convert canonical key (e.g. 'A!B') to display label (e.g. 'A & not B')
   const displayLabel = toDisplayLabelFromKey(label)
 
@@ -36,15 +42,11 @@ export const IntersectionResultsLabel = ({ label }: { label: string }) => {
   // Render each part, fading as appropriate
   return (
     <>
-      {parts.map((part, i) =>
-        part.faded ? (
-          <span key={i} className="text-gray-400 font-normal">
-            {part.text}
-          </span>
-        ) : (
-          <span key={i}>{part.text}</span>
-        )
-      )}
+      {parts.map((part, i) => (
+        <span key={i} className={(part.faded && tested && `opacity-20`) || ''}>
+          {part.text}
+        </span>
+      ))}
     </>
   )
 }
