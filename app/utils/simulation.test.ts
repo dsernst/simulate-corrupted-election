@@ -312,23 +312,38 @@ describe('calculateTestResults', () => {
     const compromisedVotes = 1000
     const totalVotes = 10000
 
-    // Run a small number of C tests
+    // First run A and B tests to create some tested votes
+    const voteMap = new Map()
+    calculateTestResults(
+      { testA: '1000', testB: '1000', testC: '' },
+      compromisedVotes,
+      totalVotes,
+      mt,
+      voteMap
+    )
+
+    // Then run a small number of C tests
     const result = calculateTestResults(
       { testA: '', testB: '', testC: '3' },
       compromisedVotes,
       totalVotes,
       mt,
-      new Map() // Start with fresh vote map to simulate new run
+      voteMap
     )
 
     // Verify C test results
     expect(result.testBreakdown.testC.count).toBe(3)
     expect(result.testBreakdown.testC.voteResults.length).toBe(3)
-    expect(
-      result.testBreakdown.testC.detectedCompromised
-    ).toBeGreaterThanOrEqual(0)
-    expect(result.testBreakdown.testC.detectedCompromised).toBeLessThanOrEqual(
-      3
-    )
+
+    // Verify that the C tests are distributed across different A/B combinations
+    const combinations = new Set<string>()
+    for (const vote of result.testBreakdown.testC.voteResults) {
+      const aTested = vote.testResults.testA !== undefined
+      const bTested = vote.testResults.testB !== undefined
+      combinations.add(`${aTested ? 'A' : '!A'}&${bTested ? 'B' : '!B'}`)
+    }
+
+    // With 3 tests, we should have at least 2 different combinations
+    expect(combinations.size).toBeGreaterThanOrEqual(2)
   })
 })

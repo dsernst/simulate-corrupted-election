@@ -282,28 +282,63 @@ export function calculateTestResults(
         const key = `${aTested ? 'A' : '!A'}&${bTested ? 'B' : '!B'}`
         quadrants[key].push(i)
       }
-      const perQuadrant = Math.floor(count / 4)
-      const remainingCount = count - perQuadrant * 4
-      const quadrantSamples: number[][] = []
-      for (const quadrant of Object.values(quadrants)) {
-        quadrantSamples.push(
-          getRandomSample(quadrant, Math.min(perQuadrant, quadrant.length), mt)
+
+      // Get only quadrants with available votes
+      let availableQuadrants = Object.entries(quadrants).filter(
+        ([, votes]) => votes.length > 0
+      )
+      const numQuadrants = availableQuadrants.length
+      if (numQuadrants === 0) return // No votes available to test
+
+      // Special case: if count <= numQuadrants, maximize spread
+      if (count <= numQuadrants) {
+        // Shuffle quadrants for fairness
+        const shuffled = getRandomSample(
+          availableQuadrants,
+          availableQuadrants.length,
+          mt
         )
-      }
-      for (const sample of quadrantSamples) {
-        for (const id of sample) runTestOnVote(id)
-      }
-      if (remainingCount > 0) {
-        const availableQuadrants = Object.values(quadrants).filter(
-          (q) => q.length > perQuadrant
-        )
-        const usedIds = quadrantSamples.flat()
-        const extraIds: number[] = []
-        for (const q of availableQuadrants) {
-          extraIds.push(...q.filter((id) => !usedIds.includes(id)))
+        for (let i = 0; i < count; i++) {
+          const [, votes] = shuffled[i]
+          if (votes.length > 0) {
+            const sample = getRandomSample(votes, 1, mt)
+            for (const id of sample) runTestOnVote(id)
+          }
         }
-        const extraSample = getRandomSample(extraIds, remainingCount, mt)
-        for (const id of extraSample) runTestOnVote(id)
+        return
+      }
+
+      // Calculate base number of tests per quadrant
+      const basePerQuadrant = Math.floor(count / numQuadrants)
+      let remainder = count - basePerQuadrant * numQuadrants
+
+      // Track how many tests we assign to each quadrant
+      const testsToAssign: { [key: string]: number } = {}
+      for (const [key, votes] of availableQuadrants) {
+        testsToAssign[key] = Math.min(basePerQuadrant, votes.length)
+      }
+
+      // Distribute the remainder one by one to quadrants with most available votes left
+      while (remainder > 0) {
+        availableQuadrants = availableQuadrants.filter(
+          ([key, votes]) => votes.length > testsToAssign[key]
+        )
+        if (availableQuadrants.length === 0) break
+        availableQuadrants.sort(
+          ([, aVotes], [, bVotes]) => bVotes.length - aVotes.length
+        )
+        const [key] = availableQuadrants[0]
+        testsToAssign[key]++
+        remainder--
+      }
+
+      // Now actually assign the tests
+      for (const [key, votes] of Object.entries(quadrants)) {
+        const n = testsToAssign[key] || 0
+        if (n > 0 && votes.length > 0) {
+          const sample = getRandomSample(votes, n, mt)
+          for (const id of sample) runTestOnVote(id)
+        }
       }
     }
     // For A tests, randomly sample from eligible votes
