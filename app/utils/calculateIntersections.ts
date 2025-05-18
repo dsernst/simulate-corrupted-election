@@ -18,8 +18,8 @@ export interface LayeredStat {
   label: string
   tested: number
   bias?: string
-  signatures: (number | undefined)[]
-  percentSignatures: (number | undefined)[]
+  compromises: (number | undefined)[]
+  percentages: (number | undefined)[]
 }
 
 // Define a type for the vote object in voteMap
@@ -86,15 +86,15 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
     const tests = getTestsFromKey(key)
 
     // For single-test groups, compromised is just that test; for intersections, use marginal counts
-    const signatures = getMarginalCompromisedCounts(votes, tests)
-    const percentSignatures = getMarginalCompromisedPercents(votes, tests)
+    const compromises = getMarginalCompromisedCounts(votes, tests)
+    const percentages = getMarginalCompromisedPercents(votes, tests)
 
     return {
       key,
       label: key, // For now, label is an alias to key
       tested,
-      signatures,
-      percentSignatures,
+      compromises,
+      percentages,
     }
   })
 }

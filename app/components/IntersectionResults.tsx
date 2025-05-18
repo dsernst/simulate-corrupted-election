@@ -47,7 +47,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
           </thead>
           <tbody>
             {layeredStats.map(
-              ({ key, label, tested, signatures, percentSignatures }) => {
+              ({ key, label, tested, compromises, percentages }) => {
                 return (
                   <tr
                     key={label}
@@ -67,13 +67,13 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
                       <IntersectionResultsLabel label={label} tested={tested} />
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap">
-                      {percentSignatures
+                      {percentages
                         .map((s) => (s !== undefined ? `${s}%` : null))
                         .filter(Boolean)
                         .join(' | ')}
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap">
-                      {signatures
+                      {compromises
                         .map((s) =>
                           s !== undefined ? s.toLocaleString() : null
                         )
