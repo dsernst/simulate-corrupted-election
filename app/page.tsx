@@ -27,6 +27,7 @@ export default function Home() {
   })
   const [testRuns, setTestRuns] = useState<TestRun[]>([])
   const [nextRunId, setNextRunId] = useState(1)
+  const [mtState, setMtState] = useState<MT19937 | null>(null)
 
   const onStartOver = (newSeed?: number) => {
     const seedToUse = newSeed || getRandomSeed()
@@ -35,20 +36,21 @@ export default function Home() {
     setShowCompromised(false)
     setTestRuns([])
     setNextRunId(1)
+    setMtState(new MT19937(seedToUse))
   }
 
   // Simulate an election when the page first loads
   useEffect(() => onStartOver(), [])
 
   const handleRunTests = () => {
-    if (!simulation) return
+    if (!simulation) return alert('Simulation not initialized')
+    if (!mtState) return alert('MT state not initialized')
 
-    const mt = new MT19937(simulation.seed)
     const results = calculateTestResults(
       testResults,
       simulation.compromisedVotes,
       simulation.totalVotes,
-      mt
+      mtState
     )
 
     // Add new test run to history
