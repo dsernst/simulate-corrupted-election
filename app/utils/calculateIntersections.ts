@@ -17,7 +17,6 @@ export interface LayeredStat {
   key: string
   label: string
   tested: number
-  percentCompromised: number
   bias?: string
   signatures: (number | undefined)[]
   percentSignatures: (number | undefined)[]
@@ -76,17 +75,6 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
     })
   })
 
-  // Helper to count compromised in a set for a given test
-  function countCompromised(votes: VoteResult[], test: 'A' | 'B' | 'C') {
-    // testX === true means detected compromise
-    return votes.filter((v) => v[`test${test}`] === true).length
-  }
-
-  // Helper to percent
-  function percent(n: number, d: number) {
-    return d === 0 ? 0 : Math.round((n / d) * 1000) / 10
-  }
-
   // Calculate stats for each group
   return intersectionGroups.map((key) => {
     // Filter votes by which tests were run on them
@@ -98,22 +86,13 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
     const tests = getTestsFromKey(key)
 
     // For single-test groups, compromised is just that test; for intersections, use marginal counts
-    let signatures: (number | undefined)[]
-    let percentSignatures: (number | undefined)[]
-    if (tests.length === 1) {
-      const c = countCompromised(votes, tests[0])
-      signatures = [c]
-      percentSignatures = [percent(c, tested)]
-    } else {
-      signatures = getMarginalCompromisedCounts(votes, tests)
-      percentSignatures = getMarginalCompromisedPercents(votes, tests)
-    }
+    const signatures = getMarginalCompromisedCounts(votes, tests)
+    const percentSignatures = getMarginalCompromisedPercents(votes, tests)
 
     return {
       key,
       label: key, // For now, label is an alias to key
       tested,
-      percentCompromised: percentSignatures[0] ?? 0,
       signatures,
       percentSignatures,
     }
