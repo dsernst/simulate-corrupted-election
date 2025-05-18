@@ -306,4 +306,29 @@ describe('calculateTestResults', () => {
     }
     expect(testedA).toBe(1500)
   })
+
+  it('should handle small number of test C after A and B tests', () => {
+    const mt = new MT19937(42)
+    const compromisedVotes = 1000
+    const totalVotes = 10000
+
+    // Run a small number of C tests
+    const result = calculateTestResults(
+      { testA: '', testB: '', testC: '3' },
+      compromisedVotes,
+      totalVotes,
+      mt,
+      new Map() // Start with fresh vote map to simulate new run
+    )
+
+    // Verify C test results
+    expect(result.testBreakdown.testC.count).toBe(3)
+    expect(result.testBreakdown.testC.voteResults.length).toBe(3)
+    expect(
+      result.testBreakdown.testC.detectedCompromised
+    ).toBeGreaterThanOrEqual(0)
+    expect(result.testBreakdown.testC.detectedCompromised).toBeLessThanOrEqual(
+      3
+    )
+  })
 })
