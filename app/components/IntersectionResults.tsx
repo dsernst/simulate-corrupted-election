@@ -12,7 +12,8 @@ interface IntersectionResultsProps {
 }
 
 export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
-  if (!ranAtLeastTwoTypes(testRuns)) return null
+  const ran = ranAtLeastOneTestOf(testRuns)
+  if (!ranAtLeastTwoTypes(ran)) return null
 
   const layeredStats = calculateLayeredStats(testRuns)
 
@@ -27,8 +28,6 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
     second,
     matrix: calculateConfusionMatrix(testRuns, first, second),
   }))
-
-  // console.log(layeredStats)
 
   return (
     <div className="mt-8 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
@@ -48,6 +47,11 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
           <tbody>
             {layeredStats.map(
               ({ key, label, tested, compromises, percentages }) => {
+                // Hide intersection rows for tests that were never run
+                for (const [key, value] of Object.entries(ran)) {
+                  if (!value && label.includes(key)) return null
+                }
+
                 return (
                   <tr
                     key={label}
@@ -109,16 +113,16 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
   )
 }
 
-/** At least two different types of tests need to have run, to show results */
-function ranAtLeastTwoTypes(testRuns: TestRun[]) {
-  let sawA = false
-  let sawB = false
-  let sawC = false
-  for (const r of testRuns) {
-    if (r.results.testBreakdown.testA.count > 0) sawA = true
-    if (r.results.testBreakdown.testB.count > 0) sawB = true
-    if (r.results.testBreakdown.testC.count > 0) sawC = true
+/** Check whether there's been at least 1 probe of each type */
+function ranAtLeastOneTestOf(testRuns: TestRun[]) {
+  return {
+    A: testRuns.some((r) => r.results.testBreakdown.testA.count > 0),
+    B: testRuns.some((r) => r.results.testBreakdown.testB.count > 0),
+    C: testRuns.some((r) => r.results.testBreakdown.testC.count > 0),
   }
-  const typesSeen = [sawA, sawB, sawC].filter(Boolean).length
-  return typesSeen >= 2
+}
+
+/** Given a boolean map of which tests have been run, check whether at least two are true */
+function ranAtLeastTwoTypes(ran: ReturnType<typeof ranAtLeastOneTestOf>) {
+  return Object.values(ran).filter(Boolean).length >= 2
 }
