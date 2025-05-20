@@ -3,7 +3,7 @@ import {
   getFilterFromKey,
   getTestsFromKey,
   intersectionGroups,
-} from './create-intersections'
+} from './createIntersections'
 
 export type TestType = 'A' | 'B' | 'C'
 

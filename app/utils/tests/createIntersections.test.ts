@@ -4,7 +4,7 @@ import {
   getIndentFromKey,
   getFilterFromKey,
   generateIntersectingGroups,
-} from '../create-intersections'
+} from '../createIntersections'
 import { TestType, VoteResult } from '../calculateIntersections'
 
 type Key = string

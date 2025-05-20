@@ -3,7 +3,7 @@ import {
   calculateLayeredStats,
   calculateConfusionMatrix,
 } from '../utils/calculateIntersections'
-import { getIndentFromKey } from '../utils/create-intersections'
+import { getIndentFromKey } from '../utils/createIntersections'
 import ConfusionMatrix from './ConfusionMatrix'
 import { IntersectionResultsLabel } from './IntersectionResultsLabel'
 
