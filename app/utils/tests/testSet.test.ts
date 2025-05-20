@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'bun:test'
-import { testSetShorthand } from '../testSetShorthand'
+import { testSet } from '../testSet'
 
-describe('testSetShorthand', () => {
+describe('testSet', () => {
   it('should convert single test shorthand', () => {
-    expect(testSetShorthand('a500')).toEqual({
+    expect(testSet('a500')).toEqual({
       testA: '500',
       testB: '',
       testC: '',
@@ -11,7 +11,7 @@ describe('testSetShorthand', () => {
   })
 
   it('should convert two test shorthand', () => {
-    expect(testSetShorthand('a500b500')).toEqual({
+    expect(testSet('a500b500')).toEqual({
       testA: '500',
       testB: '500',
       testC: '',
@@ -19,7 +19,7 @@ describe('testSetShorthand', () => {
   })
 
   it('should convert all three tests shorthand', () => {
-    expect(testSetShorthand('a500b500c500')).toEqual({
+    expect(testSet('a500b500c500')).toEqual({
       testA: '500',
       testB: '500',
       testC: '500',
@@ -27,7 +27,7 @@ describe('testSetShorthand', () => {
   })
 
   it('should handle different order of tests', () => {
-    expect(testSetShorthand('b500a500')).toEqual({
+    expect(testSet('b500a500')).toEqual({
       testA: '500',
       testB: '500',
       testC: '',
@@ -35,7 +35,7 @@ describe('testSetShorthand', () => {
   })
 
   it('should handle empty string', () => {
-    expect(testSetShorthand('')).toEqual({
+    expect(testSet('')).toEqual({
       testA: '',
       testB: '',
       testC: '',
@@ -43,7 +43,7 @@ describe('testSetShorthand', () => {
   })
 
   it('should handle invalid input gracefully', () => {
-    expect(testSetShorthand('invalid')).toEqual({
+    expect(testSet('invalid')).toEqual({
       testA: '',
       testB: '',
       testC: '',
@@ -51,7 +51,7 @@ describe('testSetShorthand', () => {
   })
 
   it('should handle different numbers', () => {
-    expect(testSetShorthand('a100b200c300')).toEqual({
+    expect(testSet('a100b200c300')).toEqual({
       testA: '100',
       testB: '200',
       testC: '300',

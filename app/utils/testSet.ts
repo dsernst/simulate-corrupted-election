@@ -12,7 +12,7 @@ export interface TestSet {
  * @param shorthand The shorthand string to convert
  * @returns A TestSet object with the parsed values
  */
-export function testSetShorthand(shorthand: string): TestSet {
+export function testSet(shorthand: string): TestSet {
   const result: TestSet = {
     testA: '',
     testB: '',
