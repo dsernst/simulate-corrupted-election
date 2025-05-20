@@ -43,7 +43,10 @@ export const IntersectionResultsLabel = ({
   return (
     <>
       {parts.map((part, i) => (
-        <span key={i} className={(part.faded && tested && `opacity-20`) || ''}>
+        <span
+          key={i}
+          className={(part.faded && tested && `text-pink-700/30`) || ''}
+        >
           {part.text}
         </span>
       ))}
