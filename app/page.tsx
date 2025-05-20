@@ -34,7 +34,7 @@ export default function Home() {
   const handleRunTests = () => {
     if (!orchestrator) return alert('Simulation not initialized')
 
-    orchestrator.runTests(testResults)
+    setOrchestrator(orchestrator.runTests(testResults))
 
     // Reset the test request form
     setTestResults({

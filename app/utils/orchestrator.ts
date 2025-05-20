@@ -45,23 +45,16 @@ export class SimulationOrchestrator {
     return { ...this.state }
   }
 
-  reset(seed?: number): void {
+  reset(seed?: number): SimulationOrchestrator {
     const newSeed = seed ?? generateRandomSeed()
-    this.state = {
-      seed: newSeed,
-      simulation: generateSimulation(newSeed),
-      testRuns: [],
-      nextRunId: 1,
-      mt: new MT19937(newSeed),
-      voteMap: new Map<number, VoteTestResult>(),
-    }
+    return new SimulationOrchestrator(newSeed)
   }
 
   runTests(testCounts: {
     testA: string
     testB: string
     testC: string
-  }): TestRun {
+  }): SimulationOrchestrator {
     const results = calculateTestResults(
       testCounts,
       this.state.simulation.compromisedVotes,
@@ -76,10 +69,15 @@ export class SimulationOrchestrator {
       timestamp: new Date(),
     }
 
-    this.state.testRuns.push(testRun)
-    this.state.nextRunId++
+    const newOrchestrator = new SimulationOrchestrator(this.state.seed)
+    newOrchestrator.state = {
+      ...this.state,
+      testRuns: [...this.state.testRuns, testRun],
+      nextRunId: this.state.nextRunId + 1,
+      voteMap: new Map(this.state.voteMap),
+    }
 
-    return testRun
+    return newOrchestrator
   }
 
   getTestResults(): TestDetectionResults[] {

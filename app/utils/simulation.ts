@@ -197,21 +197,19 @@ export function calculateTestResults(
         globalVoteMap.set(voteId, voteResult)
       }
 
-      // Only run the test if it hasn't been run before
-      if (voteResult.testResults[`test${testType}`] === undefined) {
-        const isDetectedCompromised = runTest(
-          effectivenessRates,
-          voteResult.isActuallyCompromised,
-          mt
-        )
-        voteResult.testResults[`test${testType}`] = isDetectedCompromised
+      // Always run the test for the current run
+      const isDetectedCompromised = runTest(
+        effectivenessRates,
+        voteResult.isActuallyCompromised,
+        mt
+      )
+      voteResult.testResults[`test${testType}`] = isDetectedCompromised
 
-        testBreakdown[`test${testType}`].count++
-        if (isDetectedCompromised) {
-          testBreakdown[`test${testType}`].detectedCompromised++
-        }
-        testBreakdown[`test${testType}`].voteResults.push(voteResult)
+      testBreakdown[`test${testType}`].count++
+      if (isDetectedCompromised) {
+        testBreakdown[`test${testType}`].detectedCompromised++
       }
+      testBreakdown[`test${testType}`].voteResults.push(voteResult)
     }
 
     // For B tests, we need to split 50/50 between A-tested and A-untested votes
@@ -363,8 +361,12 @@ export function calculateTestResults(
   // Update test breakdown with all votes that have been tested
   for (const [voteId, voteResult] of globalVoteMap.entries()) {
     for (const testType of ['A', 'B', 'C'] as const) {
-      if (voteResult.testResults[`test${testType}`] !== undefined) {
-        const testKey = `test${testType}` as const
+      const testKey = `test${testType}` as const
+      // Only include results for tests actually requested in this run
+      if (
+        counts[testKey] > 0 &&
+        voteResult.testResults[testKey] !== undefined
+      ) {
         if (
           !testBreakdown[testKey].voteResults.some((v) => v.voteId === voteId)
         ) {
@@ -377,10 +379,17 @@ export function calculateTestResults(
   // Update counts based on vote results
   for (const testType of ['A', 'B', 'C'] as const) {
     const testKey = `test${testType}` as const
-    testBreakdown[testKey].count = testBreakdown[testKey].voteResults.length
-    testBreakdown[testKey].detectedCompromised = testBreakdown[
-      testKey
-    ].voteResults.filter((v) => v.testResults[testKey] === true).length
+    // Only count votes for tests actually requested in this run
+    if (counts[testKey] > 0) {
+      testBreakdown[testKey].count = testBreakdown[testKey].voteResults.length
+      testBreakdown[testKey].detectedCompromised = testBreakdown[
+        testKey
+      ].voteResults.filter((v) => v.testResults[testKey] === true).length
+    } else {
+      testBreakdown[testKey].count = 0
+      testBreakdown[testKey].detectedCompromised = 0
+      testBreakdown[testKey].voteResults = []
+    }
   }
 
   return { testBreakdown }
