@@ -302,12 +302,17 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
 
 describe('toDisplayLabelFromKey', () => {
   test('converts canonical keys to display labels', () => {
-    expect(toDisplayLabelFromKey('A')).toBe('A')
-    expect(toDisplayLabelFromKey('B')).toBe('B')
-    expect(toDisplayLabelFromKey('AB')).toBe('A & B')
-    expect(toDisplayLabelFromKey('ABC')).toBe('A & B & C')
-    expect(toDisplayLabelFromKey('B!A')).toBe('B & not A')
-    expect(toDisplayLabelFromKey('C!A!B')).toBe('C & not A & not B')
-    expect(toDisplayLabelFromKey('AC!B')).toBe('A & C & not B')
+    const mappings = {
+      A: 'A',
+      B: 'B',
+      AB: 'A & B',
+      ABC: 'A & B & C',
+      'B!A': 'B & not A',
+      'C!A!B': 'C & not A & not B',
+      'AC!B': 'A & C & not B',
+    }
+    for (const [key, expected] of Object.entries(mappings)) {
+      expect(toDisplayLabelFromKey(key)).toBe(expected)
+    }
   })
 })
