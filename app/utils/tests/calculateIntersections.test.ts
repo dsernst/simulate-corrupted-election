@@ -3,6 +3,7 @@ import { calculateLayeredStats, TestRun } from '../calculateIntersections'
 import { calculateTestResults } from '../simulation'
 import { MT19937 } from '../mt19937'
 import { toDisplayLabelFromKey } from '../calculateIntersections'
+import { testSet } from '../testSet'
 
 // Helper to create a TestResult
 function makeTestResult(
@@ -187,8 +188,8 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     // Use a global voteMap
     const globalVoteMap = new Map()
     // 400 A tests, 1194 B tests (batch 1)
-    const testCountsA = { testA: '400', testB: '0', testC: '0' }
-    const testCountsB = { testA: '0', testB: '1194', testC: '0' }
+    const testCountsA = testSet('a400')
+    const testCountsB = testSet('b1194')
     const resultsA = calculateTestResults(
       testCountsA,
       compromisedVotes,
@@ -204,8 +205,8 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
       globalVoteMap
     )
     // Now run a second batch of 100 A and 100 B
-    const testCountsA2 = { testA: '100', testB: '0', testC: '0' }
-    const testCountsB2 = { testA: '0', testB: '100', testC: '0' }
+    const testCountsA2 = testSet('a100')
+    const testCountsB2 = testSet('b100')
     const resultsA2 = calculateTestResults(
       testCountsA2,
       compromisedVotes,
@@ -244,7 +245,7 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     const globalVoteMap = new Map()
     // First test run: A=1000
     const resultsA1 = calculateTestResults(
-      { testA: '1000', testB: '0', testC: '0' },
+      testSet('a1000'),
       compromisedVotes,
       totalVotes,
       mt,
@@ -252,7 +253,7 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     )
     // Second test run: A=500 (A again)
     const resultsA2 = calculateTestResults(
-      { testA: '500', testB: '0', testC: '0' },
+      testSet('a500'),
       compromisedVotes,
       totalVotes,
       mt,
@@ -272,10 +273,10 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     const seed = 389518
     const totalVotes = 2000
     const compromisedVotes = 500
-    // First test run: A=1000, B=2000
+    // First test run: A=1000
     const mt1 = new MT19937(seed)
     const results1 = calculateTestResults(
-      { testA: '1000', testB: '0', testC: '0' },
+      testSet('a1000'),
       compromisedVotes,
       totalVotes,
       mt1
@@ -283,7 +284,7 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     // Second test run: A=500
     const mt2 = new MT19937(seed + 1)
     const results2 = calculateTestResults(
-      { testA: '500', testB: '0', testC: '0' },
+      testSet('a500'),
       compromisedVotes,
       totalVotes,
       mt2
