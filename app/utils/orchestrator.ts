@@ -23,6 +23,7 @@ export interface SimulationState {
   testRuns: TestRun[]
   nextRunId: number
   mt: MT19937
+  voteMap: Map<number, VoteTestResult>
 }
 
 export class SimulationOrchestrator {
@@ -36,6 +37,7 @@ export class SimulationOrchestrator {
       testRuns: [],
       nextRunId: 1,
       mt: new MT19937(initialSeed),
+      voteMap: new Map<number, VoteTestResult>(),
     }
   }
 
@@ -51,6 +53,7 @@ export class SimulationOrchestrator {
       testRuns: [],
       nextRunId: 1,
       mt: new MT19937(newSeed),
+      voteMap: new Map<number, VoteTestResult>(),
     }
   }
 
@@ -63,7 +66,8 @@ export class SimulationOrchestrator {
       testCounts,
       this.state.simulation.compromisedVotes,
       this.state.simulation.totalVotes,
-      this.state.mt
+      this.state.mt,
+      this.state.voteMap
     )
 
     const testRun: TestRun = {
@@ -111,7 +115,10 @@ export class SimulationOrchestrator {
     for (const vote of voteMap.values()) {
       const tests = Object.keys(vote.testResults)
       if (tests.length > 1) {
-        const key = tests.sort().join('∩')
+        const key = tests
+          .sort()
+          .map((test) => `test${test.slice(-1)}`)
+          .join('∩')
         intersections.set(key, (intersections.get(key) ?? 0) + 1)
       }
     }
