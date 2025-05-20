@@ -50,8 +50,10 @@ export function calculatePercentage(votes: number, total: number): string {
   return ((votes / total) * 100).toFixed(1)
 }
 
-export function generateSimulation(seed: number): SimulationResults {
-  const mt = new MT19937(seed)
+export function generateSimulation(
+  seed: number,
+  mt: MT19937
+): SimulationResults {
   const winnerVotes = Math.floor(mt.random() * 1000000)
   const runnerUpVotes = Math.floor(mt.random() * winnerVotes)
   const otherVotes = Math.floor(mt.random() * (winnerVotes * 0.2)) // Other votes up to 20% of winner's votes

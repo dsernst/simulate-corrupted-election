@@ -32,12 +32,13 @@ export class SimulationOrchestrator {
 
   constructor(seed?: number) {
     const initialSeed = seed ?? generateRandomSeed()
+    const mt = new MT19937(initialSeed)
     this.state = {
       seed: initialSeed,
-      simulation: generateSimulation(initialSeed),
+      simulation: generateSimulation(initialSeed, mt),
       testRuns: [],
       nextRunId: 1,
-      mt: new MT19937(initialSeed),
+      mt,
       voteMap: new Map<number, VoteTestResult>(),
     }
   }
