@@ -346,4 +346,89 @@ describe('calculateTestResults', () => {
     // With 3 tests, we should have at least 2 different combinations
     expect(combinations.size).toBeGreaterThanOrEqual(2)
   })
+
+  it('should calculate intersections correctly when tests are run sequentially', () => {
+    const mt = new MT19937(42)
+    const compromisedVotes = 1000
+    const totalVotes = 10000
+
+    // First run only test A
+    const resultA = calculateTestResults(
+      { testA: '100', testB: '', testC: '' },
+      compromisedVotes,
+      totalVotes,
+      mt
+    )
+
+    // Then run only test B
+    const resultB = calculateTestResults(
+      { testA: '', testB: '100', testC: '' },
+      compromisedVotes,
+      totalVotes,
+      mt
+    )
+
+    // Verify that we have results for both tests
+    expect(resultA.testBreakdown.testA.count).toBe(100)
+    expect(resultB.testBreakdown.testB.count).toBe(100)
+
+    // Verify that the vote results contain both test results
+    const voteResultsA = resultA.testBreakdown.testA.voteResults
+    const voteResultsB = resultB.testBreakdown.testB.voteResults
+
+    // Find votes that were tested by both A and B
+    const intersectionVotes = voteResultsA.filter((voteA) =>
+      voteResultsB.some(
+        (voteB) =>
+          voteB.voteId === voteA.voteId && voteB.testResults.testB !== undefined
+      )
+    )
+
+    // We should have some intersection votes
+    expect(intersectionVotes.length).toBeGreaterThan(30)
+
+    // Verify that the intersection votes have both test results
+    intersectionVotes.forEach((vote) => {
+      expect(vote.testResults.testA).toBeDefined()
+      expect(vote.testResults.testB).toBeDefined()
+    })
+  })
+
+  it('should calculate intersections correctly when tests are run simultaneously', () => {
+    const mt = new MT19937(42)
+    const compromisedVotes = 1000
+    const totalVotes = 10000
+
+    // Run both tests at once
+    const result = calculateTestResults(
+      { testA: '100', testB: '100', testC: '' },
+      compromisedVotes,
+      totalVotes,
+      mt
+    )
+
+    // Verify that we have results for both tests
+    expect(result.testBreakdown.testA.count).toBe(100)
+    expect(result.testBreakdown.testB.count).toBe(100)
+
+    // Find votes that were tested by both A and B
+    const voteResultsA = result.testBreakdown.testA.voteResults
+    const voteResultsB = result.testBreakdown.testB.voteResults
+
+    const intersectionVotes = voteResultsA.filter((voteA) =>
+      voteResultsB.some(
+        (voteB) =>
+          voteB.voteId === voteA.voteId && voteB.testResults.testB !== undefined
+      )
+    )
+
+    // We should have some intersection votes
+    expect(intersectionVotes.length).toBeGreaterThan(30)
+
+    // Verify that the intersection votes have both test results
+    intersectionVotes.forEach((vote) => {
+      expect(vote.testResults.testA).toBeDefined()
+      expect(vote.testResults.testB).toBeDefined()
+    })
+  })
 })
