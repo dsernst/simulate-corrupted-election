@@ -3,20 +3,15 @@
 import { useState, useEffect } from 'react'
 import { SimulationResultsDisplay } from './components/SimulationResults'
 import { TestResults } from './components/RequestTests'
-import {
-  SimulationResults,
-  generateSimulation,
-  calculateTestResults,
-} from './utils/simulation'
-import { TestRun } from './utils/calculateIntersections'
-import { MT19937 } from './utils/mt19937'
+import { SimulationOrchestrator } from './utils/orchestrator'
 
 function getRandomSeed() {
   return Math.floor(Math.random() * 1000000)
 }
 
 export default function Home() {
-  const [simulation, setSimulation] = useState<SimulationResults | null>(null)
+  const [orchestrator, setOrchestrator] =
+    useState<SimulationOrchestrator | null>(null)
   const [showCompromised, setShowCompromised] = useState(false)
   const [seed, setSeed] = useState<number>(getRandomSeed())
   const [showSeedInput, setShowSeedInput] = useState(false)
@@ -25,44 +20,21 @@ export default function Home() {
     testB: '',
     testC: '',
   })
-  const [testRuns, setTestRuns] = useState<TestRun[]>([])
-  const [nextRunId, setNextRunId] = useState(1)
-  const [mtState, setMtState] = useState<MT19937 | null>(null)
 
   const onStartOver = (newSeed?: number) => {
     const seedToUse = newSeed || getRandomSeed()
     setSeed(seedToUse)
-    setSimulation(generateSimulation(seedToUse))
+    setOrchestrator(new SimulationOrchestrator(seedToUse))
     setShowCompromised(false)
-    setTestRuns([])
-    setNextRunId(1)
-    setMtState(new MT19937(seedToUse))
   }
 
   // Simulate an election when the page first loads
   useEffect(() => onStartOver(), [])
 
   const handleRunTests = () => {
-    if (!simulation) return alert('Simulation not initialized')
-    if (!mtState) return alert('MT state not initialized')
+    if (!orchestrator) return alert('Simulation not initialized')
 
-    const results = calculateTestResults(
-      testResults,
-      simulation.compromisedVotes,
-      simulation.totalVotes,
-      mtState
-    )
-
-    // Add new test run to history
-    setTestRuns((prev) => [
-      ...prev,
-      {
-        id: nextRunId,
-        results,
-        timestamp: new Date(),
-      },
-    ])
-    setNextRunId((prev) => prev + 1)
+    orchestrator.runTests(testResults)
 
     // Reset the test request form
     setTestResults({
@@ -71,6 +43,18 @@ export default function Home() {
       testC: '',
     })
   }
+
+  if (!orchestrator) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center md:!p-10 p-2 py-10 gap-8">
+        <div className="italic animate-pulse text-black/50">
+          Loading initial simulation...
+        </div>
+      </main>
+    )
+  }
+
+  const state = orchestrator.getState()
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center md:!p-10 p-2 py-10 gap-8">
@@ -83,25 +67,19 @@ export default function Home() {
         </p>
       </div>
 
-      {!simulation ? (
-        <div className="italic animate-pulse text-black/50">
-          Loading initial simulation...
-        </div>
-      ) : (
-        <SimulationResultsDisplay
-          results={simulation}
-          showCompromised={showCompromised}
-          onToggleCompromised={() => setShowCompromised(!showCompromised)}
-          onStartOver={onStartOver}
-          testResults={testResults}
-          onTestResultsChange={setTestResults}
-          onRunTests={handleRunTests}
-          testRuns={testRuns}
-          seed={seed}
-          showSeedInput={showSeedInput}
-          onToggleSeedInput={() => setShowSeedInput(!showSeedInput)}
-        />
-      )}
+      <SimulationResultsDisplay
+        results={state.simulation}
+        showCompromised={showCompromised}
+        onToggleCompromised={() => setShowCompromised(!showCompromised)}
+        onStartOver={onStartOver}
+        testResults={testResults}
+        onTestResultsChange={setTestResults}
+        onRunTests={handleRunTests}
+        testRuns={state.testRuns}
+        seed={seed}
+        showSeedInput={showSeedInput}
+        onToggleSeedInput={() => setShowSeedInput(!showSeedInput)}
+      />
     </main>
   )
 }
