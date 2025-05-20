@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { MT19937 } from './mt19937'
+import { MT19937 } from '../mt19937'
 
 describe('MT19937', () => {
   test('produces reproducible sequences', () => {

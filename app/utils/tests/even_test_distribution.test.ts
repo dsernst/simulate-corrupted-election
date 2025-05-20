@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
-import { calculateTestResults } from './simulation'
-import { calculateLayeredStats } from './calculateIntersections'
-import { MT19937 } from './mt19937'
+import { calculateTestResults } from '../simulation'
+import { calculateLayeredStats } from '../calculateIntersections'
+import { MT19937 } from '../mt19937'
 
 describe('Even test distribution', () => {
   test('B tests should be split 50/50 between A and !A tested votes', () => {

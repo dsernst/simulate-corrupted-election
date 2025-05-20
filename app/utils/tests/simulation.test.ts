@@ -3,8 +3,8 @@ import {
   generateSimulation,
   calculateTestResults,
   type VoteTestResult,
-} from './simulation'
-import { MT19937 } from './mt19937'
+} from '../simulation'
+import { MT19937 } from '../mt19937'
 
 describe('generateSimulation', () => {
   it('should generate consistent results with the same seed', () => {

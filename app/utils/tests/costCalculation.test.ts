@@ -4,7 +4,7 @@ import {
   formatCost,
   calculateTestRunCost,
   calculateTotalTestRunsCost,
-} from './costCalculation'
+} from '../costCalculation'
 
 describe('costCalculation', () => {
   test('calculates total cost with default costs', () => {

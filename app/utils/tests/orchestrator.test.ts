@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { SimulationOrchestrator } from './orchestrator'
+import { SimulationOrchestrator } from '../orchestrator'
 
 describe('SimulationOrchestrator', () => {
   it('should maintain state between test runs', () => {
