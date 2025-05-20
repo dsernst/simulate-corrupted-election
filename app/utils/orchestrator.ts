@@ -6,6 +6,7 @@ import {
   generateSimulation,
   calculateTestResults,
 } from './simulation'
+import { calculateLayeredStats } from './calculateIntersections'
 
 function generateRandomSeed(): number {
   return Math.floor(Math.random() * 0x100000000)
@@ -84,43 +85,7 @@ export class SimulationOrchestrator {
     return this.state.testRuns.map((run) => run.results)
   }
 
-  getIntersections(): Map<string, number> {
-    const intersections = new Map<string, number>()
-    const voteMap = new Map<number, VoteTestResult>()
-
-    // Collect all test results into a single vote map
-    for (const run of this.state.testRuns) {
-      for (const testType of ['A', 'B', 'C'] as const) {
-        const testResults =
-          run.results.testBreakdown[`test${testType}`].voteResults
-        for (const vote of testResults) {
-          let existingVote = voteMap.get(vote.voteId)
-          if (!existingVote) {
-            existingVote = {
-              voteId: vote.voteId,
-              isActuallyCompromised: vote.isActuallyCompromised,
-              testResults: {},
-            }
-            voteMap.set(vote.voteId, existingVote)
-          }
-          existingVote.testResults[`test${testType}`] =
-            vote.testResults[`test${testType}`]
-        }
-      }
-    }
-
-    // Calculate intersections
-    for (const vote of voteMap.values()) {
-      const tests = Object.keys(vote.testResults)
-      if (tests.length > 1) {
-        const key = tests
-          .sort()
-          .map((test) => `test${test.slice(-1)}`)
-          .join('∩')
-        intersections.set(key, (intersections.get(key) ?? 0) + 1)
-      }
-    }
-
-    return intersections
+  getIntersections(): ReturnType<typeof calculateLayeredStats> {
+    return calculateLayeredStats(this.state.testRuns)
   }
 }

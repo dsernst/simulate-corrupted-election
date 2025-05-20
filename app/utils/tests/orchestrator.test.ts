@@ -20,7 +20,8 @@ describe('SimulationOrchestrator', () => {
 
     // Get intersections
     const intersections = orchestrator.getIntersections()
-    expect(intersections.get('testA∩testB')).toBeGreaterThan(0)
+    const get = (label: string) => intersections.find((g) => g.label === label)
+    expect(get('AB')?.tested).toBeGreaterThan(0)
   })
 
   it('should handle reset correctly', () => {
@@ -51,18 +52,12 @@ describe('SimulationOrchestrator', () => {
     orchestrator = orchestrator.runTests(testSet('c50'))
 
     const intersections = orchestrator.getIntersections()
+    const get = (label: string) => intersections.find((g) => g.label === label)
 
-    // Should have some A∩B intersections
-    expect(intersections.get('testA∩testB')).toBeGreaterThan(0)
-
-    // Should have some A∩C intersections
-    expect(intersections.get('testA∩testC')).toBeGreaterThan(0)
-
-    // Should have some B∩C intersections
-    expect(intersections.get('testB∩testC')).toBeGreaterThan(0)
-
-    // Should have some A∩B∩C intersections
-    expect(intersections.get('testA∩testB∩testC')).toBeGreaterThan(0)
+    // Should have AB, AC, BC, ABC intersections
+    ;['AB', 'AC', 'BC', 'ABC'].forEach((label) => {
+      expect(get(label)?.tested).toBeGreaterThan(10)
+    })
   })
 
   it('should calculate intersections correctly when tests are run sequentially', () => {
@@ -72,6 +67,7 @@ describe('SimulationOrchestrator', () => {
     orchestrator = orchestrator.runTests(testSet('a100'))
     const run1 = orchestrator.getState().testRuns[0]
     expect(run1.results.testBreakdown.testA.count).toBe(100)
+    expect(run1.results.testBreakdown.testB.count).toBe(0)
 
     // Then run only test B
     orchestrator = orchestrator.runTests(testSet('b100'))
@@ -80,42 +76,10 @@ describe('SimulationOrchestrator', () => {
 
     // Get intersections
     const intersections = orchestrator.getIntersections()
+    const get = (label: string) => intersections.find((g) => g.label === label)
 
     // We should have some A∩B intersections
-    expect(intersections.get('testA∩testB')).toBeGreaterThan(0)
-
-    // Verify that the intersection votes have both test results
-    const voteMap = new Map()
-    for (const run of [run1, run2]) {
-      for (const testType of ['A', 'B'] as const) {
-        const testResults =
-          run.results.testBreakdown[`test${testType}`].voteResults
-        for (const vote of testResults) {
-          let existingVote = voteMap.get(vote.voteId)
-          if (!existingVote) {
-            existingVote = {
-              voteId: vote.voteId,
-              testResults: {},
-            }
-            voteMap.set(vote.voteId, existingVote)
-          }
-          existingVote.testResults[`test${testType}`] =
-            vote.testResults[`test${testType}`]
-        }
-      }
-    }
-
-    // Count votes that have both test results
-    let intersectionCount = 0
-    for (const vote of voteMap.values()) {
-      if (
-        vote.testResults.testA !== undefined &&
-        vote.testResults.testB !== undefined
-      ) {
-        intersectionCount++
-      }
-    }
-    expect(intersectionCount).toBeGreaterThan(0)
+    expect(get('AB')?.tested).toBeGreaterThan(20)
   })
 
   it('should calculate intersections correctly when tests are run simultaneously', () => {
@@ -131,39 +95,9 @@ describe('SimulationOrchestrator', () => {
 
     // Get intersections
     const intersections = orchestrator.getIntersections()
+    const get = (label: string) => intersections.find((g) => g.label === label)
 
     // We should have some A∩B intersections
-    expect(intersections.get('testA∩testB')).toBeGreaterThan(0)
-
-    // Verify that the intersection votes have both test results
-    const voteMap = new Map()
-    for (const testType of ['A', 'B'] as const) {
-      const testResults =
-        run.results.testBreakdown[`test${testType}`].voteResults
-      for (const vote of testResults) {
-        let existingVote = voteMap.get(vote.voteId)
-        if (!existingVote) {
-          existingVote = {
-            voteId: vote.voteId,
-            testResults: {},
-          }
-          voteMap.set(vote.voteId, existingVote)
-        }
-        existingVote.testResults[`test${testType}`] =
-          vote.testResults[`test${testType}`]
-      }
-    }
-
-    // Count votes that have both test results
-    let intersectionCount = 0
-    for (const vote of voteMap.values()) {
-      if (
-        vote.testResults.testA !== undefined &&
-        vote.testResults.testB !== undefined
-      ) {
-        intersectionCount++
-      }
-    }
-    expect(intersectionCount).toBeGreaterThan(0)
+    expect(get('AB')?.tested).toBeGreaterThan(20)
   })
 })
