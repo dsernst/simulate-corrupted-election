@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { SimulationResultsDisplay } from './components/SimulationResults'
 import { TestResults } from './components/RequestTests'
 import { SimulationResults, generateSimulation } from './utils/simulation'
 import { TestRun } from './utils/calculateIntersections'
 import { MT19937 } from './utils/mt19937'
-import { useSearchParams, useRouter } from 'next/navigation'
 import {
   getInitialState,
   createUrlParams,
@@ -14,9 +14,8 @@ import {
   type TestRequest,
 } from './utils/urlState'
 
-export default function Home() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
+// Client component that handles all the client-side logic
+function SimulationClient() {
   const [simulation, setSimulation] = useState<SimulationResults | null>(null)
   const [showCompromised, setShowCompromised] = useState(false)
   const [showSeedInput, setShowSeedInput] = useState(false)
@@ -25,6 +24,9 @@ export default function Home() {
     testB: '',
     testC: '',
   })
+
+  const searchParams = useSearchParams()
+  const router = useRouter()
 
   // Initialize state from URL
   const { seed: initialSeed, testRequests: initialTestRequests } =
@@ -82,6 +84,29 @@ export default function Home() {
     })
   }
 
+  if (!simulation) {
+    return <Loading />
+  }
+
+  return (
+    <SimulationResultsDisplay
+      results={simulation}
+      showCompromised={showCompromised}
+      onToggleCompromised={() => setShowCompromised(!showCompromised)}
+      onStartOver={onStartOver}
+      testResults={testResults}
+      onTestResultsChange={setTestResults}
+      onRunTests={handleRunTests}
+      testRuns={testRuns}
+      seed={seed}
+      showSeedInput={showSeedInput}
+      onToggleSeedInput={() => setShowSeedInput(!showSeedInput)}
+    />
+  )
+}
+
+// Server component that provides the layout
+export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center md:!p-10 p-2 py-10 gap-8">
       <div className="text-center mb-8">
@@ -94,23 +119,7 @@ export default function Home() {
       </div>
 
       <Suspense fallback={<Loading />}>
-        {!simulation ? (
-          <Loading />
-        ) : (
-          <SimulationResultsDisplay
-            results={simulation}
-            showCompromised={showCompromised}
-            onToggleCompromised={() => setShowCompromised(!showCompromised)}
-            onStartOver={onStartOver}
-            testResults={testResults}
-            onTestResultsChange={setTestResults}
-            onRunTests={handleRunTests}
-            testRuns={testRuns}
-            seed={seed}
-            showSeedInput={showSeedInput}
-            onToggleSeedInput={() => setShowSeedInput(!showSeedInput)}
-          />
-        )}
+        <SimulationClient />
       </Suspense>
     </main>
   )
