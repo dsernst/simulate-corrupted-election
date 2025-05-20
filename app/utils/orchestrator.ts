@@ -35,7 +35,7 @@ export class SimulationOrchestrator {
     const mt = new MT19937(initialSeed)
     this.state = {
       seed: initialSeed,
-      simulation: generateSimulation(initialSeed, mt),
+      simulation: generateSimulation(mt),
       testRuns: [],
       nextRunId: 1,
       mt,
