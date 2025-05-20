@@ -1,17 +1,18 @@
 import { describe, expect, it } from 'bun:test'
 import { SimulationOrchestrator } from '../orchestrator'
+import { testSet } from '../testSet'
 
 describe('SimulationOrchestrator', () => {
   it('should maintain state between test runs', () => {
     const orchestrator = new SimulationOrchestrator(42)
 
     // Run first test
-    const run1 = orchestrator.runTests({ testA: '100', testB: '', testC: '' })
+    const run1 = orchestrator.runTests(testSet('a100'))
     expect(run1.id).toBe(1)
     expect(run1.results.testBreakdown.testA.count).toBe(100)
 
     // Run second test
-    const run2 = orchestrator.runTests({ testA: '', testB: '100', testC: '' })
+    const run2 = orchestrator.runTests(testSet('b100'))
     expect(run2.id).toBe(2)
     expect(run2.results.testBreakdown.testB.count).toBe(100)
 
@@ -24,8 +25,8 @@ describe('SimulationOrchestrator', () => {
     const orchestrator = new SimulationOrchestrator(42)
 
     // Run some tests
-    orchestrator.runTests({ testA: '100', testB: '', testC: '' })
-    orchestrator.runTests({ testA: '', testB: '100', testC: '' })
+    orchestrator.runTests(testSet('a100'))
+    orchestrator.runTests(testSet('b100'))
 
     // Reset with same seed
     orchestrator.reset(42)
@@ -34,7 +35,7 @@ describe('SimulationOrchestrator', () => {
     expect(state.nextRunId).toBe(1)
 
     // Run tests again
-    const run = orchestrator.runTests({ testA: '100', testB: '', testC: '' })
+    const run = orchestrator.runTests(testSet('a100'))
     expect(run.id).toBe(1)
   })
 
@@ -42,9 +43,9 @@ describe('SimulationOrchestrator', () => {
     const orchestrator = new SimulationOrchestrator(42)
 
     // Run tests in sequence
-    orchestrator.runTests({ testA: '100', testB: '', testC: '' })
-    orchestrator.runTests({ testA: '', testB: '100', testC: '' })
-    orchestrator.runTests({ testA: '', testB: '', testC: '50' })
+    orchestrator.runTests(testSet('a100'))
+    orchestrator.runTests(testSet('b100'))
+    orchestrator.runTests(testSet('c50'))
 
     const intersections = orchestrator.getIntersections()
 
@@ -65,11 +66,11 @@ describe('SimulationOrchestrator', () => {
     const orchestrator = new SimulationOrchestrator(42)
 
     // First run only test A
-    const run1 = orchestrator.runTests({ testA: '100', testB: '', testC: '' })
+    const run1 = orchestrator.runTests(testSet('a100'))
     expect(run1.results.testBreakdown.testA.count).toBe(100)
 
     // Then run only test B
-    const run2 = orchestrator.runTests({ testA: '', testB: '100', testC: '' })
+    const run2 = orchestrator.runTests(testSet('b100'))
     expect(run2.results.testBreakdown.testB.count).toBe(100)
 
     // Get intersections
@@ -116,7 +117,7 @@ describe('SimulationOrchestrator', () => {
     const orchestrator = new SimulationOrchestrator(42)
 
     // Run both tests at once
-    const run = orchestrator.runTests({ testA: '100', testB: '100', testC: '' })
+    const run = orchestrator.runTests(testSet('a100b100'))
 
     // Verify that we have results for both tests
     expect(run.results.testBreakdown.testA.count).toBe(100)
