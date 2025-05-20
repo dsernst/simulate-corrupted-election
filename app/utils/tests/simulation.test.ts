@@ -5,6 +5,7 @@ import {
   type VoteTestResult,
 } from '../simulation'
 import { MT19937 } from '../mt19937'
+import { testSet } from '../testSet'
 
 describe('generateSimulation', () => {
   it('should generate consistent results with the same seed', () => {
@@ -64,7 +65,7 @@ describe('generateSimulation', () => {
 describe('calculateTestResults', () => {
   it('should generate consistent results with the same seed', () => {
     const mt = new MT19937(12345)
-    const testCounts = { testA: '100', testB: '100', testC: '100' }
+    const testCounts = testSet('a100b100c100')
     const compromisedVotes = 1000
     const totalVotes = 10000
 
@@ -86,7 +87,7 @@ describe('calculateTestResults', () => {
   })
 
   it('should generate different results with different seeds', () => {
-    const testCounts = { testA: '100', testB: '100', testC: '100' }
+    const testCounts = testSet('a100b100c100')
     const compromisedVotes = 1000
     const totalVotes = 10000
 
@@ -162,7 +163,7 @@ describe('calculateTestResults', () => {
 
   it('should maintain consistent MT19937 state between test runs', () => {
     const mt = new MT19937(12345)
-    const testCounts = { testA: '10', testB: '10', testC: '10' }
+    const testCounts = testSet('a10b10c10')
     const compromisedVotes = 1000
     const totalVotes = 10000
 
@@ -188,11 +189,7 @@ describe('calculateTestResults', () => {
 
   it('should handle boundary test counts', () => {
     const mt = new MT19937(42)
-    const testCounts = {
-      testA: '0',
-      testB: '1',
-      testC: '1000000',
-    }
+    const testCounts = testSet('a0b1c1000000')
     const compromisedVotes = 1000
     const totalVotes = 10000
 
@@ -215,7 +212,7 @@ describe('calculateTestResults', () => {
 
   it('should handle edge case vote counts', () => {
     const mt = new MT19937(42)
-    const testCounts = { testA: '100', testB: '100', testC: '100' }
+    const testCounts = testSet('a100b100c100')
 
     // Test with no compromised votes
     const result1 = calculateTestResults(testCounts, 0, 10000, mt)
@@ -235,7 +232,7 @@ describe('calculateTestResults', () => {
 
   it('should maintain vote consistency across tests', () => {
     const mt = new MT19937(42)
-    const testCounts = { testA: '100', testB: '100', testC: '100' }
+    const testCounts = testSet('a100b100c100')
     const compromisedVotes = 1000
     const totalVotes = 10000
 
@@ -277,7 +274,7 @@ describe('calculateTestResults', () => {
     // First test set: A=1000, B=2000
     const voteMap = new Map()
     calculateTestResults(
-      { testA: '1000', testB: '2000', testC: '0' },
+      testSet('a1000b2000c0'),
       sim.compromisedVotes,
       sim.totalVotes,
       mt,
@@ -285,7 +282,7 @@ describe('calculateTestResults', () => {
     )
     // Second test set: A=500 (A again)
     calculateTestResults(
-      { testA: '500', testB: '0', testC: '0' },
+      testSet('a500b0c0'),
       sim.compromisedVotes,
       sim.totalVotes,
       mt,
@@ -307,7 +304,7 @@ describe('calculateTestResults', () => {
     // First run A and B tests to create some tested votes
     const voteMap = new Map()
     calculateTestResults(
-      { testA: '1000', testB: '1000', testC: '' },
+      testSet('a1000b1000c0'),
       compromisedVotes,
       totalVotes,
       mt,
@@ -316,7 +313,7 @@ describe('calculateTestResults', () => {
 
     // Then run a small number of C tests
     const result = calculateTestResults(
-      { testA: '', testB: '', testC: '3' },
+      testSet('c3'),
       compromisedVotes,
       totalVotes,
       mt,
