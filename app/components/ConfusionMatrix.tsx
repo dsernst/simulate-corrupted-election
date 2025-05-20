@@ -1,6 +1,8 @@
-import React from 'react'
-
-interface ConfusionMatrixProps {
+const ConfusionMatrix = ({
+  first,
+  second,
+  matrix,
+}: {
   first: string
   second: string
   matrix: {
@@ -10,12 +12,6 @@ interface ConfusionMatrixProps {
     compromised_compromised: number
     total: number
   }
-}
-
-const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({
-  first,
-  second,
-  matrix,
 }) => {
   const grandTotal =
     matrix.clean_clean +

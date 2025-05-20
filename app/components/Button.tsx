@@ -1,12 +1,3 @@
-interface ButtonProps {
-  onClick: () => void
-  children: React.ReactNode
-  variant?: 'primary' | 'success' | 'outline'
-  fullWidth?: boolean
-  className?: string
-  disabled?: boolean
-}
-
 export function Button({
   onClick,
   children,
@@ -14,7 +5,14 @@ export function Button({
   fullWidth = false,
   className = '',
   disabled = false,
-}: ButtonProps) {
+}: {
+  onClick: () => void
+  children: React.ReactNode
+  variant?: 'primary' | 'success' | 'outline'
+  fullWidth?: boolean
+  className?: string
+  disabled?: boolean
+}) {
   const baseClasses =
     'px-6 py-3 rounded-lg transition-colors text-lg font-semibold'
   const variantClasses = {
