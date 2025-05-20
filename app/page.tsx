@@ -5,15 +5,10 @@ import { SimulationResultsDisplay } from './components/SimulationResults'
 import { TestResults } from './components/RequestTests'
 import { SimulationOrchestrator } from './utils/orchestrator'
 
-function getRandomSeed() {
-  return Math.floor(Math.random() * 1000000)
-}
-
 export default function Home() {
   const [orchestrator, setOrchestrator] =
     useState<SimulationOrchestrator | null>(null)
   const [showCompromised, setShowCompromised] = useState(false)
-  const [seed, setSeed] = useState<number>(getRandomSeed())
   const [showSeedInput, setShowSeedInput] = useState(false)
   const [testResults, setTestResults] = useState<TestResults>({
     testA: '',
@@ -22,9 +17,7 @@ export default function Home() {
   })
 
   const onStartOver = (newSeed?: number) => {
-    const seedToUse = newSeed || getRandomSeed()
-    setSeed(seedToUse)
-    setOrchestrator(new SimulationOrchestrator(seedToUse))
+    setOrchestrator(new SimulationOrchestrator(newSeed))
     setShowCompromised(false)
   }
 
@@ -76,7 +69,7 @@ export default function Home() {
         onTestResultsChange={setTestResults}
         onRunTests={handleRunTests}
         testRuns={state.testRuns}
-        seed={seed}
+        seed={state.seed}
         showSeedInput={showSeedInput}
         onToggleSeedInput={() => setShowSeedInput(!showSeedInput)}
       />

@@ -9,7 +9,7 @@ import {
 import { calculateLayeredStats } from './calculateIntersections'
 
 function generateRandomSeed(): number {
-  return Math.floor(Math.random() * 0x100000000)
+  return Math.floor(Math.random() * 0x100000)
 }
 
 export interface TestRun {
