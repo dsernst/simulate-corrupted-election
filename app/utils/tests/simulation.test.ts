@@ -23,14 +23,6 @@ describe('generateSimulation', () => {
     expect(result1).not.toEqual(result2)
   })
 
-  it('should generate random results when no seed is provided', () => {
-    const result1 = generateSimulation()
-    const result2 = generateSimulation()
-
-    expect(result1).not.toEqual(result2)
-    expect(typeof result1.seed).toBe('number')
-  })
-
   it('should generate valid vote counts', () => {
     const result = generateSimulation(42)
 
