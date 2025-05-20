@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { calculateTestResults } from '../simulation'
 import { calculateLayeredStats } from '../calculateIntersections'
 import { MT19937 } from '../mt19937'
+import { testSet } from '../testSet'
 
 describe('Even test distribution', () => {
   test('B tests should be split 50/50 between A and !A tested votes', () => {
@@ -13,7 +14,7 @@ describe('Even test distribution', () => {
 
     // First run A tests on 1000 votes
     const aResults = calculateTestResults(
-      { testA: '1000', testB: '0', testC: '0' },
+      testSet('a1000'),
       compromisedVotes,
       totalVotes,
       mt,
@@ -22,7 +23,7 @@ describe('Even test distribution', () => {
 
     // Then run B tests on 1000 votes
     const bResults = calculateTestResults(
-      { testA: '0', testB: '1000', testC: '0' },
+      testSet('b1000'),
       compromisedVotes,
       totalVotes,
       mt,
@@ -56,7 +57,7 @@ describe('Even test distribution', () => {
 
     // First run A tests on 1000 votes
     const aResults = calculateTestResults(
-      { testA: '1000', testB: '0', testC: '0' },
+      testSet('a1000'),
       compromisedVotes,
       totalVotes,
       mt,
@@ -65,7 +66,7 @@ describe('Even test distribution', () => {
 
     // Then run B tests on 1000 votes
     const bResults = calculateTestResults(
-      { testA: '0', testB: '1000', testC: '0' },
+      testSet('b1000'),
       compromisedVotes,
       totalVotes,
       mt,
@@ -74,7 +75,7 @@ describe('Even test distribution', () => {
 
     // Finally run C tests on 1000 votes
     const cResults = calculateTestResults(
-      { testA: '0', testB: '0', testC: '1000' },
+      testSet('c1000'),
       compromisedVotes,
       totalVotes,
       mt,
@@ -143,16 +144,6 @@ describe('C test distribution edge cases', () => {
       totalVotes,
       mt
     )
-
-    // Get the intersection counts for C tests
-    // const testRuns = [{ id: 1, results: result, timestamp: new Date() }]
-    // const stats = calculateLayeredStats(testRuns)
-    // const get = (label: string) => stats.find((g) => g.label === label)
-    // const allThree = get('ABC')?.tested ?? 0
-    // const aAndC = get('AC!B')?.tested ?? 0
-    // const bAndC = get('BC!A')?.tested ?? 0
-    // const onlyC = get('C!A!B')?.tested ?? 0
-    // console.log({ allThree, aAndC, bAndC, onlyC })
 
     // Should not hang and should assign all 7 C tests
     expect(result.testBreakdown.testC.count).toBe(19)
