@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { SimulationResultsDisplay } from './components/SimulationResults'
 import { TestResults } from './components/RequestTests'
 import { SimulationResults, generateSimulation } from './utils/simulation'
@@ -93,25 +93,31 @@ export default function Home() {
         </p>
       </div>
 
-      {!simulation ? (
-        <div className="italic animate-pulse text-black/50">
-          Loading simulation...
-        </div>
-      ) : (
-        <SimulationResultsDisplay
-          results={simulation}
-          showCompromised={showCompromised}
-          onToggleCompromised={() => setShowCompromised(!showCompromised)}
-          onStartOver={onStartOver}
-          testResults={testResults}
-          onTestResultsChange={setTestResults}
-          onRunTests={handleRunTests}
-          testRuns={testRuns}
-          seed={seed}
-          showSeedInput={showSeedInput}
-          onToggleSeedInput={() => setShowSeedInput(!showSeedInput)}
-        />
-      )}
+      <Suspense fallback={<Loading />}>
+        {!simulation ? (
+          <Loading />
+        ) : (
+          <SimulationResultsDisplay
+            results={simulation}
+            showCompromised={showCompromised}
+            onToggleCompromised={() => setShowCompromised(!showCompromised)}
+            onStartOver={onStartOver}
+            testResults={testResults}
+            onTestResultsChange={setTestResults}
+            onRunTests={handleRunTests}
+            testRuns={testRuns}
+            seed={seed}
+            showSeedInput={showSeedInput}
+            onToggleSeedInput={() => setShowSeedInput(!showSeedInput)}
+          />
+        )}
+      </Suspense>
     </main>
   )
 }
+
+const Loading = () => (
+  <div className="italic animate-pulse text-black/50">
+    Loading simulation...
+  </div>
+)
