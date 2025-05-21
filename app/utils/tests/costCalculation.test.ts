@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import {
   calculateTotalCost,
   formatCost,
@@ -7,7 +7,7 @@ import {
 } from '../costCalculation'
 
 describe('costCalculation', () => {
-  test('calculates total cost with default costs', () => {
+  it('calculates total cost with default costs', () => {
     const testCounts = {
       testA: '1000', // 1000 A tests at $0.10 each = $100
       testB: '100', // 100 B tests at $1.00 each = $100
@@ -18,7 +18,7 @@ describe('costCalculation', () => {
     expect(totalCost).toBe(430)
   })
 
-  test('calculates total cost with custom costs', () => {
+  it('calculates total cost with custom costs', () => {
     const testCounts = {
       testA: '1000',
       testB: '100',
@@ -35,7 +35,7 @@ describe('costCalculation', () => {
     expect(totalCost).toBe(730) // (1000 * $0.03) + (100 * $2.00) + (10 * $50.00) = $730
   })
 
-  test('handles empty or invalid test counts', () => {
+  it('handles empty or invalid test counts', () => {
     const testCounts = {
       testA: '',
       testB: 'invalid',
@@ -46,7 +46,7 @@ describe('costCalculation', () => {
     expect(totalCost).toBe(0)
   })
 
-  test('formats costs as currency', () => {
+  it('formats costs as currency', () => {
     expect(formatCost(1234.56)).toBe('$1,234.56')
     expect(formatCost(0)).toBe('$0')
     expect(formatCost(0.1)).toBe('$0.10')
@@ -57,7 +57,7 @@ describe('costCalculation', () => {
     expect(formatCost(1.05)).toBe('$1.05')
   })
 
-  test('calculates cost of a test run', () => {
+  it('calculates cost of a test run', () => {
     const testRun = {
       testBreakdown: {
         testA: { count: 1000 },
@@ -70,7 +70,7 @@ describe('costCalculation', () => {
     expect(runCost).toBe(430)
   })
 
-  test('calculates cost of a test run with custom costs', () => {
+  it('calculates cost of a test run with custom costs', () => {
     const testRun = {
       testBreakdown: {
         testA: { count: 1000 },
@@ -89,7 +89,7 @@ describe('costCalculation', () => {
     expect(runCost).toBe(730) // (1000 * $0.03) + (100 * $2.00) + (10 * $50.00) = $730
   })
 
-  test('calculates total cost of all test runs', () => {
+  it('calculates total cost of all test runs', () => {
     const testRuns = [
       {
         results: {
@@ -115,7 +115,7 @@ describe('costCalculation', () => {
     expect(totalCost).toBe(645)
   })
 
-  test('calculates total cost of all test runs with custom costs', () => {
+  it('calculates total cost of all test runs with custom costs', () => {
     const testRuns = [
       {
         results: {
