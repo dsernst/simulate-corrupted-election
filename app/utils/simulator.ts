@@ -1,3 +1,5 @@
+import { LRUCache } from 'lru-cache'
+
 import { calculateLayeredStats } from './calculateIntersections'
 import {
   calculateTestResults,
@@ -23,7 +25,7 @@ interface SimulatorState {
 
 type TestsShorthand = string
 
-const _electionCache = new Map<number, ElectionResults>()
+const _electionCache = new LRUCache<number, ElectionResults>({ max: 50 })
 
 export class Simulator {
   public seed: number
