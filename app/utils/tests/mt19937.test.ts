@@ -1,8 +1,8 @@
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import { MT19937 } from '../mt19937'
 
 describe('MT19937', () => {
-  test('produces reproducible sequences', () => {
+  it('produces reproducible sequences', () => {
     const a = new MT19937(12345)
     const b = new MT19937(12345)
     for (let i = 0; i < 10; i++) {
@@ -10,7 +10,7 @@ describe('MT19937', () => {
     }
   })
 
-  test('produces different sequences for different seeds', () => {
+  it('produces different sequences for different seeds', () => {
     const a = new MT19937(12345)
     const b = new MT19937(54321)
     let different = false
@@ -20,7 +20,7 @@ describe('MT19937', () => {
     expect(different).toBe(true)
   })
 
-  test('output is always in [0, 1)', () => {
+  it('output is always in [0, 1)', () => {
     const mt = new MT19937(0)
     for (let i = 0; i < 1000; i++) {
       const v = mt.random()
@@ -30,7 +30,7 @@ describe('MT19937', () => {
   })
 
   // Known value test (first output for seed 5489 is ~0.8147236)
-  test('matches known output for seed 5489', () => {
+  it('matches known output for seed 5489', () => {
     const mt = new MT19937(5489)
     const first = mt.random()
     expect(Math.abs(first - 0.8147236)).toBeLessThan(1e-1)
