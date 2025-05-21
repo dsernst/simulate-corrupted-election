@@ -18,6 +18,8 @@ export interface SimulationState {
   voteMap: Map<number, VoteTestResult>
 }
 
+export type SimulatorPrivateState = Omit<SimulationState, 'seed'>
+
 export interface TestRun {
   id: number
   results: TestDetectionResults
@@ -35,7 +37,7 @@ export class Simulator {
     return this.tests.split('-').map(testSet)
   }
 
-  private state: SimulationState
+  private state: SimulatorPrivateState
 
   constructor(seed?: number, tests?: TestsShorthand) {
     const initialSeed = seed ?? generateRandomSeed()
@@ -44,7 +46,6 @@ export class Simulator {
       election: makeElection(mt),
       mt,
       nextRunId: 1,
-      seed: initialSeed,
       testRuns: [],
       voteMap: new Map<number, VoteTestResult>(),
     }
@@ -57,7 +58,7 @@ export class Simulator {
   }
 
   getState(): SimulationState {
-    return { ...this.state }
+    return { ...this.state, seed: this.seed }
   }
 
   runTests(testCounts: {
