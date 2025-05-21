@@ -234,3 +234,66 @@ describe('Simulator', () => {
     expect(state2.testRuns[0]).not.toEqual(state2.testRuns[1])
   })
 })
+
+describe('Refactored Simulator', () => {
+  it('should only store seed and tests as own properties', () => {
+    const sim = new Simulator(123)
+    sim.test('a10')
+    const ownProps = Object.keys(sim)
+    expect(ownProps).toEqual(expect.arrayContaining(['seed', 'tests']))
+    expect(ownProps).not.toEqual(
+      expect.arrayContaining(['election', 'mt', 'voteMap', 'testRuns'])
+    )
+  })
+
+  it('should decode testRunsShorthand into test run objects', () => {
+    const sim = new Simulator(123)
+    sim.test('a100-b50c5-a50')
+    // @ts-expect-error: accessing virtual property for test
+    const decoded = sim.testRuns
+    expect(decoded).toEqual([
+      { testA: '100' },
+      { testB: '50', testC: '5' },
+      { testA: '50' },
+    ])
+  })
+
+  it('should memoize election based only on seed', () => {
+    const sim = new Simulator(123)
+    // @ts-expect-error: accessing virtual property for test
+    const election1 = sim.election
+    sim.test('a10')
+    // @ts-expect-error: accessing virtual property for test
+    const election2 = sim.election
+    expect(election1).toBe(election2) // reference should not change
+
+    // If we change the seed (simulate by creating a new Simulator), the reference should change
+    const sim2 = new Simulator(456)
+    // @ts-expect-error: accessing virtual property for test
+    const election3 = sim2.election
+    expect(election3).not.toBe(election1)
+  })
+
+  it('should memoize intersections based on tests', () => {
+    const sim = new Simulator(123)
+    const intersections1 = sim.getIntersections()
+
+    // Reference should change after tests ran changes
+    sim.test('a10')
+    const intersections2 = sim.getIntersections()
+    expect(intersections1).not.toBe(intersections2)
+
+    // But if we call again without changing, should still be memoized reference
+    const intersections3 = sim.getIntersections()
+    expect(intersections2).toBe(intersections3)
+  })
+
+  it('should mutate in place', () => {
+    const sim = new Simulator(123)
+    expect(sim.getState().testRuns.length).toBe(0)
+
+    const result = sim.test('a10')
+    expect(result).toBe(sim)
+    expect(sim.getState().testRuns.length).toBe(1)
+  })
+})
