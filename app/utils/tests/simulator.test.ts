@@ -295,6 +295,7 @@ describe('Refactored Simulator', () => {
   })
 
   it('should update .tests as tests are run', () => {
+    // Mutably:
     const sim = new Simulator(SMALL_SEED)
     sim.test('a10')
     expect(sim.tests).toBe('a10')
@@ -302,9 +303,18 @@ describe('Refactored Simulator', () => {
     expect(sim.tests).toBe('a10-b5')
     sim.test('c10')
     expect(sim.tests).toBe('a10-b5-c10')
+
+    // Immutably:
+    let sim2 = new Simulator(SMALL_SEED)
+    sim2 = sim2.test('a10')
+    expect(sim2.tests).toBe('a10')
+    sim2 = sim2.test('b5')
+    expect(sim2.tests).toBe('a10-b5')
+    sim2 = sim2.test('c10')
+    expect(sim2.tests).toBe('a10-b5-c10')
   })
 
-  it.failing('should memoize intersections based on tests', () => {
+  it('should memoize intersections based on tests', () => {
     const sim = new Simulator(SMALL_SEED)
     const intersections1 = sim.getIntersections()
 

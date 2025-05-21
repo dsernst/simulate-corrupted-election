@@ -1,6 +1,6 @@
 import { LRUCache } from 'lru-cache'
 
-import { calculateLayeredStats } from './calculateIntersections'
+import { calculateLayeredStats, LayeredStat } from './calculateIntersections'
 import {
   calculateTestResults,
   ElectionResults,
@@ -9,7 +9,7 @@ import {
   VoteTestResult,
 } from './engine'
 import { MT19937 } from './mt19937'
-import { TestSet, testSet } from './testSet'
+import { TestSet, testSet, TestsShorthand, toTestSetString } from './testSet'
 
 export interface TestRun {
   id: number
@@ -17,15 +17,19 @@ export interface TestRun {
   timestamp: Date
 }
 
-interface SimulatorState {
+type CacheKey = `${Seed}.${TestsShorthand}`
+type Seed = number
+type SimulatorState = {
   mt: MT19937
   testRuns: TestRun[]
   voteMap: Map<number, VoteTestResult>
 }
 
-type TestsShorthand = string
+const _electionCache = new LRUCache<Seed, ElectionResults>({ max: 50 })
+const _intersectionCache = new LRUCache<CacheKey, LayeredStat[]>({ max: 20 })
 
-const _electionCache = new LRUCache<number, ElectionResults>({ max: 50 })
+const makeCacheKey = (seed: Seed, tests: TestsShorthand): CacheKey =>
+  `${seed}.${tests}`
 
 export class Simulator {
   public seed: number
@@ -60,8 +64,19 @@ export class Simulator {
     this.seed = initialSeed
   }
 
-  getIntersections(): ReturnType<typeof calculateLayeredStats> {
-    return calculateLayeredStats(this.state.testRuns)
+  getIntersections(): LayeredStat[] {
+    // Calc cache key from `seed` & `tests`
+    const cacheKey = makeCacheKey(this.seed, this.tests)
+
+    // Create cached copy on first access
+    if (!_intersectionCache.has(cacheKey))
+      _intersectionCache.set(
+        cacheKey,
+        calculateLayeredStats(this.state.testRuns)
+      )
+
+    // Always return cached copy
+    return _intersectionCache.get(cacheKey)!
   }
 
   getState(): SimulatorState {
@@ -81,13 +96,16 @@ export class Simulator {
       this.state.voteMap
     )
 
+    const newTests = toTestSetString(testCounts)
+    this.tests += (this.tests ? `-` : '') + newTests
+
     const testRun: TestRun = {
       id: this.state.testRuns.length + 1,
       results,
       timestamp: new Date(),
     }
 
-    const newSimulator = new Simulator(this.seed)
+    const newSimulator = new Simulator(this.seed, this.tests)
     newSimulator.state = {
       ...this.state,
       testRuns: [...this.state.testRuns, testRun],
