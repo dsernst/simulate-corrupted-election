@@ -7,7 +7,7 @@ import {
   VoteTestResult,
 } from './engine'
 import { MT19937 } from './mt19937'
-import { testSet } from './testSet'
+import { TestSet, testSet } from './testSet'
 
 export interface SimulationState {
   election: ElectionResults
@@ -24,10 +24,20 @@ export interface TestRun {
   timestamp: Date
 }
 
+type TestsShorthand = string
+
 export class Simulator {
+  public seed: number
+  public tests: TestsShorthand = ''
+
+  public get testSets(): TestSet[] {
+    if (!this.tests) return []
+    return this.tests.split('-').map(testSet)
+  }
+
   private state: SimulationState
 
-  constructor(seed?: number) {
+  constructor(seed?: number, tests?: TestsShorthand) {
     const initialSeed = seed ?? generateRandomSeed()
     const mt = new MT19937(initialSeed)
     this.state = {
@@ -38,6 +48,8 @@ export class Simulator {
       testRuns: [],
       voteMap: new Map<number, VoteTestResult>(),
     }
+    this.tests = tests ?? ''
+    this.seed = initialSeed
   }
 
   getIntersections(): ReturnType<typeof calculateLayeredStats> {
@@ -79,7 +91,7 @@ export class Simulator {
   }
 
   /** Syntactic sugar for .runTests(testSet('a500b100')) */
-  test(testSetShorthand: string): Simulator {
+  test(testSetShorthand: TestsShorthand): Simulator {
     const testCounts = testSet(testSetShorthand)
     return this.runTests(testCounts)
   }

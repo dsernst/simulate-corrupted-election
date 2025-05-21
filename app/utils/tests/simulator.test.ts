@@ -247,14 +247,13 @@ describe('Refactored Simulator', () => {
   })
 
   it('should decode testRunsShorthand into test run objects', () => {
-    const sim = new Simulator(123)
-    sim.test('a100-b50c5-a50')
-    // @ts-expect-error: accessing virtual property for test
-    const decoded = sim.testRuns
+    const sim = new Simulator(123, 'a100-b50c5-a50')
+
+    const decoded = sim.testSets
     expect(decoded).toEqual([
-      { testA: '100' },
-      { testB: '50', testC: '5' },
-      { testA: '50' },
+      { testA: '100', testB: '', testC: '' },
+      { testA: '', testB: '50', testC: '5' },
+      { testA: '50', testB: '', testC: '' },
     ])
   })
 
