@@ -1,4 +1,4 @@
-import { expect, describe, test } from 'bun:test'
+import { expect, describe, it } from 'bun:test'
 import { calculateLayeredStats, TestRun } from '../calculateIntersections'
 import { calculateTestResults } from '../engine'
 import { MT19937 } from '../mt19937'
@@ -46,7 +46,7 @@ function makeTestRun(run: {
 }
 
 describe('calculateLayeredStats', () => {
-  test('correctly groups votes for A, B, B & A, and B & not A', () => {
+  it('correctly groups votes for A, B, B & A, and B & not A', () => {
     const testRuns: TestRun[] = [
       { A: [{ id: 1, c: false, r: true }], B: [{ id: 1, c: false, r: false }] },
       { B: [{ id: 2, c: false, r: true }] },
@@ -63,7 +63,7 @@ describe('calculateLayeredStats', () => {
     expect(get('B!A')?.tested).toBe(1)
   })
 
-  test('correctly groups votes for all A/B/C combinations', () => {
+  it('correctly groups votes for all A/B/C combinations', () => {
     const testRuns: TestRun[] = [
       {
         A: [{ id: 1, c: false, r: true }],
@@ -96,7 +96,7 @@ describe('calculateLayeredStats', () => {
 })
 
 describe('calculateLayeredStats - overlap scenarios', () => {
-  test('all B tests are also A tests (full overlap)', () => {
+  it('all B tests are also A tests (full overlap)', () => {
     // 400 A, 400 B, all on same votes
     const votes = Array.from({ length: 400 }, (_, i) => ({
       id: i + 1,
@@ -112,7 +112,7 @@ describe('calculateLayeredStats - overlap scenarios', () => {
     expect(get('B!A')?.tested).toBe(0)
   })
 
-  test('no overlap between A and B', () => {
+  it('no overlap between A and B', () => {
     // 400 A (1-400), 400 B (401-800)
     const votesA = Array.from({ length: 400 }, (_, i) => ({
       id: i + 1,
@@ -133,7 +133,7 @@ describe('calculateLayeredStats - overlap scenarios', () => {
     expect(get('B!A')?.tested).toBe(400)
   })
 
-  test('partial overlap between A and B', () => {
+  it('partial overlap between A and B', () => {
     // 400 A (1-400), 400 B (201-600)
     const votesA = Array.from({ length: 400 }, (_, i) => ({
       id: i + 1,
@@ -154,7 +154,7 @@ describe('calculateLayeredStats - overlap scenarios', () => {
     expect(get('B!A')?.tested).toBe(200) // 401-600
   })
 
-  test('B tests much more numerous than A, with some overlap', () => {
+  it('B tests much more numerous than A, with some overlap', () => {
     // 400 A (1-400), 1194 B (201-1394)
     const votesA = Array.from({ length: 400 }, (_, i) => ({
       id: i + 1,
@@ -181,7 +181,7 @@ describe('calculateLayeredStats - overlap scenarios', () => {
 })
 
 describe('calculateLayeredStats - with calculateTestResults', () => {
-  test('realistic simulation with calculateTestResults and seeded MT19937', () => {
+  it('realistic simulation with calculateTestResults and seeded MT19937', () => {
     const totalVotes = 2000
     const compromisedVotes = 500
     const mt = new MT19937(12345)
@@ -238,7 +238,7 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     expect((get('AB')?.tested ?? 0) + (get('B!A')?.tested ?? 0)).toBe(1294)
   })
 
-  test('accumulates unique tested votes for A across multiple test runs (A=1000, then A=500)', () => {
+  it('accumulates unique tested votes for A across multiple test runs (A=1000, then A=500)', () => {
     const totalVotes = 2000
     const compromisedVotes = 500
     const mt = new MT19937(389518)
@@ -269,7 +269,7 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     expect(get('A')?.tested).toBe(1500)
   })
 
-  test('aggregates unique tested votes for A across independent runs (should be > 1000)', () => {
+  it('aggregates unique tested votes for A across independent runs (should be > 1000)', () => {
     const seed = 389518
     const totalVotes = 2000
     const compromisedVotes = 500
@@ -302,7 +302,7 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
 })
 
 describe('toDisplayLabelFromKey', () => {
-  test('converts canonical keys to display labels', () => {
+  it('converts canonical keys to display labels', () => {
     const mappings = {
       A: 'A',
       B: 'B',
