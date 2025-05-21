@@ -1,26 +1,26 @@
 import { describe, expect, it } from 'bun:test'
-import { SimulationOrchestrator } from '../orchestrator'
+import { Simulator } from '../simulator'
 import { testSet } from '../testSet'
 import { SMALL_SEED } from './evenTestDistribution.test'
 
-describe('SimulationOrchestrator', () => {
+describe('Simulator', () => {
   it('should maintain state between test runs', () => {
-    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
+    let simulator = new Simulator(SMALL_SEED)
 
     // Run first test
-    orchestrator = orchestrator.runTests(testSet('a100'))
-    const run1 = orchestrator.getState().testRuns[0]
+    simulator = simulator.runTests(testSet('a100'))
+    const run1 = simulator.getState().testRuns[0]
     expect(run1.id).toBe(1)
     expect(run1.results.testBreakdown.testA.count).toBe(100)
 
     // Run second test
-    orchestrator = orchestrator.runTests(testSet('b100'))
-    const run2 = orchestrator.getState().testRuns[1]
+    simulator = simulator.runTests(testSet('b100'))
+    const run2 = simulator.getState().testRuns[1]
     expect(run2.id).toBe(2)
     expect(run2.results.testBreakdown.testB.count).toBe(100)
 
     // Get intersections
-    const intersections = orchestrator.getIntersections()
+    const intersections = simulator.getIntersections()
     const get = (label: string) => intersections.find((g) => g.label === label)
     expect(get('AB')?.tested).toBeGreaterThan(0)
   })
@@ -28,19 +28,19 @@ describe('SimulationOrchestrator', () => {
   it('should maintain consistent results with same seed', () => {
     const SEED = SMALL_SEED
 
-    // Create first orchestrator and run some tests
-    let orchestrator1 = new SimulationOrchestrator(SEED)
-    orchestrator1 = orchestrator1.runTests(testSet('a100'))
-    orchestrator1 = orchestrator1.runTests(testSet('b100'))
-    const state1 = orchestrator1.getState()
+    // Create first simulator and run some tests
+    let simulator1 = new Simulator(SEED)
+    simulator1 = simulator1.runTests(testSet('a100'))
+    simulator1 = simulator1.runTests(testSet('b100'))
+    const state1 = simulator1.getState()
 
-    // Create second orchestrator with same seed and run same tests
-    let orchestrator2 = new SimulationOrchestrator(SEED)
-    orchestrator2 = orchestrator2.runTests(testSet('a100'))
-    orchestrator2 = orchestrator2.runTests(testSet('b100'))
-    const state2 = orchestrator2.getState()
+    // Create second simulator with same seed and run same tests
+    let simulator2 = new Simulator(SEED)
+    simulator2 = simulator2.runTests(testSet('a100'))
+    simulator2 = simulator2.runTests(testSet('b100'))
+    const state2 = simulator2.getState()
 
-    // Simulated election results should be identical
+    // Results should be identical
     expect(state1.election).toEqual(state2.election)
 
     const compareWithoutTimestamp = (runs: typeof state1.testRuns) =>
@@ -53,11 +53,11 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should maintain vote consistency across tests', () => {
-    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
+    let simulator = new Simulator(SMALL_SEED)
 
     // Run multiple tests on the same votes
-    orchestrator = orchestrator.runTests(testSet('a100b100c100'))
-    const state = orchestrator.getState()
+    simulator = simulator.runTests(testSet('a100b100c100'))
+    const state = simulator.getState()
 
     // Check that each vote maintains consistent test results
     const voteResults = new Map()
@@ -80,16 +80,16 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should accumulate tested votes for repeated test sets', () => {
-    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
+    let simulator = new Simulator(SMALL_SEED)
 
     // First test set: A=1000
-    orchestrator = orchestrator.runTests(testSet('a1000'))
+    simulator = simulator.runTests(testSet('a1000'))
 
     // Second test set: A=500 (A again)
-    orchestrator = orchestrator.runTests(testSet('a500'))
+    simulator = simulator.runTests(testSet('a500'))
 
     // Get the vote map from state
-    const state = orchestrator.getState()
+    const state = simulator.getState()
     let testedA = 0
     for (const v of state.voteMap.values()) {
       if (v.testResults.testA !== undefined) testedA++
@@ -98,14 +98,14 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should handle small number of test C after A and B tests', () => {
-    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
+    let simulator = new Simulator(SMALL_SEED)
 
     // First run A and B tests
-    orchestrator = orchestrator.runTests(testSet('a1000b1000'))
+    simulator = simulator.runTests(testSet('a1000b1000'))
 
     // Then run a small number of C tests
-    orchestrator = orchestrator.runTests(testSet('c3'))
-    const state = orchestrator.getState()
+    simulator = simulator.runTests(testSet('c3'))
+    const state = simulator.getState()
     const lastRun = state.testRuns[state.testRuns.length - 1]
 
     // Verify C test results
@@ -125,9 +125,9 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should handle empty test counts', () => {
-    let orchestrator = new SimulationOrchestrator(42)
-    orchestrator = orchestrator.runTests({ testA: '', testB: '', testC: '' })
-    const state = orchestrator.getState()
+    let simulator = new Simulator(42)
+    simulator = simulator.runTests({ testA: '', testB: '', testC: '' })
+    const state = simulator.getState()
     const run = state.testRuns[0]
 
     expect(run.results.testBreakdown.testA.count).toBe(0)
@@ -136,33 +136,33 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should throw on invalid test counts', () => {
-    const orchestrator = new SimulationOrchestrator(42)
+    const simulator = new Simulator(42)
 
     // Invalid A count: 'invalid'
     expect(() =>
-      orchestrator.runTests({ testA: 'invalid', testB: '0', testC: '0' })
+      simulator.runTests({ testA: 'invalid', testB: '0', testC: '0' })
     ).toThrow()
 
     // Invalid B count: '-1'
     expect(() =>
-      orchestrator.runTests({ testA: '0', testB: '-1', testC: '0' })
+      simulator.runTests({ testA: '0', testB: '-1', testC: '0' })
     ).toThrow()
 
     // Invalid C count: 'abc'
     expect(() =>
-      orchestrator.runTests({ testA: '0', testB: '0', testC: 'abc' })
+      simulator.runTests({ testA: '0', testB: '0', testC: 'abc' })
     ).toThrow()
   })
 
   it('should calculate intersections correctly across multiple runs', () => {
-    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
+    let simulator = new Simulator(SMALL_SEED)
 
     // Run tests in sequence
-    orchestrator = orchestrator.runTests(testSet('a100'))
-    orchestrator = orchestrator.runTests(testSet('b100'))
-    orchestrator = orchestrator.runTests(testSet('c50'))
+    simulator = simulator.runTests(testSet('a100'))
+    simulator = simulator.runTests(testSet('b100'))
+    simulator = simulator.runTests(testSet('c50'))
 
-    const intersections = orchestrator.getIntersections()
+    const intersections = simulator.getIntersections()
     const get = (label: string) => intersections.find((g) => g.label === label)
 
     // Should have AB, AC, BC, ABC intersections
@@ -172,21 +172,21 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should calculate intersections correctly when tests are run sequentially', () => {
-    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
+    let simulator = new Simulator(SMALL_SEED)
 
     // First run only test A
-    orchestrator = orchestrator.runTests(testSet('a100'))
-    const run1 = orchestrator.getState().testRuns[0]
+    simulator = simulator.runTests(testSet('a100'))
+    const run1 = simulator.getState().testRuns[0]
     expect(run1.results.testBreakdown.testA.count).toBe(100)
     expect(run1.results.testBreakdown.testB.count).toBe(0)
 
     // Then run only test B
-    orchestrator = orchestrator.runTests(testSet('b100'))
-    const run2 = orchestrator.getState().testRuns[1]
+    simulator = simulator.runTests(testSet('b100'))
+    const run2 = simulator.getState().testRuns[1]
     expect(run2.results.testBreakdown.testB.count).toBe(100)
 
     // Get intersections
-    const intersections = orchestrator.getIntersections()
+    const intersections = simulator.getIntersections()
     const get = (label: string) => intersections.find((g) => g.label === label)
 
     // We should have some A∩B intersections
@@ -194,18 +194,18 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should calculate intersections correctly when tests are run simultaneously', () => {
-    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
+    let simulator = new Simulator(SMALL_SEED)
 
     // Run both tests at once
-    orchestrator = orchestrator.runTests(testSet('a100b100'))
-    const run = orchestrator.getState().testRuns[0]
+    simulator = simulator.runTests(testSet('a100b100'))
+    const run = simulator.getState().testRuns[0]
 
     // Verify that we have results for both tests
     expect(run.results.testBreakdown.testA.count).toBe(100)
     expect(run.results.testBreakdown.testB.count).toBe(100)
 
     // Get intersections
-    const intersections = orchestrator.getIntersections()
+    const intersections = simulator.getIntersections()
     const get = (label: string) => intersections.find((g) => g.label === label)
 
     // We should have some A∩B intersections
@@ -213,17 +213,17 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should track accumulating MT state between test runs', () => {
-    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
+    let simulator = new Simulator(SMALL_SEED)
     const SAME_TEST_SET = testSet('a100')
 
     // Run some tests
-    orchestrator = orchestrator.runTests(SAME_TEST_SET)
-    const state1 = orchestrator.getState()
+    simulator = simulator.runTests(SAME_TEST_SET)
+    const state1 = simulator.getState()
     expect(state1.testRuns.length).toBe(1)
 
     // Run the same tests again
-    orchestrator = orchestrator.runTests(SAME_TEST_SET)
-    const state2 = orchestrator.getState()
+    simulator = simulator.runTests(SAME_TEST_SET)
+    const state2 = simulator.getState()
     expect(state2.testRuns.length).toBe(2)
 
     // The first test run should still be the same
