@@ -18,7 +18,6 @@ const TESTS = [
     label: 'Test A',
     subtitle: 'Voter Autonomous',
     description: 'Easiest, but least reliable',
-    bias: 'High',
     cost: DEFAULT_TEST_COSTS.testA,
   },
   {
@@ -26,7 +25,6 @@ const TESTS = [
     label: 'Test B',
     subtitle: 'Guided by Auditor',
     description: 'Medium cost & reliability',
-    bias: 'Medium',
     cost: DEFAULT_TEST_COSTS.testB,
   },
   {
@@ -34,7 +32,6 @@ const TESTS = [
     label: 'Test C',
     subtitle: 'Against In-person Paper',
     description: 'Highest cost, perfect accuracy',
-    bias: 'Low',
     cost: DEFAULT_TEST_COSTS.testC,
   },
 ] as const

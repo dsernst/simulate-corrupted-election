@@ -17,7 +17,6 @@ export interface LayeredStat {
   key: string
   label: string
   tested: number
-  bias?: string
   compromises: (number | undefined)[]
   percentages: (number | undefined)[]
 }
