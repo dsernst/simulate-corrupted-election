@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import {
   getTestsFromKey,
   getIndentFromKey,
@@ -31,19 +31,19 @@ describe('intersection groups', () => {
     ['C!A!B', 2, ['C']],
   ]
 
-  test('should derive tests from key correctly', () => {
+  it('should derive tests from key correctly', () => {
     testCases.forEach(([key, , tests]) => {
       expect(getTestsFromKey(key)).toEqual(tests)
     })
   })
 
-  test('should derive indent level from key correctly', () => {
+  it('should derive indent level from key correctly', () => {
     testCases.forEach(([key, indent]) => {
       expect(getIndentFromKey(key)).toBe(indent)
     })
   })
 
-  test('should derive filter function from key correctly', () => {
+  it('should derive filter function from key correctly', () => {
     type WasTested = [number, number, number]
     type ShouldPass = boolean
     const cases: [Key, WasTested, ShouldPass][] = [
@@ -87,7 +87,7 @@ describe('intersection groups', () => {
 describe('generateIntersectionGroups', () => {
   const groups = generateIntersectingGroups(['A', 'B', 'C'] as TestType[])
 
-  test('generates all expected combinations', () => {
+  it('generates all expected combinations', () => {
     // Single tests
     const singleTests = ['A', 'B', 'C']
     singleTests.forEach((test) => {
@@ -127,7 +127,7 @@ describe('generateIntersectionGroups', () => {
   })
 
   const getIndex = (name: string) => groups.indexOf(name)
-  test('orders all-positive before negative for two-test and three-test groups', () => {
+  it('orders all-positive before negative for two-test and three-test groups', () => {
     // Helper to get indices for group names
 
     // Two-test groups
@@ -150,7 +150,7 @@ describe('generateIntersectionGroups', () => {
     expect(threePositive).toBeLessThan(Math.min(...threeNegatives))
   })
 
-  test('orders negatives alphabetically', () => {
+  it('orders negatives alphabetically', () => {
     // Expected order for two test negations
     expect(getIndex('A!B')).toBeLessThan(getIndex('B!A'))
     expect(getIndex('A!C')).toBeLessThan(getIndex('C!A'))
