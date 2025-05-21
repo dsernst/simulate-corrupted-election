@@ -286,8 +286,7 @@ describe('Refactored Simulator', () => {
     const sim2 = sim.test('b5')
     const electionResults3 = sim2.election
     // Same seed, expect same reference
-    expect(electionResults3).not.toBe(electionResults1) // <-- wrong   FIXME
-    // expect(electionResults3).toBe(electionResults1) // <-- goal     FIXME
+    expect(electionResults3).toBe(electionResults1)
 
     // If we change the seed, expect different reference
     const sim3 = new Simulator(456)

@@ -23,6 +23,8 @@ interface SimulatorState {
 
 type TestsShorthand = string
 
+const _electionCache = new Map<number, ElectionResults>()
+
 export class Simulator {
   public seed: number
   public tests: TestsShorthand = ''
@@ -30,18 +32,17 @@ export class Simulator {
   /** Memoized election results from seed */
   public get election(): ElectionResults {
     // Create cached copy on first access
-    if (!this._election) this._election = makeElection(new MT19937(this.seed))
+    if (!_electionCache.has(this.seed))
+      _electionCache.set(this.seed, makeElection(new MT19937(this.seed)))
 
     // Always return cached copy
-    return this._election
+    return _electionCache.get(this.seed)!
   }
 
   public get testSets(): TestSet[] {
     if (!this.tests) return []
     return this.tests.split('-').map(testSet)
   }
-
-  private _election: ElectionResults | undefined
 
   private state: SimulatorState
 
