@@ -12,7 +12,6 @@ import { TestSet, testSet } from './testSet'
 export interface SimulationState {
   election: ElectionResults
   mt: MT19937
-  seed: number
   testRuns: TestRun[]
   voteMap: Map<number, VoteTestResult>
 }
@@ -56,7 +55,7 @@ export class Simulator {
   }
 
   getState(): SimulationState {
-    return { ...this.state, seed: this.seed }
+    return { ...this.state }
   }
 
   runTests(testCounts: {

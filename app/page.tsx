@@ -43,7 +43,7 @@ export default function Home() {
         onToggleSeedInput={() => setShowSeedInput(!showSeedInput)}
         requestedTests={requestedTests}
         results={state.election}
-        seed={state.seed}
+        seed={simulator.seed}
         setRequestedTests={setRequestedTests}
         showCompromised={showCompromised}
         showSeedInput={showSeedInput}
