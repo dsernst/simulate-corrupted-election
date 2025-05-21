@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "bun test",
-    "testslow": "bun test --time 2>&1 | grep -E '[[0-9.]+ms]' | awk -F'[][]' '{print $2, $0}' | sort -nr | cut -d' ' -f2-",
+    "testslow": "bun scripts/find-slow-tests.js",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
