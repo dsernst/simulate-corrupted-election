@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 
-import { testSet } from '../testSet'
+import { testSet, toTestSetString } from '../testSet'
 
 describe('testSet', () => {
   it('should convert single test shorthand', () => {
@@ -57,5 +57,36 @@ describe('testSet', () => {
       testB: '200',
       testC: '300',
     })
+  })
+})
+
+describe('toTestSetString', () => {
+  it('should convert test set to shorthand', () => {
+    expect(
+      toTestSetString({ testA: '100', testB: '200', testC: '300' })
+    ).toEqual('a100b200c300')
+  })
+
+  it('should handle empty sets', () => {
+    expect(toTestSetString({ testA: '', testB: '', testC: '' })).toEqual('')
+  })
+
+  it('should handle missing tests', () => {
+    expect(toTestSetString({ testA: '100', testB: '', testC: '' })).toEqual(
+      'a100'
+    )
+  })
+
+  it('should handle multiple tests', () => {
+    expect(toTestSetString({ testA: '100', testB: '200', testC: '' })).toEqual(
+      'a100b200'
+    )
+  })
+
+  it('should undo testSet', () => {
+    const example = 'a100b200c300'
+    const asObject = testSet(example)
+    expect(asObject).not.toEqual(example)
+    expect(toTestSetString(asObject)).toEqual(example)
   })
 })

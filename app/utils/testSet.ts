@@ -3,6 +3,7 @@ export interface TestSet {
   testB: string
   testC: string
 }
+export type TestsShorthand = string
 
 /**
  * Converts a shorthand string into a TestSet object.
@@ -12,7 +13,7 @@ export interface TestSet {
  * @param shorthand The shorthand string to convert
  * @returns A TestSet object with the parsed values
  */
-export function testSet(shorthand: string): TestSet {
+export function testSet(shorthand: TestsShorthand): TestSet {
   const result: TestSet = {
     testA: '',
     testB: '',
@@ -39,4 +40,12 @@ export function testSet(shorthand: string): TestSet {
   }
 
   return result
+}
+
+/** Converts test objects -> shorthand strings */
+export function toTestSetString(testCounts: TestSet): TestsShorthand {
+  return Object.entries(testCounts)
+    .filter(([, count]) => +count > 0)
+    .map(([test, count]) => `${test.slice(4).toLowerCase()}${count}`)
+    .join('')
 }
