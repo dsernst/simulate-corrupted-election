@@ -5,21 +5,7 @@ import { TestHistory } from './TestHistory'
 import { TestRun } from '../utils/calculateIntersections'
 import { PreliminaryResults } from './PreliminaryResults'
 
-interface SimulationResultsProps {
-  results: ElectionResults
-  showCompromised: boolean
-  onToggleCompromised: () => void
-  onStartOver: (newSeed?: number) => void
-  testResults: TestResults
-  onTestResultsChange: (results: TestResults) => void
-  onRunTests: () => void
-  testRuns: TestRun[]
-  seed: number
-  showSeedInput: boolean
-  onToggleSeedInput: () => void
-}
-
-export function SimulationResultsDisplay({
+export function SimulatedContent({
   results,
   showCompromised,
   onToggleCompromised,
@@ -31,7 +17,19 @@ export function SimulationResultsDisplay({
   seed,
   showSeedInput,
   onToggleSeedInput,
-}: SimulationResultsProps) {
+}: {
+  results: ElectionResults
+  showCompromised: boolean
+  onToggleCompromised: () => void
+  onStartOver: (newSeed?: number) => void
+  testResults: TestResults
+  onTestResultsChange: (results: TestResults) => void
+  onRunTests: () => void
+  testRuns: TestRun[]
+  seed: number
+  showSeedInput: boolean
+  onToggleSeedInput: () => void
+}) {
   return (
     <div className="mt-8 p-6 bg-white shadow-lg rounded-lg w-full max-w-3xl">
       <PreliminaryResults results={results} />

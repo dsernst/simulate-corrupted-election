@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { SimulationResultsDisplay } from './components/SimulationResults'
+import { SimulatedContent } from './components/SimulatedContent'
 import { TestResults } from './components/RequestTests'
 import { SimulationOrchestrator } from './utils/orchestrator'
 
@@ -60,7 +60,7 @@ export default function Home() {
         </p>
       </div>
 
-      <SimulationResultsDisplay
+      <SimulatedContent
         results={state.election}
         showCompromised={showCompromised}
         onToggleCompromised={() => setShowCompromised(!showCompromised)}
