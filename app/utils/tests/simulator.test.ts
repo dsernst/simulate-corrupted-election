@@ -323,11 +323,33 @@ describe('Refactored Simulator', () => {
     expect(intersections2).toBe(intersections3)
   })
 
-  // TODO: Need a better way to test this, now that the old prop was removed
-  // it('should get .testRuns virtually', () => {
-  //   const sim = new Simulator(SMALL_SEED)
-  //   expect(sim.getState().testRuns).toBeUndefined()
-  // })
+  it('should only have seed & tests as properties, the rest via getters', () => {
+    const sim = new Simulator(SMALL_SEED)
+
+    /** Checks if a property is a getter, including up the prototype chain */
+    const isGetter = (obj: object, prop: string): boolean => {
+      while (obj) {
+        const desc = Object.getOwnPropertyDescriptor(obj, prop)
+        if (desc?.get) return true
+        obj = Object.getPrototypeOf(obj)
+      }
+      return false
+    }
+
+    // Virtual properties
+    const virtualProps = ['testRuns', 'election', 'voteMap'] as const
+    virtualProps.forEach((prop) => {
+      expect(isGetter(sim, prop)).toBe(true)
+      expect(sim[prop], prop).not.toBeUndefined()
+    })
+
+    // Direct properties, to make sure our getter is working
+    const directProps = ['tests', 'seed'] as const
+    directProps.forEach((prop) => {
+      expect(isGetter(sim, prop)).toBe(false)
+      expect(sim[prop], prop).not.toBeUndefined()
+    })
+  })
 
   it.failing('should mutate in place', () => {
     const sim = new Simulator(SMALL_SEED)
