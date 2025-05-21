@@ -1,6 +1,6 @@
 import { expect, describe, test } from 'bun:test'
 import { calculateLayeredStats, TestRun } from '../calculateIntersections'
-import { calculateTestResults } from '../simulation'
+import { calculateTestResults } from '../engine'
 import { MT19937 } from '../mt19937'
 import { toDisplayLabelFromKey } from '../calculateIntersections'
 import { testSet } from '../testSet'

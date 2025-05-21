@@ -1,11 +1,11 @@
 import { MT19937 } from './mt19937'
 import {
-  SimulationResults,
+  ElectionResults,
   VoteTestResult,
   TestDetectionResults,
-  generateSimulation,
+  makeElection,
   calculateTestResults,
-} from './simulation'
+} from './engine'
 import { calculateLayeredStats } from './calculateIntersections'
 
 function generateRandomSeed(): number {
@@ -20,7 +20,7 @@ export interface TestRun {
 
 export interface SimulationState {
   seed: number
-  simulation: SimulationResults
+  election: ElectionResults
   testRuns: TestRun[]
   nextRunId: number
   mt: MT19937
@@ -35,7 +35,7 @@ export class SimulationOrchestrator {
     const mt = new MT19937(initialSeed)
     this.state = {
       seed: initialSeed,
-      simulation: generateSimulation(mt),
+      election: makeElection(mt),
       testRuns: [],
       nextRunId: 1,
       mt,
@@ -54,8 +54,8 @@ export class SimulationOrchestrator {
   }): SimulationOrchestrator {
     const results = calculateTestResults(
       testCounts,
-      this.state.simulation.compromisedVotes,
-      this.state.simulation.totalVotes,
+      this.state.election.compromisedVotes,
+      this.state.election.totalVotes,
       this.state.mt,
       this.state.voteMap
     )

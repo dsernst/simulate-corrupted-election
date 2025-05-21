@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test'
-import { generateSimulation } from '../simulation'
+import { makeElection } from '../engine'
 import { MT19937 } from '../mt19937'
 
-describe('generateSimulation', () => {
+describe('makeElection', () => {
   it('should generate consistent results with the same MT instance', () => {
     // Same MT
     const seed = 12345
@@ -11,8 +11,8 @@ describe('generateSimulation', () => {
     expect(mt1).toEqual(mt2)
 
     // Same results
-    const result1 = generateSimulation(mt1)
-    const result2 = generateSimulation(mt2)
+    const result1 = makeElection(mt1)
+    const result2 = makeElection(mt2)
     expect(result1).toEqual(result2)
   })
 
@@ -23,13 +23,13 @@ describe('generateSimulation', () => {
     expect(mt1).not.toEqual(mt2)
 
     // Different results
-    const result1 = generateSimulation(mt1)
-    const result2 = generateSimulation(mt2)
+    const result1 = makeElection(mt1)
+    const result2 = makeElection(mt2)
     expect(result1).not.toEqual(result2)
   })
 
   it('should generate valid vote counts', () => {
-    const result = generateSimulation(new MT19937(42))
+    const result = makeElection(new MT19937(42))
 
     expect(result.winnerVotes).toBeGreaterThan(0)
     expect(result.runnerUpVotes).toBeLessThanOrEqual(result.winnerVotes)
@@ -43,7 +43,7 @@ describe('generateSimulation', () => {
   })
 
   it('should generate results within reasonable bounds', () => {
-    const result = generateSimulation(new MT19937(42))
+    const result = makeElection(new MT19937(42))
 
     // Test that vote counts are reasonable
     expect(result.winnerVotes).toBeLessThan(1_000_000) // Max is 1M
@@ -58,12 +58,12 @@ describe('generateSimulation', () => {
   it('should handle edge case seeds', () => {
     // Test with 0 seed
     const mt1 = new MT19937(0)
-    const result1 = generateSimulation(mt1)
+    const result1 = makeElection(mt1)
     expect(result1).not.toBeEmptyObject()
 
     // Test with max 32-bit integer seed
     const mt2 = new MT19937(0xffffffff)
-    const result2 = generateSimulation(mt2)
+    const result2 = makeElection(mt2)
     expect(result2).not.toBeEmptyObject()
   })
 })

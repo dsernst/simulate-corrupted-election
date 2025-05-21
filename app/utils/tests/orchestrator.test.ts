@@ -40,8 +40,8 @@ describe('SimulationOrchestrator', () => {
     orchestrator2 = orchestrator2.runTests(testSet('b100'))
     const state2 = orchestrator2.getState()
 
-    // Results should be identical
-    expect(state1.simulation).toEqual(state2.simulation)
+    // Simulated election results should be identical
+    expect(state1.election).toEqual(state2.election)
 
     const compareWithoutTimestamp = (runs: typeof state1.testRuns) =>
       runs.map(({ id, results }) => ({ id, results }))

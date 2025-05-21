@@ -1,14 +1,11 @@
-import {
-  SimulationResults as SimulationResultsType,
-  calculatePercentage,
-} from '../utils/simulation'
+import { ElectionResults, calculatePercentage } from '../utils/engine'
 import { RevealStartOverLine } from './RevealStartOverLine'
 import { RequestTests, TestResults } from './RequestTests'
 import { TestHistory } from './TestHistory'
 import { TestRun } from '../utils/calculateIntersections'
 
 interface SimulationResultsProps {
-  results: SimulationResultsType
+  results: ElectionResults
   showCompromised: boolean
   onToggleCompromised: () => void
   onStartOver: (newSeed?: number) => void

@@ -61,7 +61,7 @@ export default function Home() {
       </div>
 
       <SimulationResultsDisplay
-        results={state.simulation}
+        results={state.election}
         showCompromised={showCompromised}
         onToggleCompromised={() => setShowCompromised(!showCompromised)}
         onStartOver={onStartOver}

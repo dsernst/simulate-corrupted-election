@@ -1,5 +1,5 @@
 import { Button } from './Button'
-import { SimulationResults } from '../utils/simulation'
+import { ElectionResults } from '../utils/engine'
 import { IoChevronDown, IoChevronUp, IoDiceOutline } from 'react-icons/io5'
 import { useEffect, useState } from 'react'
 
@@ -12,10 +12,10 @@ export const RevealStartOverLine = ({
   showSeedInput,
   onToggleSeedInput,
 }: {
+  results: ElectionResults
   showCompromised: boolean
   onToggleCompromised: () => void
   onStartOver: (newSeed?: number) => void
-  results: SimulationResults
   seed: number
   showSeedInput: boolean
   onToggleSeedInput: () => void

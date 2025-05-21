@@ -1,4 +1,4 @@
-import { TestDetectionResults } from './simulation'
+import { TestDetectionResults } from './engine'
 import {
   getFilterFromKey,
   getTestsFromKey,
