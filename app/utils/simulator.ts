@@ -27,14 +27,21 @@ export class Simulator {
   public seed: number
   public tests: TestsShorthand = ''
 
+  /** Memoized election results from seed */
   public get election(): ElectionResults {
-    return makeElection(new MT19937(this.seed))
+    // Create cached copy on first access
+    if (!this._election) this._election = makeElection(new MT19937(this.seed))
+
+    // Always return cached copy
+    return this._election
   }
 
   public get testSets(): TestSet[] {
     if (!this.tests) return []
     return this.tests.split('-').map(testSet)
   }
+
+  private _election: ElectionResults | undefined
 
   private state: SimulatorState
 
