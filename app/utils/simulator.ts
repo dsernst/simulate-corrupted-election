@@ -7,6 +7,7 @@ import {
   calculateTestResults,
 } from './engine'
 import { calculateLayeredStats } from './calculateIntersections'
+import { testSet } from './testSet'
 
 function generateRandomSeed(): number {
   return Math.floor(Math.random() * 0x100000)
@@ -75,6 +76,12 @@ export class Simulator {
     }
 
     return newSimulator
+  }
+
+  /** Syntactic sugar for .runTests(testSet('a500b100')) */
+  test(testSetShorthand: string): Simulator {
+    const testCounts = testSet(testSetShorthand)
+    return this.runTests(testCounts)
   }
 
   getIntersections(): ReturnType<typeof calculateLayeredStats> {

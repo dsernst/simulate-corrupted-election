@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'bun:test'
 import { Simulator } from '../simulator'
-import { testSet } from '../testSet'
 
 /** This seed has 45k votes: relatively small, for faster tests. */
 export const SMALL_SEED = 54801
@@ -10,12 +9,12 @@ describe('Even test distribution', () => {
     let simulator = new Simulator(SMALL_SEED)
 
     // Run A tests first
-    simulator = simulator.runTests(testSet('a300'))
+    simulator = simulator.test('a300')
     const state1 = simulator.getState()
     expect(state1.testRuns[0].results.testBreakdown.testA.count).toBe(300)
 
     // Then run B tests
-    simulator = simulator.runTests(testSet('b300'))
+    simulator = simulator.test('b300')
     const state2 = simulator.getState()
     expect(state2.testRuns[1].results.testBreakdown.testB.count).toBe(300)
 
@@ -33,13 +32,13 @@ describe('Even test distribution', () => {
     let simulator = new Simulator(SMALL_SEED)
 
     // Run A and B tests first
-    simulator = simulator.runTests(testSet('a100b100'))
+    simulator = simulator.test('a100b100')
     const state1 = simulator.getState()
     expect(state1.testRuns[0].results.testBreakdown.testA.count).toBe(100)
     expect(state1.testRuns[0].results.testBreakdown.testB.count).toBe(100)
 
     // Then run C tests
-    simulator = simulator.runTests(testSet('c100'))
+    simulator = simulator.test('c100')
     const state2 = simulator.getState()
     expect(state2.testRuns[1].results.testBreakdown.testC.count).toBe(100)
 
@@ -72,7 +71,7 @@ describe('C test distribution edge cases', () => {
     for (let c = 1; c <= 5; c++) {
       let simulator = new Simulator(SMALL_SEED)
       expect(() => {
-        simulator = simulator.runTests(testSet(`a10b10c${c}`))
+        simulator = simulator.test(`a10b10c${c}`)
         const state = simulator.getState()
         const lastRun = state.testRuns[state.testRuns.length - 1]
         // The total number of C tests should match the request or be capped by available votes
@@ -83,7 +82,7 @@ describe('C test distribution edge cases', () => {
 
   it('should distribute all C tests even if not divisible by 4', () => {
     let simulator = new Simulator(SMALL_SEED)
-    simulator = simulator.runTests(testSet('a30b30c19'))
+    simulator = simulator.test('a30b30c19')
 
     const state = simulator.getState()
     const lastRun = state.testRuns[state.testRuns.length - 1]

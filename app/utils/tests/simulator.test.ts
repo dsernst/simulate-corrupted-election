@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'bun:test'
 import { Simulator } from '../simulator'
-import { testSet } from '../testSet'
 import { SMALL_SEED } from './evenTestDistribution.test'
 
 describe('Simulator', () => {
@@ -8,13 +7,13 @@ describe('Simulator', () => {
     let simulator = new Simulator(SMALL_SEED)
 
     // Run first test
-    simulator = simulator.runTests(testSet('a100'))
+    simulator = simulator.test('a100')
     const run1 = simulator.getState().testRuns[0]
     expect(run1.id).toBe(1)
     expect(run1.results.testBreakdown.testA.count).toBe(100)
 
     // Run second test
-    simulator = simulator.runTests(testSet('b100'))
+    simulator = simulator.test('b100')
     const run2 = simulator.getState().testRuns[1]
     expect(run2.id).toBe(2)
     expect(run2.results.testBreakdown.testB.count).toBe(100)
@@ -30,14 +29,14 @@ describe('Simulator', () => {
 
     // Create first simulator and run some tests
     let simulator1 = new Simulator(SEED)
-    simulator1 = simulator1.runTests(testSet('a100'))
-    simulator1 = simulator1.runTests(testSet('b100'))
+    simulator1 = simulator1.test('a100')
+    simulator1 = simulator1.test('b100')
     const state1 = simulator1.getState()
 
     // Create second simulator with same seed and run same tests
     let simulator2 = new Simulator(SEED)
-    simulator2 = simulator2.runTests(testSet('a100'))
-    simulator2 = simulator2.runTests(testSet('b100'))
+    simulator2 = simulator2.test('a100')
+    simulator2 = simulator2.test('b100')
     const state2 = simulator2.getState()
 
     // Results should be identical
@@ -56,7 +55,7 @@ describe('Simulator', () => {
     let simulator = new Simulator(SMALL_SEED)
 
     // Run multiple tests on the same votes
-    simulator = simulator.runTests(testSet('a100b100c100'))
+    simulator = simulator.test('a100b100c100')
     const state = simulator.getState()
 
     // Check that each vote maintains consistent test results
@@ -83,10 +82,10 @@ describe('Simulator', () => {
     let simulator = new Simulator(SMALL_SEED)
 
     // First test set: A=1000
-    simulator = simulator.runTests(testSet('a1000'))
+    simulator = simulator.test('a1000')
 
     // Second test set: A=500 (A again)
-    simulator = simulator.runTests(testSet('a500'))
+    simulator = simulator.test('a500')
 
     // Get the vote map from state
     const state = simulator.getState()
@@ -101,10 +100,10 @@ describe('Simulator', () => {
     let simulator = new Simulator(SMALL_SEED)
 
     // First run A and B tests
-    simulator = simulator.runTests(testSet('a1000b1000'))
+    simulator = simulator.test('a1000b1000')
 
     // Then run a small number of C tests
-    simulator = simulator.runTests(testSet('c3'))
+    simulator = simulator.test('c3')
     const state = simulator.getState()
     const lastRun = state.testRuns[state.testRuns.length - 1]
 
@@ -126,7 +125,7 @@ describe('Simulator', () => {
 
   it('should handle empty test counts', () => {
     let simulator = new Simulator(42)
-    simulator = simulator.runTests({ testA: '', testB: '', testC: '' })
+    simulator = simulator.test('')
     const state = simulator.getState()
     const run = state.testRuns[0]
 
@@ -158,9 +157,9 @@ describe('Simulator', () => {
     let simulator = new Simulator(SMALL_SEED)
 
     // Run tests in sequence
-    simulator = simulator.runTests(testSet('a100'))
-    simulator = simulator.runTests(testSet('b100'))
-    simulator = simulator.runTests(testSet('c50'))
+    simulator = simulator.test('a100')
+    simulator = simulator.test('b100')
+    simulator = simulator.test('c50')
 
     const intersections = simulator.getIntersections()
     const get = (label: string) => intersections.find((g) => g.label === label)
@@ -175,13 +174,13 @@ describe('Simulator', () => {
     let simulator = new Simulator(SMALL_SEED)
 
     // First run only test A
-    simulator = simulator.runTests(testSet('a100'))
+    simulator = simulator.test('a100')
     const run1 = simulator.getState().testRuns[0]
     expect(run1.results.testBreakdown.testA.count).toBe(100)
     expect(run1.results.testBreakdown.testB.count).toBe(0)
 
     // Then run only test B
-    simulator = simulator.runTests(testSet('b100'))
+    simulator = simulator.test('b100')
     const run2 = simulator.getState().testRuns[1]
     expect(run2.results.testBreakdown.testB.count).toBe(100)
 
@@ -197,7 +196,7 @@ describe('Simulator', () => {
     let simulator = new Simulator(SMALL_SEED)
 
     // Run both tests at once
-    simulator = simulator.runTests(testSet('a100b100'))
+    simulator = simulator.test('a100b100')
     const run = simulator.getState().testRuns[0]
 
     // Verify that we have results for both tests
@@ -214,15 +213,15 @@ describe('Simulator', () => {
 
   it('should track accumulating MT state between test runs', () => {
     let simulator = new Simulator(SMALL_SEED)
-    const SAME_TEST_SET = testSet('a100')
+    const SAME_TEST_SET = 'a100'
 
     // Run some tests
-    simulator = simulator.runTests(SAME_TEST_SET)
+    simulator = simulator.test(SAME_TEST_SET)
     const state1 = simulator.getState()
     expect(state1.testRuns.length).toBe(1)
 
     // Run the same tests again
-    simulator = simulator.runTests(SAME_TEST_SET)
+    simulator = simulator.test(SAME_TEST_SET)
     const state2 = simulator.getState()
     expect(state2.testRuns.length).toBe(2)
 
