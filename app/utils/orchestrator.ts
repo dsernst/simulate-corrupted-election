@@ -77,10 +77,6 @@ export class SimulationOrchestrator {
     return newOrchestrator
   }
 
-  getTestResults(): TestDetectionResults[] {
-    return this.state.testRuns.map((run) => run.results)
-  }
-
   getIntersections(): ReturnType<typeof calculateLayeredStats> {
     return calculateLayeredStats(this.state.testRuns)
   }
