@@ -12,7 +12,6 @@ import { TestSet, testSet } from './testSet'
 export interface SimulationState {
   election: ElectionResults
   mt: MT19937
-  nextRunId: number
   seed: number
   testRuns: TestRun[]
   voteMap: Map<number, VoteTestResult>
@@ -45,7 +44,6 @@ export class Simulator {
     this.state = {
       election: makeElection(mt),
       mt,
-      nextRunId: 1,
       testRuns: [],
       voteMap: new Map<number, VoteTestResult>(),
     }
@@ -75,7 +73,7 @@ export class Simulator {
     )
 
     const testRun: TestRun = {
-      id: this.state.nextRunId,
+      id: this.state.testRuns.length + 1,
       results,
       timestamp: new Date(),
     }
@@ -83,7 +81,6 @@ export class Simulator {
     const newSimulator = new Simulator()
     newSimulator.state = {
       ...this.state,
-      nextRunId: this.state.nextRunId + 1,
       testRuns: [...this.state.testRuns, testRun],
       voteMap: new Map(this.state.voteMap),
     }
