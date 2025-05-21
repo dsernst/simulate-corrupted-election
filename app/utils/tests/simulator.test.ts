@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+
 import { Simulator } from '../simulator'
 import { SMALL_SEED } from './evenTestDistribution.test'
 

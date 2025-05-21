@@ -1,10 +1,10 @@
-import { NumberInput } from './NumberInput'
-import { Button } from './Button'
 import {
   calculateTotalCost,
   formatCost,
   DEFAULT_TEST_COSTS,
 } from '../utils/costCalculation'
+import { Button } from './Button'
+import { NumberInput } from './NumberInput'
 
 export interface TestResults {
   testA: string

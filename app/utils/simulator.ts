@@ -1,4 +1,4 @@
-import { MT19937 } from './mt19937'
+import { calculateLayeredStats } from './calculateIntersections'
 import {
   ElectionResults,
   VoteTestResult,
@@ -6,7 +6,7 @@ import {
   makeElection,
   calculateTestResults,
 } from './engine'
-import { calculateLayeredStats } from './calculateIntersections'
+import { MT19937 } from './mt19937'
 import { testSet } from './testSet'
 
 function generateRandomSeed(): number {

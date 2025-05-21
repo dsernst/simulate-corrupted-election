@@ -1,7 +1,8 @@
-import { Button } from './Button'
-import { ElectionResults } from '../utils/engine'
-import { IoChevronDown, IoChevronUp, IoDiceOutline } from 'react-icons/io5'
 import { useEffect, useState } from 'react'
+import { IoChevronDown, IoChevronUp, IoDiceOutline } from 'react-icons/io5'
+
+import { ElectionResults } from '../utils/engine'
+import { Button } from './Button'
 
 export const RevealStartOverLine = ({
   showCompromised,

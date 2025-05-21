@@ -1,8 +1,9 @@
 import { expect, describe, it } from 'bun:test'
+
 import { calculateLayeredStats, TestRun } from '../calculateIntersections'
+import { toDisplayLabelFromKey } from '../calculateIntersections'
 import { calculateTestResults } from '../engine'
 import { MT19937 } from '../mt19937'
-import { toDisplayLabelFromKey } from '../calculateIntersections'
 import { testSet } from '../testSet'
 
 // Helper to create a TestResult

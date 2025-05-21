@@ -1,9 +1,9 @@
-import { TestDetectionResults } from './engine'
 import {
   getFilterFromKey,
   getTestsFromKey,
   intersectionGroups,
 } from './createIntersections'
+import { TestDetectionResults } from './engine'
 
 export type TestType = 'A' | 'B' | 'C'
 

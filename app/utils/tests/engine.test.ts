@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+
 import { makeElection } from '../engine'
 import { MT19937 } from '../mt19937'
 

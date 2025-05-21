@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { SimulatedContent } from './components/SimulatedContent'
-import { TestResults } from './components/RequestTests'
-import { Simulator } from './utils/simulator'
+
 import { Header } from './components/Header'
+import { TestResults } from './components/RequestTests'
+import { SimulatedContent } from './components/SimulatedContent'
+import { Simulator } from './utils/simulator'
 
 export default function Home() {
   const [simulator, setSimulator] = useState<Simulator | null>(null)

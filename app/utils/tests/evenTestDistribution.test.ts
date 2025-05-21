@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+
 import { Simulator } from '../simulator'
 
 /** This seed has 45k votes: relatively small, for faster tests. */

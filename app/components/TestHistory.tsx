@@ -1,10 +1,10 @@
 import { TestRun, type TestType } from '../utils/calculateIntersections'
-import { TestResultCard } from './TestResultCard'
-import { IntersectionResults } from './IntersectionResults'
 import {
   calculateTotalTestRunsCost,
   formatCost,
 } from '../utils/costCalculation'
+import { IntersectionResults } from './IntersectionResults'
+import { TestResultCard } from './TestResultCard'
 
 export const TestHistory = ({ testRuns }: { testRuns: TestRun[] }) => {
   if (!testRuns.length) return null

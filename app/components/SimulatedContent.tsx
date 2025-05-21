@@ -1,9 +1,9 @@
-import { ElectionResults } from '../utils/engine'
-import { RevealStartOverLine } from './RevealStartOverLine'
-import { RequestTests, TestResults } from './RequestTests'
-import { TestHistory } from './TestHistory'
 import { TestRun } from '../utils/calculateIntersections'
+import { ElectionResults } from '../utils/engine'
 import { PreliminaryResults } from './PreliminaryResults'
+import { RequestTests, TestResults } from './RequestTests'
+import { RevealStartOverLine } from './RevealStartOverLine'
+import { TestHistory } from './TestHistory'
 
 export function SimulatedContent({
   results,

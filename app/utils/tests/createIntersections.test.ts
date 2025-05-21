@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'bun:test'
+
+import { TestType, VoteResult } from '../calculateIntersections'
 import {
   getTestsFromKey,
   getIndentFromKey,
   getFilterFromKey,
   generateIntersectingGroups,
 } from '../createIntersections'
-import { TestType, VoteResult } from '../calculateIntersections'
 
 type Key = string
 type Indent = number

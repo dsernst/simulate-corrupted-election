@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+
 import { MT19937 } from '../mt19937'
 
 describe('MT19937', () => {
