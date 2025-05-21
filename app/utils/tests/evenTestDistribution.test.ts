@@ -1,40 +1,50 @@
-import { describe, expect, test } from 'bun:test'
-import { SimulationOrchestrator } from '../orchestrator'
+import { describe, expect, it } from 'bun:test'
+import { Simulator } from '../simulator'
 import { testSet } from '../testSet'
 
 /** This seed has 45k votes: relatively small, for faster tests. */
 export const SMALL_SEED = 54801
 
 describe('Even test distribution', () => {
-  test('B tests should be split 50/50 between A and !A tested votes', () => {
-    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
+  it('B tests should be split 50/50 between A and !A tested votes', () => {
+    let simulator = new Simulator(SMALL_SEED)
 
     // Run A tests first
-    orchestrator = orchestrator.runTests(testSet('a1000'))
-    // Then run B tests
-    orchestrator = orchestrator.runTests(testSet('b1000'))
+    simulator = simulator.runTests(testSet('a300'))
+    const state1 = simulator.getState()
+    expect(state1.testRuns[0].results.testBreakdown.testA.count).toBe(300)
 
-    const intersections = orchestrator.getIntersections()
+    // Then run B tests
+    simulator = simulator.runTests(testSet('b300'))
+    const state2 = simulator.getState()
+    expect(state2.testRuns[1].results.testBreakdown.testB.count).toBe(300)
+
+    // Get intersections
+    const intersections = simulator.getIntersections()
     const get = (label: string) => intersections.find((g) => g.label === label)
 
-    // Get the intersection counts
-    const bAndA = get('AB')?.tested ?? 0
-    const bAndNotA = get('B!A')?.tested ?? 0
-    const totalB = bAndA + bAndNotA
-
     // Verify B tests are split roughly 50/50
-    expect(Math.abs(bAndA - bAndNotA)).toBeLessThanOrEqual(totalB * 0.1) // Allow 10% deviation
+    const AB = get('AB')?.tested ?? 0
+    const onlyB = get('B!A')?.tested ?? 0
+    expect(Math.abs(AB - onlyB)).toBeLessThanOrEqual(2) // Allow for some randomness
   })
 
-  test('C tests should be split 25/25/25/25 across A/B combinations', () => {
-    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
+  it('C tests should be split 25/25/25/25 across A/B combinations', () => {
+    let simulator = new Simulator(SMALL_SEED)
 
-    // Run tests in sequence
-    orchestrator = orchestrator.runTests(testSet('a100'))
-    orchestrator = orchestrator.runTests(testSet('b100'))
-    orchestrator = orchestrator.runTests(testSet('c100'))
+    // Run A and B tests first
+    simulator = simulator.runTests(testSet('a100b100'))
+    const state1 = simulator.getState()
+    expect(state1.testRuns[0].results.testBreakdown.testA.count).toBe(100)
+    expect(state1.testRuns[0].results.testBreakdown.testB.count).toBe(100)
 
-    const intersections = orchestrator.getIntersections()
+    // Then run C tests
+    simulator = simulator.runTests(testSet('c100'))
+    const state2 = simulator.getState()
+    expect(state2.testRuns[1].results.testBreakdown.testC.count).toBe(100)
+
+    // Get intersections
+    const intersections = simulator.getIntersections()
     const get = (label: string) => intersections.find((g) => g.label === label)
 
     // Get the intersection counts for C tests
@@ -57,13 +67,13 @@ describe('Even test distribution', () => {
 })
 
 describe('C test distribution edge cases', () => {
-  test('should not throw or hang when testC is not divisible by 4', () => {
+  it('should not throw or hang when testC is not divisible by 4', () => {
     // Try a range of C test counts not divisible by 4
     for (let c = 1; c <= 5; c++) {
-      let orchestrator = new SimulationOrchestrator(SMALL_SEED)
+      let simulator = new Simulator(SMALL_SEED)
       expect(() => {
-        orchestrator = orchestrator.runTests(testSet(`a10b10c${c}`))
-        const state = orchestrator.getState()
+        simulator = simulator.runTests(testSet(`a10b10c${c}`))
+        const state = simulator.getState()
         const lastRun = state.testRuns[state.testRuns.length - 1]
         // The total number of C tests should match the request or be capped by available votes
         expect(lastRun.results.testBreakdown.testC.count).toBeLessThanOrEqual(c)
@@ -71,11 +81,11 @@ describe('C test distribution edge cases', () => {
     }
   })
 
-  test('should distribute all C tests even if not divisible by 4', () => {
-    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
-    orchestrator = orchestrator.runTests(testSet('a30b30c19'))
+  it('should distribute all C tests even if not divisible by 4', () => {
+    let simulator = new Simulator(SMALL_SEED)
+    simulator = simulator.runTests(testSet('a30b30c19'))
 
-    const state = orchestrator.getState()
+    const state = simulator.getState()
     const lastRun = state.testRuns[state.testRuns.length - 1]
     // Should not hang and should assign all 19 C tests
     expect(lastRun.results.testBreakdown.testC.count).toBe(19)
