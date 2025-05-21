@@ -9,19 +9,17 @@ import {
 import { MT19937 } from './mt19937'
 import { TestSet, testSet } from './testSet'
 
-export interface SimulationState {
-  election: ElectionResults
-  mt: MT19937
-  testRuns: TestRun[]
-  voteMap: Map<number, VoteTestResult>
-}
-
-export type SimulatorPrivateState = Omit<SimulationState, 'seed'>
-
 export interface TestRun {
   id: number
   results: TestDetectionResults
   timestamp: Date
+}
+
+interface SimulatorState {
+  election: ElectionResults
+  mt: MT19937
+  testRuns: TestRun[]
+  voteMap: Map<number, VoteTestResult>
 }
 
 type TestsShorthand = string
@@ -35,7 +33,7 @@ export class Simulator {
     return this.tests.split('-').map(testSet)
   }
 
-  private state: SimulatorPrivateState
+  private state: SimulatorState
 
   constructor(seed?: number, tests?: TestsShorthand) {
     const initialSeed = seed ?? generateRandomSeed()
@@ -54,7 +52,7 @@ export class Simulator {
     return calculateLayeredStats(this.state.testRuns)
   }
 
-  getState(): SimulationState {
+  getState(): SimulatorState {
     return { ...this.state }
   }
 
