@@ -9,13 +9,13 @@ describe('Simulator', () => {
 
     // Run first test
     simulator = simulator.test('a100')
-    const run1 = simulator.getState().testRuns[0]
+    const run1 = simulator.testRuns[0]
     expect(run1.id).toBe(1)
     expect(run1.results.testBreakdown.testA.count).toBe(100)
 
     // Run second test
     simulator = simulator.test('b100')
-    const run2 = simulator.getState().testRuns[1]
+    const run2 = simulator.testRuns[1]
     expect(run2.id).toBe(2)
     expect(run2.results.testBreakdown.testB.count).toBe(100)
 
@@ -32,24 +32,22 @@ describe('Simulator', () => {
     let simulator1 = new Simulator(SEED)
     simulator1 = simulator1.test('a100')
     simulator1 = simulator1.test('b100')
-    const state1 = simulator1.getState()
 
     // Create second simulator with same seed and run same tests
     let simulator2 = new Simulator(SEED)
     simulator2 = simulator2.test('a100')
     simulator2 = simulator2.test('b100')
-    const state2 = simulator2.getState()
 
     // Results should be identical
     expect(simulator1.seed).toEqual(simulator2.seed)
     expect(simulator1.election).toEqual(simulator2.election)
 
-    const compareWithoutTimestamp = (runs: typeof state1.testRuns) =>
+    const compareWithoutTimestamp = (runs: typeof simulator1.testRuns) =>
       runs.map(({ id, results }) => ({ id, results }))
 
     // Compare test runs without timestamps
-    expect(compareWithoutTimestamp(state1.testRuns)).toEqual(
-      compareWithoutTimestamp(state2.testRuns)
+    expect(compareWithoutTimestamp(simulator1.testRuns)).toEqual(
+      compareWithoutTimestamp(simulator2.testRuns)
     )
   })
 
@@ -58,15 +56,15 @@ describe('Simulator', () => {
 
     // Run multiple tests on the same votes
     simulator = simulator.test('a100b100c100')
-    const state = simulator.getState()
 
     // Check that each vote maintains consistent test results
     const voteResults = new Map()
 
     // Collect all vote results
     for (const test of ['A', 'B', 'C'] as const) {
-      for (const vote of state.testRuns[0].results.testBreakdown[`test${test}`]
-        .voteResults) {
+      for (const vote of simulator.testRuns[0].results.testBreakdown[
+        `test${test}`
+      ].voteResults) {
         if (!voteResults.has(vote.voteId)) {
           voteResults.set(vote.voteId, vote)
         } else {
@@ -106,8 +104,7 @@ describe('Simulator', () => {
 
     // Then run a small number of C tests
     simulator = simulator.test('c3')
-    const state = simulator.getState()
-    const lastRun = state.testRuns[state.testRuns.length - 1]
+    const lastRun = simulator.testRuns[simulator.testRuns.length - 1]
 
     // Verify C test results
     expect(lastRun.results.testBreakdown.testC.count).toBe(3)
@@ -128,8 +125,7 @@ describe('Simulator', () => {
   it('should handle empty test counts', () => {
     let simulator = new Simulator(42)
     simulator = simulator.test('')
-    const state = simulator.getState()
-    const run = state.testRuns[0]
+    const run = simulator.testRuns[0]
 
     expect(run.results.testBreakdown.testA.count).toBe(0)
     expect(run.results.testBreakdown.testB.count).toBe(0)
@@ -177,13 +173,13 @@ describe('Simulator', () => {
 
     // First run only test A
     simulator = simulator.test('a100')
-    const run1 = simulator.getState().testRuns[0]
+    const run1 = simulator.testRuns[0]
     expect(run1.results.testBreakdown.testA.count).toBe(100)
     expect(run1.results.testBreakdown.testB.count).toBe(0)
 
     // Then run only test B
     simulator = simulator.test('b100')
-    const run2 = simulator.getState().testRuns[1]
+    const run2 = simulator.testRuns[1]
     expect(run2.results.testBreakdown.testB.count).toBe(100)
 
     // Get intersections
@@ -199,7 +195,7 @@ describe('Simulator', () => {
 
     // Run both tests at once
     simulator = simulator.test('a100b100')
-    const run = simulator.getState().testRuns[0]
+    const run = simulator.testRuns[0]
 
     // Verify that we have results for both tests
     expect(run.results.testBreakdown.testA.count).toBe(100)
@@ -219,20 +215,20 @@ describe('Simulator', () => {
 
     // Run some tests
     simulator = simulator.test(SAME_TEST_SET)
-    const state1 = simulator.getState()
-    expect(state1.testRuns.length).toBe(1)
+    const testRuns1 = [...simulator.testRuns]
+    expect(testRuns1.length).toBe(1)
 
     // Run the same tests again
     simulator = simulator.test(SAME_TEST_SET)
-    const state2 = simulator.getState()
-    expect(state2.testRuns.length).toBe(2)
+    const testRuns2 = [...simulator.testRuns]
+    expect(testRuns2.length).toBe(2)
 
     // The first test run should still be the same
-    expect(state1.testRuns[0]).toEqual(state2.testRuns[0])
+    expect(testRuns1[0]).toEqual(testRuns2[0])
 
     // But the same test run again should get different results
     // (because the underlying MT state has advanced)
-    expect(state2.testRuns[0]).not.toEqual(state2.testRuns[1])
+    expect(testRuns2[0]).not.toEqual(testRuns2[1])
   })
 })
 
@@ -328,17 +324,18 @@ describe('Refactored Simulator', () => {
     expect(intersections2).toBe(intersections3)
   })
 
-  it.failing('should get .testRuns virtually', () => {
-    const sim = new Simulator(SMALL_SEED)
-    expect(sim.getState().testRuns).toBeUndefined()
-  })
+  // TODO: Need a better way to test this, now that the old prop was removed
+  // it('should get .testRuns virtually', () => {
+  //   const sim = new Simulator(SMALL_SEED)
+  //   expect(sim.getState().testRuns).toBeUndefined()
+  // })
 
   it.failing('should mutate in place', () => {
     const sim = new Simulator(SMALL_SEED)
-    expect(sim.getState().testRuns.length).toBe(0)
+    expect(sim.testRuns.length).toBe(0)
 
     const result = sim.test('a10')
     expect(result).toBe(sim)
-    expect(sim.getState().testRuns.length).toBe(1)
+    expect(sim.testRuns.length).toBe(1)
   })
 })

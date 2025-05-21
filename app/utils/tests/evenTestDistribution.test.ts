@@ -11,13 +11,11 @@ describe('Even test distribution', () => {
 
     // Run A tests first
     simulator = simulator.test('a300')
-    const state1 = simulator.getState()
-    expect(state1.testRuns[0].results.testBreakdown.testA.count).toBe(300)
+    expect(simulator.testRuns[0].results.testBreakdown.testA.count).toBe(300)
 
     // Then run B tests
     simulator = simulator.test('b300')
-    const state2 = simulator.getState()
-    expect(state2.testRuns[1].results.testBreakdown.testB.count).toBe(300)
+    expect(simulator.testRuns[1].results.testBreakdown.testB.count).toBe(300)
 
     // Get intersections
     const intersections = simulator.getIntersections()
@@ -34,14 +32,12 @@ describe('Even test distribution', () => {
 
     // Run A and B tests first
     simulator = simulator.test('a100b100')
-    const state1 = simulator.getState()
-    expect(state1.testRuns[0].results.testBreakdown.testA.count).toBe(100)
-    expect(state1.testRuns[0].results.testBreakdown.testB.count).toBe(100)
+    expect(simulator.testRuns[0].results.testBreakdown.testA.count).toBe(100)
+    expect(simulator.testRuns[0].results.testBreakdown.testB.count).toBe(100)
 
     // Then run C tests
     simulator = simulator.test('c100')
-    const state2 = simulator.getState()
-    expect(state2.testRuns[1].results.testBreakdown.testC.count).toBe(100)
+    expect(simulator.testRuns[1].results.testBreakdown.testC.count).toBe(100)
 
     // Get intersections
     const intersections = simulator.getIntersections()
@@ -73,8 +69,7 @@ describe('C test distribution edge cases', () => {
       let simulator = new Simulator(SMALL_SEED)
       expect(() => {
         simulator = simulator.test(`a10b10c${c}`)
-        const state = simulator.getState()
-        const lastRun = state.testRuns[state.testRuns.length - 1]
+        const lastRun = simulator.testRuns[simulator.testRuns.length - 1]
         // The total number of C tests should match the request or be capped by available votes
         expect(lastRun.results.testBreakdown.testC.count).toBeLessThanOrEqual(c)
       }).not.toThrow()
@@ -85,8 +80,7 @@ describe('C test distribution edge cases', () => {
     let simulator = new Simulator(SMALL_SEED)
     simulator = simulator.test('a30b30c19')
 
-    const state = simulator.getState()
-    const lastRun = state.testRuns[state.testRuns.length - 1]
+    const lastRun = simulator.testRuns[simulator.testRuns.length - 1]
     // Should not hang and should assign all 19 C tests
     expect(lastRun.results.testBreakdown.testC.count).toBe(19)
   })

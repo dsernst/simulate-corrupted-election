@@ -20,8 +20,8 @@ export interface TestRun {
 type CacheKey = `${Seed}.${TestsShorthand}`
 type Seed = number
 type SimulatorState = {
+  _testRuns: TestRun[]
   mt: MT19937
-  testRuns: TestRun[]
   voteMap: Map<number, VoteTestResult>
 }
 
@@ -45,6 +45,23 @@ export class Simulator {
     return _electionCache.get(this.seed)!
   }
 
+  // private get testRuns(): TestRun[] {
+  //   return this.testSets.map((testSet) => ({
+  //     id: this.tests.split('-').length,
+  //     results: calculateTestResults(
+  //       testSet,
+  //       this.election.compromisedVotes,
+  //       this.election.totalVotes,
+  //       this.state.mt,
+  //       this.state.voteMap
+  //     ),
+  //     timestamp: new Date(),
+  //   }))
+  // }
+  public get testRuns(): TestRun[] {
+    return this.state._testRuns
+  }
+
   public get testSets(): TestSet[] {
     if (!this.tests) return []
     return this.tests.split('-').map(testSet)
@@ -56,8 +73,8 @@ export class Simulator {
     const initialSeed = seed ?? generateRandomSeed()
     const mt = new MT19937(initialSeed)
     this.state = {
+      _testRuns: [],
       mt,
-      testRuns: [],
       voteMap: new Map<number, VoteTestResult>(),
     }
     this.tests = tests ?? ''
@@ -70,10 +87,7 @@ export class Simulator {
 
     // Create cached copy on first access
     if (!_intersectionCache.has(cacheKey))
-      _intersectionCache.set(
-        cacheKey,
-        calculateLayeredStats(this.state.testRuns)
-      )
+      _intersectionCache.set(cacheKey, calculateLayeredStats(this.testRuns))
 
     // Always return cached copy
     return _intersectionCache.get(cacheKey)!
@@ -108,7 +122,7 @@ export class Simulator {
     const newSimulator = new Simulator(this.seed, this.tests)
     newSimulator.state = {
       ...this.state,
-      testRuns: [...this.state.testRuns, testRun],
+      _testRuns: [...this.testRuns, testRun],
       voteMap: new Map(this.state.voteMap),
     }
 

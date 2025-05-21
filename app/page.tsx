@@ -26,8 +26,6 @@ export default function Home() {
 
   if (!simulator) return <LoadingSimulation />
 
-  const state = simulator.getState()
-
   return (
     <main className="flex min-h-screen flex-col items-center justify-center md:!p-10 p-2 py-10 gap-8">
       <Header />
@@ -47,7 +45,7 @@ export default function Home() {
         setRequestedTests={setRequestedTests}
         showCompromised={showCompromised}
         showSeedInput={showSeedInput}
-        testRuns={state.testRuns}
+        testRuns={simulator.testRuns}
       />
     </main>
   )
