@@ -1,21 +1,18 @@
 import { LRUCache } from 'lru-cache'
 
-import { calculateLayeredStats, LayeredStat } from './calculateIntersections'
+import {
+  calculateLayeredStats,
+  LayeredStat,
+  TestRun,
+} from './calculateIntersections'
 import {
   calculateTestResults,
   ElectionResults,
   makeElection,
-  TestDetectionResults,
   VoteTestResult,
 } from './engine'
 import { MT19937 } from './mt19937'
 import { TestSet, testSet, TestsShorthand, toTestSetString } from './testSet'
-
-export interface TestRun {
-  id: number
-  results: TestDetectionResults
-  timestamp: Date
-}
 
 type CacheKey = `${Seed}.${TestsShorthand}`
 type Seed = number
@@ -45,7 +42,7 @@ export class Simulator {
     return _electionCache.get(this.seed)!
   }
 
-  // private get testRuns(): TestRun[] {
+  // public get testRuns(): TestRun[] {
   //   return this.testSets.map((testSet) => ({
   //     id: this.tests.split('-').length,
   //     results: calculateTestResults(
