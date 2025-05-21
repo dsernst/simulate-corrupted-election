@@ -49,7 +49,7 @@ export function calculateTestResults(
   compromisedVotes: number,
   totalVotes: number,
   mt: MT19937,
-  voteMap?: Map<number, VoteTestResult>
+  voteMap: Map<number, VoteTestResult>
 ): TestDetectionResults {
   const effectiveness: TestEffectiveness = {
     testA: {
@@ -92,9 +92,6 @@ export function calculateTestResults(
     },
   }
 
-  // Use provided voteMap or create a new one
-  const globalVoteMap = voteMap ?? new Map<number, VoteTestResult>()
-
   // For each test type, run tests on unique, randomly selected votes
   function runUniqueTests(
     testType: 'A' | 'B' | 'C',
@@ -103,7 +100,7 @@ export function calculateTestResults(
   ) {
     // Helper function to run a test on a single vote
     function runTestOnVote(voteId: number) {
-      let voteResult = globalVoteMap.get(voteId)
+      let voteResult = voteMap.get(voteId)
       if (!voteResult) {
         const isActuallyCompromised = sampleVote(
           compromisedVotes,
@@ -115,7 +112,7 @@ export function calculateTestResults(
           testResults: {},
           voteId,
         }
-        globalVoteMap.set(voteId, voteResult)
+        voteMap.set(voteId, voteResult)
       }
 
       // Always run the test for the current run
@@ -138,7 +135,7 @@ export function calculateTestResults(
       const aTested: number[] = []
       const aUntested: number[] = []
       for (let i = 1; i <= totalVotes; i++) {
-        const voteResult = globalVoteMap.get(i)
+        const voteResult = voteMap.get(i)
         if (voteResult?.testResults.testB !== undefined) continue
         if (voteResult?.testResults.testA !== undefined) {
           aTested.push(i)
@@ -194,7 +191,7 @@ export function calculateTestResults(
         'A&B': [],
       }
       for (let i = 1; i <= totalVotes; i++) {
-        const voteResult = globalVoteMap.get(i)
+        const voteResult = voteMap.get(i)
         if (voteResult?.testResults.testC !== undefined) continue
         const aTested = voteResult?.testResults.testA !== undefined
         const bTested = voteResult?.testResults.testB !== undefined
@@ -264,7 +261,7 @@ export function calculateTestResults(
     else {
       const eligible: number[] = []
       for (let i = 1; i <= totalVotes; i++) {
-        const voteResult = globalVoteMap.get(i)
+        const voteResult = voteMap.get(i)
         if (voteResult?.testResults.testA !== undefined) continue
         eligible.push(i)
       }
@@ -280,7 +277,7 @@ export function calculateTestResults(
   runUniqueTests('C', counts.testC, effectiveness.testC)
 
   // Update test breakdown with all votes that have been tested
-  for (const [voteId, voteResult] of globalVoteMap.entries()) {
+  for (const [voteId, voteResult] of voteMap.entries()) {
     for (const testType of ['A', 'B', 'C'] as const) {
       const testKey = `test${testType}` as const
       // Only include results for tests actually requested in this run

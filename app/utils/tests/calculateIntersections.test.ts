@@ -274,22 +274,26 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     const seed = 389518
     const totalVotes = 2000
     const compromisedVotes = 500
+    const voteMap = new Map()
+
     // First test run: A=1000
-    const mt1 = new MT19937(seed)
     const results1 = calculateTestResults(
       testSet('a1000'),
       compromisedVotes,
       totalVotes,
-      mt1
+      new MT19937(seed),
+      voteMap
     )
+
     // Second test run: A=500
-    const mt2 = new MT19937(seed + 1)
     const results2 = calculateTestResults(
       testSet('a500'),
       compromisedVotes,
       totalVotes,
-      mt2
+      new MT19937(seed + 1),
+      voteMap
     )
+
     // Pass both runs to calculateLayeredStats
     const testRuns = [
       { id: 1, results: results1, timestamp: new Date() },
@@ -297,8 +301,7 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     ]
     const stats = calculateLayeredStats(testRuns)
     const get = (label: string) => stats.find((g) => g.label === label)
-    expect(get('A')?.tested).toBeGreaterThan(1000)
-    expect(get('A')?.tested).toBeLessThan(1500)
+    expect(get('A')?.tested).toBe(1500)
   })
 })
 
