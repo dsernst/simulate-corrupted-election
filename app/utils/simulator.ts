@@ -27,7 +27,7 @@ export interface SimulationState {
   voteMap: Map<number, VoteTestResult>
 }
 
-export class SimulationOrchestrator {
+export class Simulator {
   private state: SimulationState
 
   constructor(seed?: number) {
@@ -51,7 +51,7 @@ export class SimulationOrchestrator {
     testA: string
     testB: string
     testC: string
-  }): SimulationOrchestrator {
+  }): Simulator {
     const results = calculateTestResults(
       testCounts,
       this.state.election.compromisedVotes,
@@ -66,15 +66,15 @@ export class SimulationOrchestrator {
       timestamp: new Date(),
     }
 
-    const newOrchestrator = new SimulationOrchestrator(this.state.seed)
-    newOrchestrator.state = {
+    const newSimulator = new Simulator()
+    newSimulator.state = {
       ...this.state,
       testRuns: [...this.state.testRuns, testRun],
       nextRunId: this.state.nextRunId + 1,
       voteMap: new Map(this.state.voteMap),
     }
 
-    return newOrchestrator
+    return newSimulator
   }
 
   getIntersections(): ReturnType<typeof calculateLayeredStats> {

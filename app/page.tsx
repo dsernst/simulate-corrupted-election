@@ -3,12 +3,11 @@
 import { useState, useEffect } from 'react'
 import { SimulatedContent } from './components/SimulatedContent'
 import { TestResults } from './components/RequestTests'
-import { SimulationOrchestrator } from './utils/orchestrator'
+import { Simulator } from './utils/simulator'
 import { Header } from './components/Header'
 
 export default function Home() {
-  const [orchestrator, setOrchestrator] =
-    useState<SimulationOrchestrator | null>(null)
+  const [simulator, setSimulator] = useState<Simulator | null>(null)
   const [showCompromised, setShowCompromised] = useState(false)
   const [showSeedInput, setShowSeedInput] = useState(false)
   const [testResults, setTestResults] = useState<TestResults>({
@@ -18,16 +17,16 @@ export default function Home() {
   })
 
   const onStartOver = (newSeed?: number) => {
-    setOrchestrator(new SimulationOrchestrator(newSeed))
+    setSimulator(new Simulator(newSeed))
     setShowCompromised(false)
   }
 
   // Simulate an election when the page first loads
   useEffect(() => onStartOver(), [])
 
-  if (!orchestrator) return <LoadingSimulation />
+  if (!simulator) return <LoadingSimulation />
 
-  const state = orchestrator.getState()
+  const state = simulator.getState()
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center md:!p-10 p-2 py-10 gap-8">
@@ -41,9 +40,9 @@ export default function Home() {
         testResults={testResults}
         onTestResultsChange={setTestResults}
         onRunTests={() => {
-          if (!orchestrator) return alert('Simulation not initialized')
+          if (!simulator) return alert('Simulation not initialized')
 
-          setOrchestrator(orchestrator.runTests(testResults))
+          setSimulator(simulator.runTests(testResults))
 
           // Reset the test request form
           setTestResults({
