@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'bun:test'
 import { SimulationOrchestrator } from '../orchestrator'
 import { testSet } from '../testSet'
+import { SMALL_SEED } from './evenTestDistribution.test'
 
 describe('SimulationOrchestrator', () => {
   it('should maintain state between test runs', () => {
-    let orchestrator = new SimulationOrchestrator(42)
+    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
 
     // Run first test
     orchestrator = orchestrator.runTests(testSet('a100'))
@@ -25,7 +26,7 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should maintain consistent results with same seed', () => {
-    const SEED = 42
+    const SEED = SMALL_SEED
 
     // Create first orchestrator and run some tests
     let orchestrator1 = new SimulationOrchestrator(SEED)
@@ -52,7 +53,7 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should maintain vote consistency across tests', () => {
-    let orchestrator = new SimulationOrchestrator(42)
+    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
 
     // Run multiple tests on the same votes
     orchestrator = orchestrator.runTests(testSet('a100b100c100'))
@@ -79,7 +80,7 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should accumulate tested votes for repeated test sets', () => {
-    let orchestrator = new SimulationOrchestrator(389518)
+    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
 
     // First test set: A=1000
     orchestrator = orchestrator.runTests(testSet('a1000'))
@@ -97,7 +98,7 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should handle small number of test C after A and B tests', () => {
-    let orchestrator = new SimulationOrchestrator(42)
+    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
 
     // First run A and B tests
     orchestrator = orchestrator.runTests(testSet('a1000b1000'))
@@ -154,7 +155,7 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should calculate intersections correctly across multiple runs', () => {
-    let orchestrator = new SimulationOrchestrator(42)
+    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
 
     // Run tests in sequence
     orchestrator = orchestrator.runTests(testSet('a100'))
@@ -171,7 +172,7 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should calculate intersections correctly when tests are run sequentially', () => {
-    let orchestrator = new SimulationOrchestrator(42)
+    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
 
     // First run only test A
     orchestrator = orchestrator.runTests(testSet('a100'))
@@ -193,7 +194,7 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should calculate intersections correctly when tests are run simultaneously', () => {
-    let orchestrator = new SimulationOrchestrator(42)
+    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
 
     // Run both tests at once
     orchestrator = orchestrator.runTests(testSet('a100b100'))
@@ -212,7 +213,7 @@ describe('SimulationOrchestrator', () => {
   })
 
   it('should track accumulating MT state between test runs', () => {
-    let orchestrator = new SimulationOrchestrator(42)
+    let orchestrator = new SimulationOrchestrator(SMALL_SEED)
     const SAME_TEST_SET = testSet('a100')
 
     // Run some tests
