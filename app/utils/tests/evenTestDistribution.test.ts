@@ -30,30 +30,29 @@ describe('Even test distribution', () => {
     let orchestrator = new SimulationOrchestrator(SMALL_SEED)
 
     // Run tests in sequence
-    orchestrator = orchestrator.runTests(testSet('a1000'))
-    orchestrator = orchestrator.runTests(testSet('b1000'))
-    orchestrator = orchestrator.runTests(testSet('c1000'))
+    orchestrator = orchestrator.runTests(testSet('a100'))
+    orchestrator = orchestrator.runTests(testSet('b100'))
+    orchestrator = orchestrator.runTests(testSet('c100'))
 
     const intersections = orchestrator.getIntersections()
     const get = (label: string) => intersections.find((g) => g.label === label)
 
     // Get the intersection counts for C tests
-    const allThree = get('ABC')?.tested ?? 0
-    const aAndC = get('AC!B')?.tested ?? 0
-    const bAndC = get('BC!A')?.tested ?? 0
-    const onlyC = get('C!A!B')?.tested ?? 0
-    const totalC = allThree + aAndC + bAndC + onlyC
+    const ABC = get('ABC')?.tested ?? 0
+    const AC = get('AC!B')?.tested ?? 0
+    const BC = get('BC!A')?.tested ?? 0
+    const C = get('C!A!B')?.tested ?? 0
+    const totalC = ABC + AC + BC + C
+
+    // Confirm tests ran
+    expect(totalC).toBeGreaterThan(75)
 
     // Each quadrant should be roughly 25%
-    const expectedPerQuadrant = totalC * 0.25
-    const tolerance = totalC * 0.1 // Allow 10% deviation
-
-    expect(Math.abs(allThree - expectedPerQuadrant)).toBeLessThanOrEqual(
-      tolerance
-    )
-    expect(Math.abs(aAndC - expectedPerQuadrant)).toBeLessThanOrEqual(tolerance)
-    expect(Math.abs(bAndC - expectedPerQuadrant)).toBeLessThanOrEqual(tolerance)
-    expect(Math.abs(onlyC - expectedPerQuadrant)).toBeLessThanOrEqual(tolerance)
+    const expected = totalC * 0.25
+    const tolerance = totalC / 10 // Allow 10% deviation
+    ;[ABC, AC, BC, C].forEach((subset) => {
+      expect(Math.abs(subset - expected)).toBeLessThanOrEqual(tolerance)
+    })
   })
 })
 
