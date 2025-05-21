@@ -294,6 +294,16 @@ describe('Refactored Simulator', () => {
     expect(electionResults4).not.toBe(electionResults1)
   })
 
+  it('should update .tests as tests are run', () => {
+    const sim = new Simulator(SMALL_SEED)
+    sim.test('a10')
+    expect(sim.tests).toBe('a10')
+    sim.test('b5')
+    expect(sim.tests).toBe('a10-b5')
+    sim.test('c10')
+    expect(sim.tests).toBe('a10-b5-c10')
+  })
+
   it.failing('should memoize intersections based on tests', () => {
     const sim = new Simulator(SMALL_SEED)
     const intersections1 = sim.getIntersections()
