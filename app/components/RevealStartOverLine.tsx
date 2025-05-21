@@ -5,21 +5,21 @@ import { ElectionResults } from '../utils/engine'
 import { Button } from './Button'
 
 export const RevealStartOverLine = ({
-  showCompromised,
-  onToggleCompromised,
   onStartOver,
+  onToggleCompromised,
+  onToggleSeedInput,
   results,
   seed,
+  showCompromised,
   showSeedInput,
-  onToggleSeedInput,
 }: {
-  results: ElectionResults
-  showCompromised: boolean
-  onToggleCompromised: () => void
   onStartOver: (newSeed?: number) => void
-  seed: number
-  showSeedInput: boolean
+  onToggleCompromised: () => void
   onToggleSeedInput: () => void
+  results: ElectionResults
+  seed: number
+  showCompromised: boolean
+  showSeedInput: boolean
 }) => {
   const [inputSeed, setInputSeed] = useState(seed)
 
@@ -33,9 +33,9 @@ export const RevealStartOverLine = ({
       <div className="h-20 flex justify-between items-center">
         {!showCompromised ? (
           <Button
+            className="text-sm flex-1 mr-2"
             onClick={onToggleCompromised}
             variant="outline"
-            className="text-sm flex-1 mr-2"
           >
             👀 Reveal Compromised Votes
           </Button>
@@ -51,17 +51,17 @@ export const RevealStartOverLine = ({
         )}
         <div className="flex items-center relative">
           <Button
+            className="text-sm py-2 !px-3.5 rounded-r-none"
             onClick={() => onStartOver()}
             variant="outline"
-            className="text-sm py-2 !px-3.5 rounded-r-none"
           >
             ♻️ Start Over
           </Button>
           <Button
+            aria-label={showSeedInput ? 'Hide seed input' : 'Show seed input'}
+            className="!py-3.5 !px-1 !ml-0 rounded-l-none relative right-0.5"
             onClick={onToggleSeedInput}
             variant="outline"
-            className="!py-3.5 !px-1 !ml-0 rounded-l-none relative right-0.5"
-            aria-label={showSeedInput ? 'Hide seed input' : 'Show seed input'}
           >
             {showSeedInput ? (
               <IoChevronUp size={16} />
@@ -77,21 +77,21 @@ export const RevealStartOverLine = ({
               style={{ minWidth: 0 }}
             >
               <IoDiceOutline
-                size={18}
                 className="absolute left-5 text-purple-500"
+                size={18}
               />
               <input
-                type="number"
-                name="seed"
-                value={inputSeed}
-                onChange={(e) => setInputSeed(Number(e.target.value))}
                 className="pl-8 px-3 py-2 border border-gray-400 rounded text-sm w-32"
+                name="seed"
+                onChange={(e) => setInputSeed(Number(e.target.value))}
                 placeholder="Enter seed"
+                type="number"
+                value={inputSeed}
               />
               <Button
+                className="!px-3 !py-2 text-xs whitespace-nowrap"
                 onClick={() => onStartOver(inputSeed)}
                 variant="outline"
-                className="!px-3 !py-2 text-xs whitespace-nowrap"
               >
                 ♻️ Start Over w/ Seed
               </Button>

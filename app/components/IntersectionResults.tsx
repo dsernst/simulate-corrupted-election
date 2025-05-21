@@ -1,7 +1,7 @@
 import {
-  TestRun,
-  calculateLayeredStats,
   calculateConfusionMatrix,
+  calculateLayeredStats,
+  TestRun,
 } from '../utils/calculateIntersections'
 import { getIndentFromKey } from '../utils/createIntersections'
 import ConfusionMatrix from './ConfusionMatrix'
@@ -25,8 +25,8 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
   ] as const
   const confusionMatrices = pairs.map(({ first, second }) => ({
     first,
-    second,
     matrix: calculateConfusionMatrix(testRuns, first, second),
+    second,
   }))
 
   return (
@@ -46,7 +46,7 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
           </thead>
           <tbody>
             {layeredStats.map(
-              ({ key, label, tested, compromises, percentages }) => {
+              ({ compromises, key, label, percentages, tested }) => {
                 // Hide intersection rows for tests that were never run
                 for (const [key, value] of Object.entries(ran)) {
                   if (!value && label.includes(key)) return null
@@ -54,10 +54,10 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
 
                 return (
                   <tr
-                    key={label}
                     className={`${
                       !tested && 'opacity-20'
                     } border-t border-gray-200`}
+                    key={label}
                   >
                     <td
                       className="px-4 py-2 whitespace-nowrap text-left"
@@ -100,12 +100,12 @@ export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
         Pairwise Confusion Matrices
       </h3>
       <div className="flex flex-col items-center">
-        {confusionMatrices.map(({ first, second, matrix }) => (
+        {confusionMatrices.map(({ first, matrix, second }) => (
           <div
             className="overflow-x-auto max-w-full mb-8"
             key={`${first}-${second}`}
           >
-            <ConfusionMatrix first={first} second={second} matrix={matrix} />
+            <ConfusionMatrix first={first} matrix={matrix} second={second} />
           </div>
         ))}
       </div>

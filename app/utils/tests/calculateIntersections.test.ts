@@ -1,4 +1,4 @@
-import { expect, describe, it } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 
 import { calculateLayeredStats, TestRun } from '../calculateIntersections'
 import { toDisplayLabelFromKey } from '../calculateIntersections'
@@ -8,16 +8,16 @@ import { testSet } from '../testSet'
 
 // Helper to create a TestResult
 function makeTestResult(
-  votes: { id: number; c: boolean; r: boolean }[] = [],
+  votes: { c: boolean; id: number; r: boolean }[] = [],
   testKey: 'A' | 'B' | 'C'
 ) {
   return {
     count: votes.length,
     detectedCompromised: votes.filter((v) => v.r).length,
     voteResults: votes.map((v) => ({
-      voteId: v.id,
       isActuallyCompromised: v.c,
       testResults: { [`test${testKey}`]: v.r },
+      voteId: v.id,
     })),
   }
 }
@@ -29,11 +29,12 @@ let id = 0
  * r = result (detected)
  */
 function makeTestRun(run: {
-  A?: { id: number; c: boolean; r: boolean }[]
-  B?: { id: number; c: boolean; r: boolean }[]
-  C?: { id: number; c: boolean; r: boolean }[]
+  A?: { c: boolean; id: number; r: boolean }[]
+  B?: { c: boolean; id: number; r: boolean }[]
+  C?: { c: boolean; id: number; r: boolean }[]
 }): TestRun {
   return {
+    id: id++,
     results: {
       testBreakdown: {
         testA: makeTestResult(run.A, 'A'),
@@ -41,7 +42,6 @@ function makeTestRun(run: {
         testC: makeTestResult(run.C, 'C'),
       },
     },
-    id: id++,
     timestamp: new Date(),
   }
 }
@@ -49,9 +49,9 @@ function makeTestRun(run: {
 describe('calculateLayeredStats', () => {
   it('correctly groups votes for A, B, B & A, and B & not A', () => {
     const testRuns: TestRun[] = [
-      { A: [{ id: 1, c: false, r: true }], B: [{ id: 1, c: false, r: false }] },
-      { B: [{ id: 2, c: false, r: true }] },
-      { A: [{ id: 3, c: false, r: false }] },
+      { A: [{ c: false, id: 1, r: true }], B: [{ c: false, id: 1, r: false }] },
+      { B: [{ c: false, id: 2, r: true }] },
+      { A: [{ c: false, id: 3, r: false }] },
       {},
     ].map(makeTestRun)
 
@@ -67,15 +67,15 @@ describe('calculateLayeredStats', () => {
   it('correctly groups votes for all A/B/C combinations', () => {
     const testRuns: TestRun[] = [
       {
-        A: [{ id: 1, c: false, r: true }],
-        B: [{ id: 1, c: false, r: false }],
-        C: [{ id: 1, c: false, r: true }],
+        A: [{ c: false, id: 1, r: true }],
+        B: [{ c: false, id: 1, r: false }],
+        C: [{ c: false, id: 1, r: true }],
       },
-      { A: [{ id: 2, c: false, r: false }], B: [{ id: 2, c: false, r: true }] },
-      { B: [{ id: 3, c: false, r: true }], C: [{ id: 3, c: false, r: false }] },
-      { A: [{ id: 4, c: false, r: true }] },
-      { B: [{ id: 5, c: false, r: false }] },
-      { C: [{ id: 6, c: false, r: true }] },
+      { A: [{ c: false, id: 2, r: false }], B: [{ c: false, id: 2, r: true }] },
+      { B: [{ c: false, id: 3, r: true }], C: [{ c: false, id: 3, r: false }] },
+      { A: [{ c: false, id: 4, r: true }] },
+      { B: [{ c: false, id: 5, r: false }] },
+      { C: [{ c: false, id: 6, r: true }] },
       {},
     ].map(makeTestRun)
 
@@ -100,8 +100,8 @@ describe('calculateLayeredStats - overlap scenarios', () => {
   it('all B tests are also A tests (full overlap)', () => {
     // 400 A, 400 B, all on same votes
     const votes = Array.from({ length: 400 }, (_, i) => ({
-      id: i + 1,
       c: false,
+      id: i + 1,
       r: true,
     }))
     const testRuns: TestRun[] = [makeTestRun({ A: votes, B: votes })]
@@ -116,13 +116,13 @@ describe('calculateLayeredStats - overlap scenarios', () => {
   it('no overlap between A and B', () => {
     // 400 A (1-400), 400 B (401-800)
     const votesA = Array.from({ length: 400 }, (_, i) => ({
-      id: i + 1,
       c: false,
+      id: i + 1,
       r: true,
     }))
     const votesB = Array.from({ length: 400 }, (_, i) => ({
-      id: i + 401,
       c: false,
+      id: i + 401,
       r: true,
     }))
     const testRuns: TestRun[] = [makeTestRun({ A: votesA, B: votesB })]
@@ -137,13 +137,13 @@ describe('calculateLayeredStats - overlap scenarios', () => {
   it('partial overlap between A and B', () => {
     // 400 A (1-400), 400 B (201-600)
     const votesA = Array.from({ length: 400 }, (_, i) => ({
-      id: i + 1,
       c: false,
+      id: i + 1,
       r: true,
     }))
     const votesB = Array.from({ length: 400 }, (_, i) => ({
-      id: i + 201,
       c: false,
+      id: i + 201,
       r: true,
     }))
     const testRuns: TestRun[] = [makeTestRun({ A: votesA, B: votesB })]
@@ -158,13 +158,13 @@ describe('calculateLayeredStats - overlap scenarios', () => {
   it('B tests much more numerous than A, with some overlap', () => {
     // 400 A (1-400), 1194 B (201-1394)
     const votesA = Array.from({ length: 400 }, (_, i) => ({
-      id: i + 1,
       c: false,
+      id: i + 1,
       r: true,
     }))
     const votesB = Array.from({ length: 1194 }, (_, i) => ({
-      id: i + 201,
       c: false,
+      id: i + 201,
       r: true,
     }))
     const testRuns: TestRun[] = [makeTestRun({ A: votesA, B: votesB })]
@@ -306,12 +306,12 @@ describe('toDisplayLabelFromKey', () => {
   it('converts canonical keys to display labels', () => {
     const mappings = {
       A: 'A',
-      B: 'B',
       AB: 'A & B',
       ABC: 'A & B & C',
+      'AC!B': 'A & C & not B',
+      B: 'B',
       'B!A': 'B & not A',
       'C!A!B': 'C & not A & not B',
-      'AC!B': 'A & C & not B',
     }
     for (const [key, expected] of Object.entries(mappings)) {
       expect(toDisplayLabelFromKey(key)).toBe(expected)

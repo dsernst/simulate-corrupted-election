@@ -1,39 +1,12 @@
 import { MT19937 } from './mt19937'
 
 export interface ElectionResults {
-  winnerVotes: number
-  runnerUpVotes: number
-  otherVotes: number
-  totalVotes: number
-  compromisedVotes: number
   compromisedPercentage: number
-}
-
-export interface VoteTestResult {
-  voteId: number
-  isActuallyCompromised: boolean
-  testResults: {
-    testA?: boolean // true if detected as compromised
-    testB?: boolean
-    testC?: boolean
-  }
-}
-
-interface TestResult {
-  count: number
-  detectedCompromised: number
-  voteResults: VoteTestResult[]
-}
-
-interface TestEffectivenessRates {
-  falseCleanRate: number
-  falseCompromisedRate: number
-}
-
-export interface TestEffectiveness {
-  testA: TestEffectivenessRates
-  testB: TestEffectivenessRates
-  testC: TestEffectivenessRates
+  compromisedVotes: number
+  otherVotes: number
+  runnerUpVotes: number
+  totalVotes: number
+  winnerVotes: number
 }
 
 export interface TestDetectionResults {
@@ -44,71 +17,31 @@ export interface TestDetectionResults {
   }
 }
 
-export function makeElection(mt: MT19937): ElectionResults {
-  const winnerVotes = Math.floor(mt.random() * 1000000)
-  const runnerUpVotes = Math.floor(mt.random() * winnerVotes)
-  const otherVotes = Math.floor(mt.random() * (winnerVotes * 0.2)) // Other votes up to 20% of winner's votes
-  const totalVotes = winnerVotes + runnerUpVotes + otherVotes
+export interface TestEffectiveness {
+  testA: TestEffectivenessRates
+  testB: TestEffectivenessRates
+  testC: TestEffectivenessRates
+}
 
-  // Generate random compromised percentage between 0 and 100
-  const compromisedPercentage = mt.random() * 100
-  const compromisedVotes = Math.floor(
-    (compromisedPercentage / 100) * totalVotes
-  )
-
-  return {
-    winnerVotes,
-    runnerUpVotes,
-    otherVotes,
-    totalVotes,
-    compromisedVotes,
-    compromisedPercentage,
+export interface VoteTestResult {
+  isActuallyCompromised: boolean
+  testResults: {
+    testA?: boolean // true if detected as compromised
+    testB?: boolean
+    testC?: boolean
   }
+  voteId: number
 }
 
-function sampleVote(
-  compromisedVotes: number,
-  totalVotes: number,
-  mt: MT19937
-): boolean {
-  // Randomly select a vote and determine if it's compromised
-  return mt.random() < compromisedVotes / totalVotes
+interface TestEffectivenessRates {
+  falseCleanRate: number
+  falseCompromisedRate: number
 }
 
-function runTest(
-  effectiveness: {
-    falseCleanRate: number
-    falseCompromisedRate: number
-  },
-  isActuallyCompromised: boolean,
-  mt: MT19937
-): boolean {
-  const random = mt.random()
-
-  if (isActuallyCompromised) {
-    // For actually compromised votes, we have a false clean rate
-    return random >= effectiveness.falseCleanRate
-  } else {
-    // For actually clean votes, we have a false compromised rate
-    return random < effectiveness.falseCompromisedRate
-  }
-}
-
-function parseCount(val: string, label: string): number {
-  const n = parseInt(val || '0', 10)
-  if (isNaN(n) || n < 0)
-    throw new Error(`Invalid test count for ${label}: ${val}`)
-  return n
-}
-
-function getRandomSample<T>(arr: T[], n: number, mt: MT19937): T[] {
-  // Fisher-Yates shuffle for reproducible random sampling
-  const a = arr.slice()
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(mt.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a.slice(0, n)
+interface TestResult {
+  count: number
+  detectedCompromised: number
+  voteResults: VoteTestResult[]
 }
 
 export function calculateTestResults(
@@ -178,9 +111,9 @@ export function calculateTestResults(
           mt
         )
         voteResult = {
-          voteId,
-          testResults: {},
           isActuallyCompromised,
+          testResults: {},
+          voteId,
         }
         globalVoteMap.set(voteId, voteResult)
       }
@@ -255,10 +188,10 @@ export function calculateTestResults(
     // For C tests, we need to split evenly across all A/B combinations
     else if (testType === 'C') {
       const quadrants: { [key: string]: number[] } = {
-        'A&B': [],
-        'A&!B': [],
-        '!A&B': [],
         '!A&!B': [],
+        '!A&B': [],
+        'A&!B': [],
+        'A&B': [],
       }
       for (let i = 1; i <= totalVotes; i++) {
         const voteResult = globalVoteMap.get(i)
@@ -381,4 +314,71 @@ export function calculateTestResults(
   }
 
   return { testBreakdown }
+}
+
+export function makeElection(mt: MT19937): ElectionResults {
+  const winnerVotes = Math.floor(mt.random() * 1000000)
+  const runnerUpVotes = Math.floor(mt.random() * winnerVotes)
+  const otherVotes = Math.floor(mt.random() * (winnerVotes * 0.2)) // Other votes up to 20% of winner's votes
+  const totalVotes = winnerVotes + runnerUpVotes + otherVotes
+
+  // Generate random compromised percentage between 0 and 100
+  const compromisedPercentage = mt.random() * 100
+  const compromisedVotes = Math.floor(
+    (compromisedPercentage / 100) * totalVotes
+  )
+
+  return {
+    compromisedPercentage,
+    compromisedVotes,
+    otherVotes,
+    runnerUpVotes,
+    totalVotes,
+    winnerVotes,
+  }
+}
+
+function getRandomSample<T>(arr: T[], n: number, mt: MT19937): T[] {
+  // Fisher-Yates shuffle for reproducible random sampling
+  const a = arr.slice()
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(mt.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a.slice(0, n)
+}
+
+function parseCount(val: string, label: string): number {
+  const n = parseInt(val || '0', 10)
+  if (isNaN(n) || n < 0)
+    throw new Error(`Invalid test count for ${label}: ${val}`)
+  return n
+}
+
+function runTest(
+  effectiveness: {
+    falseCleanRate: number
+    falseCompromisedRate: number
+  },
+  isActuallyCompromised: boolean,
+  mt: MT19937
+): boolean {
+  const random = mt.random()
+
+  if (isActuallyCompromised) {
+    // For actually compromised votes, we have a false clean rate
+    return random >= effectiveness.falseCleanRate
+  } else {
+    // For actually clean votes, we have a false compromised rate
+    return random < effectiveness.falseCompromisedRate
+  }
+}
+
+function sampleVote(
+  compromisedVotes: number,
+  totalVotes: number,
+  mt: MT19937
+): boolean {
+  // Randomly select a vote and determine if it's compromised
+  return mt.random() < compromisedVotes / totalVotes
 }

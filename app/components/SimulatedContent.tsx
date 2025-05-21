@@ -6,29 +6,29 @@ import { RevealStartOverLine } from './RevealStartOverLine'
 import { TestHistory } from './TestHistory'
 
 export function SimulatedContent({
-  results,
-  showCompromised,
-  onToggleCompromised,
-  onStartOver,
-  requestedTests,
-  setRequestedTests,
   onRunTests,
-  testRuns,
-  seed,
-  showSeedInput,
+  onStartOver,
+  onToggleCompromised,
   onToggleSeedInput,
+  requestedTests,
+  results,
+  seed,
+  setRequestedTests,
+  showCompromised,
+  showSeedInput,
+  testRuns,
 }: {
-  results: ElectionResults
-  showCompromised: boolean
-  onToggleCompromised: () => void
-  onStartOver: (newSeed?: number) => void
-  requestedTests: TestResults
-  setRequestedTests: (results: TestResults) => void
   onRunTests: () => void
-  testRuns: TestRun[]
-  seed: number
-  showSeedInput: boolean
+  onStartOver: (newSeed?: number) => void
+  onToggleCompromised: () => void
   onToggleSeedInput: () => void
+  requestedTests: TestResults
+  results: ElectionResults
+  seed: number
+  setRequestedTests: (results: TestResults) => void
+  showCompromised: boolean
+  showSeedInput: boolean
+  testRuns: TestRun[]
 }) {
   return (
     <div className="mt-8 p-6 bg-white shadow-lg rounded-lg w-full max-w-3xl">
@@ -41,21 +41,21 @@ export function SimulatedContent({
 
           {/* Test Request Form */}
           <RequestTests
-            requestedTests={requestedTests}
-            totalVotes={results.totalVotes}
-            setRequestedTests={setRequestedTests}
             onSubmit={onRunTests}
+            requestedTests={requestedTests}
+            setRequestedTests={setRequestedTests}
+            totalVotes={results.totalVotes}
           />
 
           <RevealStartOverLine
             {...{
-              results,
-              showCompromised,
-              onToggleCompromised,
               onStartOver,
-              seed,
-              showSeedInput,
+              onToggleCompromised,
               onToggleSeedInput,
+              results,
+              seed,
+              showCompromised,
+              showSeedInput,
             }}
           />
         </div>

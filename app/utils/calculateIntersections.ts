@@ -5,7 +5,13 @@ import {
 } from './createIntersections'
 import { TestDetectionResults } from './engine'
 
-export type TestType = 'A' | 'B' | 'C'
+export interface LayeredStat {
+  compromises: (number | undefined)[]
+  key: string
+  label: string
+  percentages: (number | undefined)[]
+  tested: number
+}
 
 export interface TestRun {
   id: number
@@ -13,13 +19,7 @@ export interface TestRun {
   timestamp: Date
 }
 
-export interface LayeredStat {
-  key: string
-  label: string
-  tested: number
-  compromises: (number | undefined)[]
-  percentages: (number | undefined)[]
-}
+export type TestType = 'A' | 'B' | 'C'
 
 // Define a type for the vote object in voteMap
 export interface VoteResult {
@@ -29,73 +29,6 @@ export interface VoteResult {
   testedA: boolean | undefined
   testedB: boolean | undefined
   testedC: boolean | undefined
-}
-
-// Utility: Marginal count for each test (votes where test detected compromise, regardless of others)
-export function getMarginalCompromisedCounts(
-  votes: VoteResult[],
-  tests: ('A' | 'B' | 'C')[]
-) {
-  return tests.map((t) => votes.filter((v) => v[`test${t}`] === true).length)
-}
-
-export function getMarginalCompromisedPercents(
-  votes: VoteResult[],
-  tests: ('A' | 'B' | 'C')[]
-) {
-  const total = votes.length
-  if (total === 0) return tests.map(() => undefined)
-  return getMarginalCompromisedCounts(votes, tests).map(
-    (count) => Math.round((count / total) * 1000) / 10
-  )
-}
-
-export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
-  // Build voteMap
-  const voteMap = new Map<number, VoteResult>()
-  testRuns.forEach((run) => {
-    Object.entries(run.results.testBreakdown).forEach(([testKey, test]) => {
-      const testType = testKey.slice(-1) as TestType
-      test.voteResults.forEach((vote) => {
-        const existing = voteMap.get(vote.voteId) || {
-          testA: undefined,
-          testB: undefined,
-          testC: undefined,
-          testedA: false,
-          testedB: false,
-          testedC: false,
-        }
-        voteMap.set(vote.voteId, {
-          ...existing,
-          [`test${testType}`]: vote.testResults[`test${testType}`],
-          [`tested${testType}`]: true,
-        })
-      })
-    })
-  })
-
-  // Calculate stats for each group
-  return intersectionGroups.map((key) => {
-    // Filter votes by which tests were run on them
-    const votes = Array.from(voteMap.values()).filter(
-      (v) => !!v && getFilterFromKey(key)(v)
-    )
-
-    const tested = votes.length
-    const tests = getTestsFromKey(key)
-
-    // For single-test groups, compromised is just that test; for intersections, use marginal counts
-    const compromises = getMarginalCompromisedCounts(votes, tests)
-    const percentages = getMarginalCompromisedPercents(votes, tests)
-
-    return {
-      key,
-      label: key, // For now, label is an alias to key
-      tested,
-      compromises,
-      percentages,
-    }
-  })
 }
 
 export function calculateConfusionMatrix(
@@ -160,6 +93,73 @@ export function calculateConfusionMatrix(
     compromised_compromised,
     total,
   }
+}
+
+export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
+  // Build voteMap
+  const voteMap = new Map<number, VoteResult>()
+  testRuns.forEach((run) => {
+    Object.entries(run.results.testBreakdown).forEach(([testKey, test]) => {
+      const testType = testKey.slice(-1) as TestType
+      test.voteResults.forEach((vote) => {
+        const existing = voteMap.get(vote.voteId) || {
+          testA: undefined,
+          testB: undefined,
+          testC: undefined,
+          testedA: false,
+          testedB: false,
+          testedC: false,
+        }
+        voteMap.set(vote.voteId, {
+          ...existing,
+          [`test${testType}`]: vote.testResults[`test${testType}`],
+          [`tested${testType}`]: true,
+        })
+      })
+    })
+  })
+
+  // Calculate stats for each group
+  return intersectionGroups.map((key) => {
+    // Filter votes by which tests were run on them
+    const votes = Array.from(voteMap.values()).filter(
+      (v) => !!v && getFilterFromKey(key)(v)
+    )
+
+    const tested = votes.length
+    const tests = getTestsFromKey(key)
+
+    // For single-test groups, compromised is just that test; for intersections, use marginal counts
+    const compromises = getMarginalCompromisedCounts(votes, tests)
+    const percentages = getMarginalCompromisedPercents(votes, tests)
+
+    return {
+      compromises,
+      key,
+      label: key, // For now, label is an alias to key
+      percentages,
+      tested,
+    }
+  })
+}
+
+// Utility: Marginal count for each test (votes where test detected compromise, regardless of others)
+export function getMarginalCompromisedCounts(
+  votes: VoteResult[],
+  tests: ('A' | 'B' | 'C')[]
+) {
+  return tests.map((t) => votes.filter((v) => v[`test${t}`] === true).length)
+}
+
+export function getMarginalCompromisedPercents(
+  votes: VoteResult[],
+  tests: ('A' | 'B' | 'C')[]
+) {
+  const total = votes.length
+  if (total === 0) return tests.map(() => undefined)
+  return getMarginalCompromisedCounts(votes, tests).map(
+    (count) => Math.round((count / total) * 1000) / 10
+  )
 }
 
 /** Utility: Convert canonical group key to display label */

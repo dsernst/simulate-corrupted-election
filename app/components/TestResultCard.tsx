@@ -1,15 +1,15 @@
 import { TestType } from '../utils/calculateIntersections'
 
 interface TestResultCardProps {
-  testType: TestType
   count: number
   detectedCompromised: number
+  testType: TestType
 }
 
 export function TestResultCard({
-  testType,
   count,
   detectedCompromised,
+  testType,
 }: TestResultCardProps) {
   const percentage =
     count > 0 ? ((detectedCompromised / count) * 100).toFixed(1) : '0.0'

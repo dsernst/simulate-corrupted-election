@@ -1,11 +1,51 @@
 interface NumberInputProps {
+  autoFocus?: boolean
   id: string
   label: string
-  value: string
   onChange: (value: string) => void
   onEnterKey?: () => void
   placeholder?: string
-  autoFocus?: boolean
+  value: string
+}
+
+export function NumberInput({
+  autoFocus,
+  id,
+  label,
+  onChange,
+  onEnterKey,
+  placeholder = 'Enter quantity',
+  value,
+}: NumberInputProps) {
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="text-lg font-medium" htmlFor={id}>
+        {label}
+      </label>
+      <input
+        autoFocus={autoFocus}
+        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+        id={id}
+        inputMode="numeric"
+        onChange={(e) => onChange(parseNumberInput(e.target.value))}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && onEnterKey) {
+            e.preventDefault()
+            onEnterKey()
+          }
+        }}
+        pattern="[0-9,kmKM]*"
+        placeholder={placeholder}
+        type="text"
+        value={formatNumberWithCommas(value)}
+      />
+    </div>
+  )
+}
+
+function formatNumberWithCommas(value: string): string {
+  if (!value) return ''
+  return parseInt(value).toLocaleString()
 }
 
 function parseNumberInput(input: string): string {
@@ -31,44 +71,4 @@ function parseNumberInput(input: string): string {
 
   // Handle regular numbers
   return input
-}
-
-function formatNumberWithCommas(value: string): string {
-  if (!value) return ''
-  return parseInt(value).toLocaleString()
-}
-
-export function NumberInput({
-  id,
-  label,
-  value,
-  onChange,
-  onEnterKey,
-  placeholder = 'Enter quantity',
-  autoFocus,
-}: NumberInputProps) {
-  return (
-    <div className="flex flex-col gap-2">
-      <label htmlFor={id} className="text-lg font-medium">
-        {label}
-      </label>
-      <input
-        type="text"
-        id={id}
-        autoFocus={autoFocus}
-        value={formatNumberWithCommas(value)}
-        onChange={(e) => onChange(parseNumberInput(e.target.value))}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && onEnterKey) {
-            e.preventDefault()
-            onEnterKey()
-          }
-        }}
-        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-        placeholder={placeholder}
-        pattern="[0-9,kmKM]*"
-        inputMode="numeric"
-      />
-    </div>
-  )
 }

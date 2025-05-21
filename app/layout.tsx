@@ -3,8 +3,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Simulate Corrupted Elections',
   description: 'How efficiently can you detect the compromised votes?',
+  title: 'Simulate Corrupted Elections',
 }
 
 export default function RootLayout({

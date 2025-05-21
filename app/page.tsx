@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Header } from './components/Header'
 import { TestResults } from './components/RequestTests'
@@ -10,7 +10,7 @@ import { Simulator } from './utils/simulator'
 const defaultRequested = { testA: '', testB: '', testC: '' }
 
 export default function Home() {
-  const [simulator, setSimulator] = useState<Simulator | null>(null)
+  const [simulator, setSimulator] = useState<null | Simulator>(null)
   const [showCompromised, setShowCompromised] = useState(false)
   const [showSeedInput, setShowSeedInput] = useState(false)
   const [requestedTests, setRequestedTests] =
@@ -33,21 +33,21 @@ export default function Home() {
       <Header />
 
       <SimulatedContent
-        results={state.election}
-        showCompromised={showCompromised}
-        onToggleCompromised={() => setShowCompromised(!showCompromised)}
-        onStartOver={onStartOver}
-        requestedTests={requestedTests}
-        setRequestedTests={setRequestedTests}
         onRunTests={() => {
           if (!simulator) return alert('Simulation not initialized')
           setSimulator(simulator.runTests(requestedTests))
           setRequestedTests(defaultRequested) // Reset form
         }}
-        testRuns={state.testRuns}
-        seed={state.seed}
-        showSeedInput={showSeedInput}
+        onStartOver={onStartOver}
+        onToggleCompromised={() => setShowCompromised(!showCompromised)}
         onToggleSeedInput={() => setShowSeedInput(!showSeedInput)}
+        requestedTests={requestedTests}
+        results={state.election}
+        seed={state.seed}
+        setRequestedTests={setRequestedTests}
+        showCompromised={showCompromised}
+        showSeedInput={showSeedInput}
+        testRuns={state.testRuns}
       />
     </main>
   )

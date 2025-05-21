@@ -1,10 +1,28 @@
 /** Mersenne Twister implementation (MT19937) */
 export class MT19937 {
-  private mt: number[] = new Array(624)
   private index = 0
+  private mt: number[] = new Array(624)
 
   constructor(seed: number) {
     this.seed(seed)
+  }
+
+  // Returns a 32-bit unsigned integer
+  int() {
+    if (this.index >= 624) {
+      this.twist()
+    }
+    let y = this.mt[this.index++]
+    y ^= y >>> 11
+    y ^= (y << 7) & 0x9d2c5680
+    y ^= (y << 15) & 0xefc60000
+    y ^= y >>> 18
+    return y >>> 0
+  }
+
+  // Returns a float in [0, 1)
+  random() {
+    return this.int() / 0x100000000
   }
 
   seed(seed: number) {
@@ -26,23 +44,5 @@ export class MT19937 {
       }
     }
     this.index = 0
-  }
-
-  // Returns a 32-bit unsigned integer
-  int() {
-    if (this.index >= 624) {
-      this.twist()
-    }
-    let y = this.mt[this.index++]
-    y ^= y >>> 11
-    y ^= (y << 7) & 0x9d2c5680
-    y ^= (y << 15) & 0xefc60000
-    y ^= y >>> 18
-    return y >>> 0
-  }
-
-  // Returns a float in [0, 1)
-  random() {
-    return this.int() / 0x100000000
   }
 }

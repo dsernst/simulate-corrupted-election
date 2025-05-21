@@ -1,10 +1,9 @@
 const ConfusionMatrix = ({
   first,
-  second,
   matrix,
+  second,
 }: {
   first: string
-  second: string
   matrix: {
     clean_clean: number
     clean_compromised: number
@@ -12,6 +11,7 @@ const ConfusionMatrix = ({
     compromised_compromised: number
     total: number
   }
+  second: string
 }) => {
   const grandTotal =
     matrix.clean_clean +
@@ -38,8 +38,8 @@ const ConfusionMatrix = ({
       <div
         className="text-base mr-2 border border-gray-400/70 relative top-[76px] left-2 h-29 text-center bg-yellow-100 rotate-180"
         style={{
-          writingMode: 'vertical-rl',
           letterSpacing: '0.05em',
+          writingMode: 'vertical-rl',
         }}
       >
         Test {first}

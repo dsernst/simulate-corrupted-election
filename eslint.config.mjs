@@ -12,12 +12,7 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
-  {
-    plugins: { perfectionist },
-    rules: {
-      'perfectionist/sort-imports': 'error',
-    },
-  },
+  perfectionist.configs['recommended-natural'],
 ]
 
 export default eslintConfig

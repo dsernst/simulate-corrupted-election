@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'bun:test'
 
 import {
-  calculateTotalCost,
-  formatCost,
   calculateTestRunCost,
+  calculateTotalCost,
   calculateTotalTestRunsCost,
+  formatCost,
 } from '../costCalculation'
 
 describe('costCalculation', () => {

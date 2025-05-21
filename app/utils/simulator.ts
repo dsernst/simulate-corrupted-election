@@ -1,31 +1,27 @@
 import { calculateLayeredStats } from './calculateIntersections'
 import {
-  ElectionResults,
-  VoteTestResult,
-  TestDetectionResults,
-  makeElection,
   calculateTestResults,
+  ElectionResults,
+  makeElection,
+  TestDetectionResults,
+  VoteTestResult,
 } from './engine'
 import { MT19937 } from './mt19937'
 import { testSet } from './testSet'
 
-function generateRandomSeed(): number {
-  return Math.floor(Math.random() * 0x100000)
+export interface SimulationState {
+  election: ElectionResults
+  mt: MT19937
+  nextRunId: number
+  seed: number
+  testRuns: TestRun[]
+  voteMap: Map<number, VoteTestResult>
 }
 
 export interface TestRun {
   id: number
   results: TestDetectionResults
   timestamp: Date
-}
-
-export interface SimulationState {
-  seed: number
-  election: ElectionResults
-  testRuns: TestRun[]
-  nextRunId: number
-  mt: MT19937
-  voteMap: Map<number, VoteTestResult>
 }
 
 export class Simulator {
@@ -35,13 +31,17 @@ export class Simulator {
     const initialSeed = seed ?? generateRandomSeed()
     const mt = new MT19937(initialSeed)
     this.state = {
-      seed: initialSeed,
       election: makeElection(mt),
-      testRuns: [],
-      nextRunId: 1,
       mt,
+      nextRunId: 1,
+      seed: initialSeed,
+      testRuns: [],
       voteMap: new Map<number, VoteTestResult>(),
     }
+  }
+
+  getIntersections(): ReturnType<typeof calculateLayeredStats> {
+    return calculateLayeredStats(this.state.testRuns)
   }
 
   getState(): SimulationState {
@@ -70,8 +70,8 @@ export class Simulator {
     const newSimulator = new Simulator()
     newSimulator.state = {
       ...this.state,
-      testRuns: [...this.state.testRuns, testRun],
       nextRunId: this.state.nextRunId + 1,
+      testRuns: [...this.state.testRuns, testRun],
       voteMap: new Map(this.state.voteMap),
     }
 
@@ -83,8 +83,8 @@ export class Simulator {
     const testCounts = testSet(testSetShorthand)
     return this.runTests(testCounts)
   }
+}
 
-  getIntersections(): ReturnType<typeof calculateLayeredStats> {
-    return calculateLayeredStats(this.state.testRuns)
-  }
+function generateRandomSeed(): number {
+  return Math.floor(Math.random() * 0x100000)
 }

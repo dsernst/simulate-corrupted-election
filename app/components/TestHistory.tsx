@@ -45,10 +45,10 @@ const TestRunDisplay = ({ run }: { run: TestRun }) => (
         const test = run.results.testBreakdown[`test${testType}`]
         return (
           <TestResultCard
-            key={testType}
-            testType={testType}
             count={test.count}
             detectedCompromised={test.detectedCompromised}
+            key={testType}
+            testType={testType}
           />
         )
       })}

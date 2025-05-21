@@ -1,7 +1,7 @@
 import {
   calculateTotalCost,
-  formatCost,
   DEFAULT_TEST_COSTS,
+  formatCost,
 } from '../utils/costCalculation'
 import { Button } from './Button'
 import { NumberInput } from './NumberInput'
@@ -14,37 +14,37 @@ export interface TestResults {
 
 const TESTS = [
   {
+    cost: DEFAULT_TEST_COSTS.testA,
+    description: 'Easiest, but least reliable',
     key: 'testA' as const,
     label: 'Test A',
     subtitle: 'Voter Autonomous',
-    description: 'Easiest, but least reliable',
-    cost: DEFAULT_TEST_COSTS.testA,
   },
   {
+    cost: DEFAULT_TEST_COSTS.testB,
+    description: 'Medium cost & reliability',
     key: 'testB' as const,
     label: 'Test B',
     subtitle: 'Guided by Auditor',
-    description: 'Medium cost & reliability',
-    cost: DEFAULT_TEST_COSTS.testB,
   },
   {
+    cost: DEFAULT_TEST_COSTS.testC,
+    description: 'Highest cost, perfect accuracy',
     key: 'testC' as const,
     label: 'Test C',
     subtitle: 'Against In-person Paper',
-    description: 'Highest cost, perfect accuracy',
-    cost: DEFAULT_TEST_COSTS.testC,
   },
 ] as const
 
 export function RequestTests({
+  onSubmit,
   requestedTests,
   setRequestedTests,
-  onSubmit,
   totalVotes,
 }: {
+  onSubmit: () => void
   requestedTests: TestResults
   setRequestedTests: (results: TestResults) => void
-  onSubmit: () => void
   totalVotes: number
 }) {
   const hasValidTests = Object.values(requestedTests).some(
@@ -67,7 +67,7 @@ export function RequestTests({
       </h3>
       <div className="space-y-4">
         <div className="grid grid-cols-3 gap-4">
-          {TESTS.map(({ key, label, subtitle, description, cost }, index) => (
+          {TESTS.map(({ cost, description, key, label, subtitle }, index) => (
             <div key={key}>
               <div className="mb-2">
                 <div className="text-xs text-gray-500">{subtitle}</div>
@@ -81,15 +81,15 @@ export function RequestTests({
                 </div>
               </div>
               <NumberInput
-                id={key}
                 autoFocus={index === 0}
+                id={key}
                 label={label}
-                value={requestedTests[key]}
                 onChange={(value) =>
                   setRequestedTests({ ...requestedTests, [key]: value })
                 }
                 onEnterKey={handleSubmit}
                 placeholder="Enter count"
+                value={requestedTests[key]}
               />
             </div>
           ))}
@@ -100,9 +100,9 @@ export function RequestTests({
             <span className="font-semibold">{formatCost(totalCost)}</span>
           </div>
           <Button
-            onClick={handleSubmit}
             className="px-6"
             disabled={!hasValidTests}
+            onClick={handleSubmit}
           >
             Run Tests
           </Button>

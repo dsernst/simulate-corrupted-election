@@ -2,14 +2,14 @@ import { describe, expect, it } from 'bun:test'
 
 import { TestType, VoteResult } from '../calculateIntersections'
 import {
-  getTestsFromKey,
-  getIndentFromKey,
-  getFilterFromKey,
   generateIntersectingGroups,
+  getFilterFromKey,
+  getIndentFromKey,
+  getTestsFromKey,
 } from '../createIntersections'
 
-type Key = string
 type Indent = number
+type Key = string
 type Tests = TestType[]
 
 describe('intersection groups', () => {
@@ -66,12 +66,12 @@ describe('intersection groups', () => {
     /** Convert compressed [1, 0, 1] -> { testedA: true, testedB: false, testedC: true } */
     function mockVoteFromWasTested(wasTested: WasTested): VoteResult {
       return {
-        testedA: !!wasTested[0],
-        testedB: !!wasTested[1],
-        testedC: !!wasTested[2],
         testA: undefined,
         testB: undefined,
         testC: undefined,
+        testedA: !!wasTested[0],
+        testedB: !!wasTested[1],
+        testedC: !!wasTested[2],
       }
     }
 
