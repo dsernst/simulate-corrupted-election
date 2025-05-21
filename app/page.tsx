@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { SimulatedContent } from './components/SimulatedContent'
 import { TestResults } from './components/RequestTests'
 import { SimulationOrchestrator } from './utils/orchestrator'
-
+import { Header } from './components/Header'
 export default function Home() {
   const [orchestrator, setOrchestrator] =
     useState<SimulationOrchestrator | null>(null)
@@ -51,14 +51,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center md:!p-10 p-2 py-10 gap-8">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-2">
-          Simulate Corrupted Elections
-        </h1>
-        <p className="text-xl text-gray-600 px-4">
-          How efficiently can you detect the compromised votes?
-        </p>
-      </div>
+      <Header />
 
       <SimulatedContent
         results={state.election}
