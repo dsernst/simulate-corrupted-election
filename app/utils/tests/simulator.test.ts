@@ -328,6 +328,11 @@ describe('Refactored Simulator', () => {
     expect(intersections2).toBe(intersections3)
   })
 
+  it.failing('should get .testRuns virtually', () => {
+    const sim = new Simulator(SMALL_SEED)
+    expect(sim.getState().testRuns).toBeUndefined()
+  })
+
   it.failing('should mutate in place', () => {
     const sim = new Simulator(SMALL_SEED)
     expect(sim.getState().testRuns.length).toBe(0)
