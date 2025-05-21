@@ -44,11 +44,6 @@ export interface TestDetectionResults {
   }
 }
 
-export function calculatePercentage(votes: number, total: number): string {
-  if (!total) return '0'
-  return ((votes / total) * 100).toFixed(1)
-}
-
 export function makeElection(mt: MT19937): ElectionResults {
   const winnerVotes = Math.floor(mt.random() * 1000000)
   const runnerUpVotes = Math.floor(mt.random() * winnerVotes)

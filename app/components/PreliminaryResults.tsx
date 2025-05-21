@@ -1,4 +1,4 @@
-import { ElectionResults, calculatePercentage } from '../utils/engine'
+import { ElectionResults } from '../utils/engine'
 
 export function PreliminaryResults({ results }: { results: ElectionResults }) {
   return (
@@ -22,4 +22,9 @@ export function PreliminaryResults({ results }: { results: ElectionResults }) {
       </p>
     </div>
   )
+}
+
+function calculatePercentage(votes: number, total: number): string {
+  if (!total) return '0'
+  return ((votes / total) * 100).toFixed(1)
 }
