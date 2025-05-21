@@ -16,7 +16,6 @@ export interface TestRun {
 }
 
 interface SimulatorState {
-  election: ElectionResults
   mt: MT19937
   testRuns: TestRun[]
   voteMap: Map<number, VoteTestResult>
@@ -27,6 +26,10 @@ type TestsShorthand = string
 export class Simulator {
   public seed: number
   public tests: TestsShorthand = ''
+
+  public get election(): ElectionResults {
+    return makeElection(new MT19937(this.seed))
+  }
 
   public get testSets(): TestSet[] {
     if (!this.tests) return []
@@ -39,7 +42,6 @@ export class Simulator {
     const initialSeed = seed ?? generateRandomSeed()
     const mt = new MT19937(initialSeed)
     this.state = {
-      election: makeElection(mt),
       mt,
       testRuns: [],
       voteMap: new Map<number, VoteTestResult>(),
@@ -63,8 +65,8 @@ export class Simulator {
   }): Simulator {
     const results = calculateTestResults(
       testCounts,
-      this.state.election.compromisedVotes,
-      this.state.election.totalVotes,
+      this.election.compromisedVotes,
+      this.election.totalVotes,
       this.state.mt,
       this.state.voteMap
     )
@@ -75,7 +77,7 @@ export class Simulator {
       timestamp: new Date(),
     }
 
-    const newSimulator = new Simulator()
+    const newSimulator = new Simulator(this.seed)
     newSimulator.state = {
       ...this.state,
       testRuns: [...this.state.testRuns, testRun],

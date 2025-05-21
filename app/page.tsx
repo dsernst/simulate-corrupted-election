@@ -42,7 +42,7 @@ export default function Home() {
         onToggleCompromised={() => setShowCompromised(!showCompromised)}
         onToggleSeedInput={() => setShowSeedInput(!showSeedInput)}
         requestedTests={requestedTests}
-        results={state.election}
+        results={simulator.election}
         seed={simulator.seed}
         setRequestedTests={setRequestedTests}
         showCompromised={showCompromised}
