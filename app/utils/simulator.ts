@@ -100,7 +100,7 @@ export class Simulator {
     this.tests += (this.tests ? `-` : '') + newTests
 
     const testRun: TestRun = {
-      id: this.state.testRuns.length + 1,
+      id: this.tests.split('-').length,
       results,
       timestamp: new Date(),
     }
