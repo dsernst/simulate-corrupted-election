@@ -18,8 +18,8 @@ type CacheKey = `${Seed}.${TestsShorthand}`
 type Seed = number
 type SimulatorState = {
   _testRuns: TestRun[]
+  _voteMap: Map<number, VoteTestResult>
   mt: MT19937
-  voteMap: Map<number, VoteTestResult>
 }
 
 const _electionCache = new LRUCache<Seed, ElectionResults>({ max: 50 })
@@ -64,6 +64,10 @@ export class Simulator {
     return this.tests.split('-').map(testSet)
   }
 
+  public get voteMap(): Map<number, VoteTestResult> {
+    return this.state._voteMap
+  }
+
   private state: SimulatorState
 
   constructor(seed?: number, tests?: TestsShorthand) {
@@ -71,8 +75,8 @@ export class Simulator {
     const mt = new MT19937(initialSeed)
     this.state = {
       _testRuns: [],
+      _voteMap: new Map<number, VoteTestResult>(),
       mt,
-      voteMap: new Map<number, VoteTestResult>(),
     }
     this.tests = tests ?? ''
     this.seed = initialSeed
@@ -104,7 +108,7 @@ export class Simulator {
       this.election.compromisedVotes,
       this.election.totalVotes,
       this.state.mt,
-      this.state.voteMap
+      this.voteMap
     )
 
     const newTests = toTestSetString(testCounts)
@@ -120,7 +124,6 @@ export class Simulator {
     newSimulator.state = {
       ...this.state,
       _testRuns: [...this.testRuns, testRun],
-      voteMap: new Map(this.state.voteMap),
     }
 
     return newSimulator

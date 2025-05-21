@@ -87,10 +87,9 @@ describe('Simulator', () => {
     // Second test set: A=500 (A again)
     simulator = simulator.test('a500')
 
-    // Get the vote map from state
-    const state = simulator.getState()
     let testedA = 0
-    for (const v of state.voteMap.values()) {
+    // Count testedA in the vote map
+    for (const v of simulator.voteMap.values()) {
       if (v.testResults.testA !== undefined) testedA++
     }
     expect(testedA).toBe(1500)
