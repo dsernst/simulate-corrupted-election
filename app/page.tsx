@@ -41,11 +41,8 @@ export default function Home() {
         setRequestedTests={setRequestedTests}
         onRunTests={() => {
           if (!simulator) return alert('Simulation not initialized')
-
           setSimulator(simulator.runTests(requestedTests))
-
-          // Reset the test request form
-          setRequestedTests(defaultRequested)
+          setRequestedTests(defaultRequested) // Reset form
         }}
         testRuns={state.testRuns}
         seed={state.seed}
