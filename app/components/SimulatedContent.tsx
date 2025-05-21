@@ -10,8 +10,8 @@ export function SimulatedContent({
   showCompromised,
   onToggleCompromised,
   onStartOver,
-  testResults,
-  onTestResultsChange,
+  requestedTests,
+  setRequestedTests,
   onRunTests,
   testRuns,
   seed,
@@ -22,8 +22,8 @@ export function SimulatedContent({
   showCompromised: boolean
   onToggleCompromised: () => void
   onStartOver: (newSeed?: number) => void
-  testResults: TestResults
-  onTestResultsChange: (results: TestResults) => void
+  requestedTests: TestResults
+  setRequestedTests: (results: TestResults) => void
   onRunTests: () => void
   testRuns: TestRun[]
   seed: number
@@ -41,9 +41,9 @@ export function SimulatedContent({
 
           {/* Test Request Form */}
           <RequestTests
-            testResults={testResults}
+            requestedTests={requestedTests}
             totalVotes={results.totalVotes}
-            onTestResultsChange={onTestResultsChange}
+            setRequestedTests={setRequestedTests}
             onSubmit={onRunTests}
           />
 

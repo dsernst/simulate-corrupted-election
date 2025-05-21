@@ -12,13 +12,6 @@ export interface TestResults {
   testC: string
 }
 
-interface RequestTestsProps {
-  testResults: TestResults
-  onTestResultsChange: (results: TestResults) => void
-  onSubmit: () => void
-  totalVotes: number
-}
-
 const TESTS = [
   {
     key: 'testA' as const,
@@ -47,16 +40,21 @@ const TESTS = [
 ] as const
 
 export function RequestTests({
-  testResults,
-  onTestResultsChange,
+  requestedTests,
+  setRequestedTests,
   onSubmit,
   totalVotes,
-}: RequestTestsProps) {
-  const hasValidTests = Object.values(testResults).some(
+}: {
+  requestedTests: TestResults
+  setRequestedTests: (results: TestResults) => void
+  onSubmit: () => void
+  totalVotes: number
+}) {
+  const hasValidTests = Object.values(requestedTests).some(
     (value) => parseInt(value) > 0
   )
 
-  const totalCost = calculateTotalCost(testResults)
+  const totalCost = calculateTotalCost(requestedTests)
 
   const handleSubmit = () => {
     if (hasValidTests) onSubmit()
@@ -89,9 +87,9 @@ export function RequestTests({
                 id={key}
                 autoFocus={index === 0}
                 label={label}
-                value={testResults[key]}
+                value={requestedTests[key]}
                 onChange={(value) =>
-                  onTestResultsChange({ ...testResults, [key]: value })
+                  setRequestedTests({ ...requestedTests, [key]: value })
                 }
                 onEnterKey={handleSubmit}
                 placeholder="Enter count"

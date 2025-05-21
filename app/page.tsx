@@ -7,15 +7,18 @@ import { TestResults } from './components/RequestTests'
 import { SimulatedContent } from './components/SimulatedContent'
 import { Simulator } from './utils/simulator'
 
+const defaultRequested = {
+  testA: '',
+  testB: '',
+  testC: '',
+}
+
 export default function Home() {
   const [simulator, setSimulator] = useState<Simulator | null>(null)
   const [showCompromised, setShowCompromised] = useState(false)
   const [showSeedInput, setShowSeedInput] = useState(false)
-  const [testResults, setTestResults] = useState<TestResults>({
-    testA: '',
-    testB: '',
-    testC: '',
-  })
+  const [requestedTests, setRequestedTests] =
+    useState<TestResults>(defaultRequested)
 
   const onStartOver = (newSeed?: number) => {
     setSimulator(new Simulator(newSeed))
@@ -38,19 +41,15 @@ export default function Home() {
         showCompromised={showCompromised}
         onToggleCompromised={() => setShowCompromised(!showCompromised)}
         onStartOver={onStartOver}
-        testResults={testResults}
-        onTestResultsChange={setTestResults}
+        requestedTests={requestedTests}
+        setRequestedTests={setRequestedTests}
         onRunTests={() => {
           if (!simulator) return alert('Simulation not initialized')
 
-          setSimulator(simulator.runTests(testResults))
+          setSimulator(simulator.runTests(requestedTests))
 
           // Reset the test request form
-          setTestResults({
-            testA: '',
-            testB: '',
-            testC: '',
-          })
+          setRequestedTests(defaultRequested)
         }}
         testRuns={state.testRuns}
         seed={state.seed}
