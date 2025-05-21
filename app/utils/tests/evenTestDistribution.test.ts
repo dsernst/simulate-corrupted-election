@@ -6,7 +6,7 @@ import { testSet } from '../testSet'
 export const SMALL_SEED = 54801
 
 describe('Even test distribution', () => {
-  it('B tests should be split 50/50 between A and !A tested votes', () => {
+  it('should split B tests 50/50 between A and !A tested votes', () => {
     let simulator = new Simulator(SMALL_SEED)
 
     // Run A tests first
@@ -29,7 +29,7 @@ describe('Even test distribution', () => {
     expect(Math.abs(AB - onlyB)).toBeLessThanOrEqual(2) // Allow for some randomness
   })
 
-  it('C tests should be split 25/25/25/25 across A/B combinations', () => {
+  it('should split C tests 25/25/25/25 across A/B combinations', () => {
     let simulator = new Simulator(SMALL_SEED)
 
     // Run A and B tests first
