@@ -18,7 +18,6 @@ type CacheKey = `${Seed}.${TestsShorthand}`
 type Seed = number
 type SimulatorState = {
   _testRuns: TestRun[]
-  _voteMap: Map<number, VoteTestResult>
   mt: MT19937
 }
 
@@ -65,17 +64,18 @@ export class Simulator {
   }
 
   public get voteMap(): Map<number, VoteTestResult> {
-    return this.state._voteMap
+    return this._voteMap
   }
+  private _voteMap: Map<number, VoteTestResult>
 
   private state: SimulatorState
 
   constructor(seed?: number, tests?: TestsShorthand) {
     const initialSeed = seed ?? generateRandomSeed()
     const mt = new MT19937(initialSeed)
+    this._voteMap = new Map<number, VoteTestResult>()
     this.state = {
       _testRuns: [],
-      _voteMap: new Map<number, VoteTestResult>(),
       mt,
     }
     this.tests = tests ?? ''
