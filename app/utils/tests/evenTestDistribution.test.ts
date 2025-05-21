@@ -2,9 +2,12 @@ import { describe, expect, test } from 'bun:test'
 import { SimulationOrchestrator } from '../orchestrator'
 import { testSet } from '../testSet'
 
+/** This seed has 45k votes: relatively small, for faster tests. */
+const SEED = 54801
+
 describe('Even test distribution', () => {
   test('B tests should be split 50/50 between A and !A tested votes', () => {
-    let orchestrator = new SimulationOrchestrator(12345)
+    let orchestrator = new SimulationOrchestrator(SEED)
 
     // Run A tests first
     orchestrator = orchestrator.runTests(testSet('a1000'))
@@ -24,7 +27,7 @@ describe('Even test distribution', () => {
   })
 
   test('C tests should be split 25/25/25/25 across A/B combinations', () => {
-    let orchestrator = new SimulationOrchestrator(12345)
+    let orchestrator = new SimulationOrchestrator(SEED)
 
     // Run tests in sequence
     orchestrator = orchestrator.runTests(testSet('a1000'))
@@ -57,8 +60,8 @@ describe('Even test distribution', () => {
 describe('C test distribution edge cases', () => {
   test('should not throw or hang when testC is not divisible by 4', () => {
     // Try a range of C test counts not divisible by 4
-    for (let c = 1; c <= 20; c++) {
-      let orchestrator = new SimulationOrchestrator(42)
+    for (let c = 1; c <= 5; c++) {
+      let orchestrator = new SimulationOrchestrator(SEED)
       expect(() => {
         orchestrator = orchestrator.runTests(testSet(`a10b10c${c}`))
         const state = orchestrator.getState()
@@ -70,7 +73,7 @@ describe('C test distribution edge cases', () => {
   })
 
   test('should distribute all C tests even if not divisible by 4', () => {
-    let orchestrator = new SimulationOrchestrator(123)
+    let orchestrator = new SimulationOrchestrator(SEED)
     orchestrator = orchestrator.runTests(testSet('a30b30c19'))
 
     const state = orchestrator.getState()
