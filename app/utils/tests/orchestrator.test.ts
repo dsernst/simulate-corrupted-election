@@ -24,25 +24,6 @@ describe('SimulationOrchestrator', () => {
     expect(get('AB')?.tested).toBeGreaterThan(0)
   })
 
-  it('should handle reset correctly', () => {
-    let orchestrator = new SimulationOrchestrator(42)
-
-    // Run some tests
-    orchestrator = orchestrator.runTests(testSet('a100'))
-    orchestrator = orchestrator.runTests(testSet('b100'))
-
-    // Reset with same seed
-    orchestrator = orchestrator.reset(42)
-    const state = orchestrator.getState()
-    expect(state.testRuns).toHaveLength(0)
-    expect(state.nextRunId).toBe(1)
-
-    // Run tests again
-    orchestrator = orchestrator.runTests(testSet('a100'))
-    const run = orchestrator.getState().testRuns[0]
-    expect(run.id).toBe(1)
-  })
-
   it('should maintain consistent results with same seed', () => {
     const SEED = 42
 

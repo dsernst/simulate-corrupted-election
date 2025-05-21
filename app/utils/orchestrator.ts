@@ -47,11 +47,6 @@ export class SimulationOrchestrator {
     return { ...this.state }
   }
 
-  reset(seed?: number): SimulationOrchestrator {
-    const newSeed = seed ?? generateRandomSeed()
-    return new SimulationOrchestrator(newSeed)
-  }
-
   runTests(testCounts: {
     testA: string
     testB: string
