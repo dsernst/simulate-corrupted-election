@@ -7,11 +7,7 @@ import { TestResults } from './components/RequestTests'
 import { SimulatedContent } from './components/SimulatedContent'
 import { Simulator } from './utils/simulator'
 
-const defaultRequested = {
-  testA: '',
-  testB: '',
-  testC: '',
-}
+const defaultRequested = { testA: '', testB: '', testC: '' }
 
 export default function Home() {
   const [simulator, setSimulator] = useState<Simulator | null>(null)
