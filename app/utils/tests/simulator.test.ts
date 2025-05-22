@@ -149,19 +149,16 @@ describe('Simulator', () => {
   })
 
   it('should calculate intersections correctly across multiple runs', () => {
-    let simulator = new Simulator(SMALL_SEED)
+    const simulator = new Simulator(SMALL_SEED)
 
     // Run tests in sequence
-    simulator = simulator.test('a100')
-    simulator = simulator.test('b100')
-    simulator = simulator.test('c50')
-
-    const intersections = simulator.getIntersections()
-    const get = (label: string) => intersections.find((g) => g.label === label)
+    simulator.test('a100')
+    simulator.test('b100')
+    simulator.test('c50')
 
     // Should have AB, AC, BC, ABC intersections
     ;['AB', 'AC', 'BC', 'ABC'].forEach((label) => {
-      expect(get(label)?.tested).toBeGreaterThan(10)
+      expect(simulator.get(label).tested).toBeGreaterThan(10)
     })
   })
 
