@@ -94,14 +94,14 @@ describe('Simulator', () => {
   })
 
   it('should handle small number of test C after A and B tests', () => {
-    let simulator = new Simulator(SMALL_SEED)
+    const simulator = new Simulator(SMALL_SEED)
 
     // First run A and B tests
-    simulator = simulator.test('a1000b1000')
+    simulator.test('a1000b1000')
 
     // Then run a small number of C tests
-    simulator = simulator.test('c3')
-    const lastRun = simulator.testRuns[simulator.testRuns.length - 1]
+    simulator.test('c3')
+    const lastRun = simulator.testRuns.at(-1)!
 
     // Verify C test results
     expect(lastRun.results.testBreakdown.testC.count).toBe(3)
