@@ -196,16 +196,16 @@ describe('Simulator', () => {
   })
 
   it('should track accumulating MT state between test runs', () => {
-    let simulator = new Simulator(SMALL_SEED)
+    const simulator = new Simulator(SMALL_SEED)
     const SAME_TEST_SET = 'a100'
 
     // Run some tests
-    simulator = simulator.test(SAME_TEST_SET)
+    simulator.test(SAME_TEST_SET)
     const testRuns1 = [...simulator.testRuns]
     expect(testRuns1.length).toBe(1)
 
     // Run the same tests again
-    simulator = simulator.test(SAME_TEST_SET)
+    simulator.test(SAME_TEST_SET)
     const testRuns2 = [...simulator.testRuns]
     expect(testRuns2.length).toBe(2)
 
