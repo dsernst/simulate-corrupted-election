@@ -50,10 +50,10 @@ describe('Simulator', () => {
   })
 
   it('should maintain vote consistency across tests', () => {
-    let simulator = new Simulator(SMALL_SEED)
+    const simulator = new Simulator(SMALL_SEED)
 
     // Run multiple tests on the same votes
-    simulator = simulator.test('a100b100c100')
+    simulator.test('a100b100c100')
 
     // Check that each vote maintains consistent test results
     const voteResults = new Map()
