@@ -21,6 +21,8 @@ type SimulatorState = {
   mt: MT19937
 }
 
+type VoteMap = Map<number, VoteTestResult>
+
 const _electionCache = new LRUCache<Seed, ElectionResults>({ max: 50 })
 const _intersectionCache = new LRUCache<CacheKey, LayeredStat[]>({ max: 20 })
 
@@ -63,10 +65,10 @@ export class Simulator {
     return this.tests.split('-').map(testSet)
   }
 
-  public get voteMap(): Map<number, VoteTestResult> {
+  public get voteMap(): VoteMap {
     return this._voteMap
   }
-  private _voteMap: Map<number, VoteTestResult>
+  private _voteMap: VoteMap
 
   private state: SimulatorState
 
