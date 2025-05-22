@@ -120,8 +120,8 @@ describe('Simulator', () => {
   })
 
   it('should handle empty test counts', () => {
-    let simulator = new Simulator(42)
-    simulator = simulator.test('')
+    const simulator = new Simulator(SMALL_SEED)
+    simulator.test('')
     const run = simulator.testRuns[0]
 
     expect(run.results.testBreakdown.testA.count).toBe(0)
@@ -130,7 +130,7 @@ describe('Simulator', () => {
   })
 
   it('should throw on invalid test counts', () => {
-    const simulator = new Simulator(42)
+    const simulator = new Simulator(SMALL_SEED)
 
     // Invalid A count: 'invalid'
     expect(() =>
