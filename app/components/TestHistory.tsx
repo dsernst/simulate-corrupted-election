@@ -35,9 +35,11 @@ const TestRunDisplay = ({ run }: { run: TestRun }) => (
       <h3 className="text-lg font-semibold text-blue-800">
         Test Set #{run.id}
       </h3>
-      <span className="text-sm text-gray-500">
-        {run.timestamp.toLocaleTimeString()}
-      </span>
+      <div className="flex justify-start text-black/50 text-xs">
+        {run.timestamp.toLocaleTimeString().toLowerCase().replace(' ', '')}
+        <span className="mx-1 opacity-50">|</span>
+        {Math.round(run.testTime / 100) / 10}s
+      </div>
     </div>
 
     <div className="grid grid-cols-3 gap-4">

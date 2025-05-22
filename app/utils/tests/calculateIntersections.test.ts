@@ -42,6 +42,7 @@ function makeTestRun(run: {
         testC: makeTestResult(run.C, 'C'),
       },
     },
+    testTime: 1,
     timestamp: new Date(),
   }
 }
@@ -224,10 +225,10 @@ describe('calculateLayeredStats - with simTests', () => {
     )
     // Collect all test runs
     const testRuns = [
-      { id: 1, results: resultsA, timestamp: new Date() },
-      { id: 2, results: resultsB, timestamp: new Date() },
-      { id: 3, results: resultsA2, timestamp: new Date() },
-      { id: 4, results: resultsB2, timestamp: new Date() },
+      { id: 1, results: resultsA, testTime: 1, timestamp: new Date() },
+      { id: 2, results: resultsB, testTime: 1, timestamp: new Date() },
+      { id: 3, results: resultsA2, testTime: 1, timestamp: new Date() },
+      { id: 4, results: resultsB2, testTime: 1, timestamp: new Date() },
     ]
     const stats = calculateLayeredStats(testRuns)
     const get = (label: string) => stats.find((g) => g.label === label)
@@ -262,9 +263,10 @@ describe('calculateLayeredStats - with simTests', () => {
     )
     // Pass both runs to calculateLayeredStats
     const testRuns = [
-      { id: 1, results: resultsA1, timestamp: new Date() },
-      { id: 2, results: resultsA2, timestamp: new Date() },
+      { id: 1, results: resultsA1, testTime: 1, timestamp: new Date() },
+      { id: 2, results: resultsA2, testTime: 1, timestamp: new Date() },
     ]
+
     const stats = calculateLayeredStats(testRuns)
     const get = (label: string) => stats.find((g) => g.label === label)
     expect(get('A')?.tested).toBe(1500)
@@ -296,8 +298,8 @@ describe('calculateLayeredStats - with simTests', () => {
 
     // Pass both runs to calculateLayeredStats
     const testRuns = [
-      { id: 1, results: results1, timestamp: new Date() },
-      { id: 2, results: results2, timestamp: new Date() },
+      { id: 1, results: results1, testTime: 1, timestamp: new Date() },
+      { id: 2, results: results2, testTime: 1, timestamp: new Date() },
     ]
     const stats = calculateLayeredStats(testRuns)
     const get = (label: string) => stats.find((g) => g.label === label)

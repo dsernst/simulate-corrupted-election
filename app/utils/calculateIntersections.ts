@@ -16,6 +16,7 @@ export interface LayeredStat {
 export interface TestRun {
   id: number
   results: TestDetectionResults
+  testTime: number
   timestamp: Date
 }
 
