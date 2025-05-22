@@ -181,22 +181,18 @@ describe('Simulator', () => {
   })
 
   it('should calculate intersections correctly when tests are run simultaneously', () => {
-    let simulator = new Simulator(SMALL_SEED)
+    const simulator = new Simulator(SMALL_SEED)
 
     // Run both tests at once
-    simulator = simulator.test('a100b100')
+    simulator.test('a100b100')
     const run = simulator.testRuns[0]
 
     // Verify that we have results for both tests
     expect(run.results.testBreakdown.testA.count).toBe(100)
     expect(run.results.testBreakdown.testB.count).toBe(100)
 
-    // Get intersections
-    const intersections = simulator.getIntersections()
-    const get = (label: string) => intersections.find((g) => g.label === label)
-
     // We should have some A∩B intersections
-    expect(get('AB')?.tested).toBeGreaterThan(20)
+    expect(simulator.get('AB').tested).toBeGreaterThan(20)
   })
 
   it('should track accumulating MT state between test runs', () => {
