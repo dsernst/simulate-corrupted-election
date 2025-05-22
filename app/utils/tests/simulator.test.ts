@@ -163,25 +163,21 @@ describe('Simulator', () => {
   })
 
   it('should calculate intersections correctly when tests are run sequentially', () => {
-    let simulator = new Simulator(SMALL_SEED)
+    const simulator = new Simulator(SMALL_SEED)
 
     // First run only test A
-    simulator = simulator.test('a100')
+    simulator.test('a100')
     const run1 = simulator.testRuns[0]
     expect(run1.results.testBreakdown.testA.count).toBe(100)
     expect(run1.results.testBreakdown.testB.count).toBe(0)
 
     // Then run only test B
-    simulator = simulator.test('b100')
+    simulator.test('b100')
     const run2 = simulator.testRuns[1]
     expect(run2.results.testBreakdown.testB.count).toBe(100)
 
-    // Get intersections
-    const intersections = simulator.getIntersections()
-    const get = (label: string) => intersections.find((g) => g.label === label)
-
     // We should have some A∩B intersections
-    expect(get('AB')?.tested).toBeGreaterThan(20)
+    expect(simulator.get('AB').tested).toBeGreaterThan(20)
   })
 
   it('should calculate intersections correctly when tests are run simultaneously', () => {
