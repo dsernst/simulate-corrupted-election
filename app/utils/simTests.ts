@@ -1,3 +1,4 @@
+import { mapObject } from './misc'
 import { MT19937 } from './mt19937'
 
 export type TestDetectionResults = { testBreakdown: TestBreakdown }
@@ -50,11 +51,7 @@ export function simTests(
   }
 
   // Convert string inputs to numbers, default to 0
-  const counts = {
-    testA: parseCount(testCounts.testA, 'testA'),
-    testB: parseCount(testCounts.testB, 'testB'),
-    testC: parseCount(testCounts.testC, 'testC'),
-  }
+  const counts = mapObject(testCounts, parseCount)
 
   // Initialize test breakdown with vote tracking
   const testBreakdown = {
@@ -293,10 +290,9 @@ function groupedSample<T>(
 }
 
 /** Parses a string count, throws if invalid. */
-function parseCount(val: string, label: string): number {
+function parseCount(val: string): number {
   const n = parseInt(val || '0', 10)
-  if (isNaN(n) || n < 0)
-    throw new Error(`Invalid test count for ${label}: ${val}`)
+  if (isNaN(n) || n < 0) throw new Error(`Invalid test count: ${val}`)
   return n
 }
 
