@@ -43,19 +43,6 @@ export class Simulator {
     return _electionCache.get(this.seed)!
   }
 
-  // public get testRuns(): TestRun[] {
-  //   return this.testSets.map((testSet) => ({
-  //     id: this.tests.split('-').length,
-  //     results: calculateTestResults(
-  //       testSet,
-  //       this.election.compromisedVotes,
-  //       this.election.totalVotes,
-  //       this.state.mt,
-  //       this.state.voteMap
-  //     ),
-  //     timestamp: new Date(),
-  //   }))
-  // }
   public get testRuns(): TestRun[] {
     return this.state._testRuns
   }
