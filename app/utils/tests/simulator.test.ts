@@ -367,6 +367,19 @@ describe('Refactored Simulator', () => {
     expect(sim._voteMap).toBe(sim.voteMap)
   })
 
+  it('should have intersection shorthand getter', () => {
+    const sim = new Simulator(SMALL_SEED)
+    sim.test('a10')
+    expect(sim.get('A').tested).toBe(10)
+    expect(sim.get('B').tested).toBe(0)
+    expect(sim.get('AB').tested).toBe(0)
+
+    sim.test('b10')
+    expect(sim.get('A').tested).toBe(10)
+    expect(sim.get('B').tested).toBe(10)
+    expect(sim.get('AB').tested).toBe(5)
+  })
+
   it.failing('should get the same results for the same seed & tests', () => {
     // A single seed & test:
     const sim1 = new Simulator(SMALL_SEED, 'a10')
