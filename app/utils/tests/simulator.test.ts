@@ -5,24 +5,22 @@ import { SMALL_SEED } from './evenTestDistribution.test'
 
 describe('Simulator', () => {
   it('should maintain state between test runs', () => {
-    let simulator = new Simulator(SMALL_SEED)
+    const simulator = new Simulator(SMALL_SEED)
 
     // Run first test
-    simulator = simulator.test('a100')
+    simulator.test('a100')
     const run1 = simulator.testRuns[0]
     expect(run1.id).toBe(1)
     expect(run1.results.testBreakdown.testA.count).toBe(100)
 
     // Run second test
-    simulator = simulator.test('b100')
+    simulator.test('b100')
     const run2 = simulator.testRuns[1]
     expect(run2.id).toBe(2)
     expect(run2.results.testBreakdown.testB.count).toBe(100)
 
     // Get intersections
-    const intersections = simulator.getIntersections()
-    const get = (label: string) => intersections.find((g) => g.label === label)
-    expect(get('AB')?.tested).toBeGreaterThan(0)
+    expect(simulator.get('AB').tested).toBeGreaterThan(0)
   })
 
   it('should maintain consistent results with same seed', () => {
