@@ -84,6 +84,21 @@ export class Simulator {
     this.seed = initialSeed
   }
 
+  /** Syntactic sugar for .getIntersections().find(stat => stat.label === testSetShorthand) */
+  get(intersectionKey: TestsShorthand): LayeredStat {
+    return (
+      this.getIntersections().find(
+        (stat) => stat.label === intersectionKey
+      ) || {
+        compromises: [],
+        key: intersectionKey,
+        label: intersectionKey,
+        percentages: [],
+        tested: 0,
+      }
+    )
+  }
+
   getIntersections(): LayeredStat[] {
     // Calc cache key from `seed` & `tests`
     const cacheKey = makeCacheKey(this.seed, this.tests)

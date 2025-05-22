@@ -368,13 +368,23 @@ describe('Refactored Simulator', () => {
   })
 
   it('should have intersection shorthand getter', () => {
-    const sim = new Simulator(SMALL_SEED)
-    sim.test('a10')
+    let sim = new Simulator(SMALL_SEED)
+    sim = sim.test('a10')
+
+    // Manual way:
+    const stats = sim.getIntersections()
+    const get = (label: string) => stats.find((g) => g.label === label)
+    expect(get('A')?.tested).toBe(10)
+    expect(get('B')?.tested).toBe(0)
+    expect(get('AB')?.tested).toBe(0)
+
+    // New shorthand:
     expect(sim.get('A').tested).toBe(10)
     expect(sim.get('B').tested).toBe(0)
     expect(sim.get('AB').tested).toBe(0)
 
-    sim.test('b10')
+    // And with a 2nd test set:
+    sim = sim.test('b10')
     expect(sim.get('A').tested).toBe(10)
     expect(sim.get('B').tested).toBe(10)
     expect(sim.get('AB').tested).toBe(5)
