@@ -32,7 +32,7 @@ const TESTS = [
     description: 'Highest cost, perfect accuracy',
     key: 'testC' as const,
     label: 'Test C',
-    subtitle: 'Against In-person Paper',
+    subtitle: 'Vs In-person Paper',
   },
 ] as const
 
