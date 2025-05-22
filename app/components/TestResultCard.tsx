@@ -14,13 +14,11 @@ export function TestResultCard({
 }: TestResultCardProps) {
   return (
     <div
-      className={`bg-white p-3 rounded-lg shadow-sm text-xs text-black/70 ${
+      className={`bg-white p-3 rounded-lg shadow-sm text-sm text-black/70 ${
         !count && 'opacity-0'
       }`}
     >
-      <h4 className="font-medium text-blue-800 mb-2 text-sm">
-        Test {testType}
-      </h4>
+      <h4 className="font-medium text-blue-800 mb-2">Test {testType}</h4>
       <p>Tests Ran: {count.toLocaleString()}</p>
       <p className="mt-1.5">
         # Compromised: {detectedCompromised.toLocaleString()}
