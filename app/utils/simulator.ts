@@ -16,11 +16,6 @@ import { TestSet, testSet, TestsShorthand, toTestSetString } from './testSet'
 
 type CacheKey = `${Seed}.${TestsShorthand}`
 type Seed = number
-type SimulatorState = {
-  _testRuns: TestRun[]
-  mt: MT19937
-}
-
 type VoteMap = Map<number, VoteTestResult>
 
 const _electionCache = new LRUCache<Seed, ElectionResults>({ max: 50 })
@@ -44,7 +39,7 @@ export class Simulator {
   }
 
   public get testRuns(): TestRun[] {
-    return this.state._testRuns
+    return this._testRuns
   }
 
   public get testSets(): TestSet[] {
@@ -55,22 +50,23 @@ export class Simulator {
   public get voteMap(): VoteMap {
     return this._voteMap
   }
+  private _mt: MT19937
+  private _testRuns: TestRun[]
   private _voteMap: VoteMap
-
-  private state: SimulatorState
 
   constructor(seed?: number, tests = '') {
     const initialSeed = seed ?? generateRandomSeed()
-    const mt = new MT19937(initialSeed)
-    this._voteMap = new Map<number, VoteTestResult>()
-    this.state = {
-      _testRuns: [],
-      mt,
-    }
-    this.tests = ''
-    this.seed = initialSeed
 
-    // If tests string is provided, replay each
+    // Init public state
+    this.seed = initialSeed
+    this.tests = ''
+
+    // Init private state
+    this._mt = new MT19937(initialSeed)
+    this._testRuns = []
+    this._voteMap = new Map<number, VoteTestResult>()
+
+    // If tests string was provided, replay each
     const testSets = tests.split('-').filter(Boolean)
     for (const set of testSets) this.runTests(testSet(set))
   }
@@ -102,10 +98,6 @@ export class Simulator {
     return _intersectionCache.get(cacheKey)!
   }
 
-  getState(): SimulatorState {
-    return { ...this.state }
-  }
-
   runTests(testCounts: {
     testA: string
     testB: string
@@ -115,27 +107,25 @@ export class Simulator {
       testCounts,
       this.election.compromisedVotes,
       this.election.totalVotes,
-      this.state.mt,
+      this._mt,
       this.voteMap
     )
 
     const newTests = toTestSetString(testCounts)
     this.tests = [this.tests, newTests].filter(Boolean).join('-')
 
-    const testRun: TestRun = {
+    this._testRuns.push({
       id: this.tests.split('-').length,
       results,
       timestamp: new Date(),
-    }
-    this.state._testRuns.push(testRun)
+    })
 
     return this
   }
 
   /** Syntactic sugar for .runTests(testSet('a500b100')) */
-  test(testSetShorthand: TestsShorthand): Simulator {
-    const testCounts = testSet(testSetShorthand)
-    return this.runTests(testCounts)
+  test(testsString: TestsShorthand): Simulator {
+    return this.runTests(testSet(testsString))
   }
 }
 
