@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { Header } from './components/Header'
+import { LoadingSimulation } from './components/LoadingSimulation'
 import { TestResults } from './components/RequestTests'
 import { SimulatedContent } from './components/SimulatedContent'
 import { Simulator } from './utils/simulator'
@@ -49,16 +50,6 @@ export default function Home() {
           ...simulator,
         }}
       />
-    </main>
-  )
-}
-
-function LoadingSimulation() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center md:!p-10 p-2 py-10 gap-8">
-      <div className="italic animate-pulse text-black/50">
-        Loading initial simulation...
-      </div>
     </main>
   )
 }
