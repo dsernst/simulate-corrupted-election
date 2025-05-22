@@ -59,7 +59,7 @@ export class Simulator {
 
   private state: SimulatorState
 
-  constructor(seed?: number, tests?: TestsShorthand) {
+  constructor(seed?: number, tests = '') {
     const initialSeed = seed ?? generateRandomSeed()
     const mt = new MT19937(initialSeed)
     this._voteMap = new Map<number, VoteTestResult>()
@@ -67,8 +67,12 @@ export class Simulator {
       _testRuns: [],
       mt,
     }
-    this.tests = tests ?? ''
+    this.tests = ''
     this.seed = initialSeed
+
+    // If tests string is provided, replay each
+    const testSets = tests.split('-').filter(Boolean)
+    for (const set of testSets) this.runTests(testSet(set))
   }
 
   /** Syntactic sugar for .getIntersections().find(stat => stat.label === testSetShorthand) */
@@ -116,22 +120,16 @@ export class Simulator {
     )
 
     const newTests = toTestSetString(testCounts)
-    this.tests += (this.tests ? `-` : '') + newTests
+    this.tests = [this.tests, newTests].filter(Boolean).join('-')
 
     const testRun: TestRun = {
       id: this.tests.split('-').length,
       results,
       timestamp: new Date(),
     }
+    this.state._testRuns.push(testRun)
 
-    const newSimulator = new Simulator(this.seed, this.tests)
-    newSimulator.state = {
-      ...this.state,
-      _testRuns: [...this.testRuns, testRun],
-    }
-    newSimulator._voteMap = this._voteMap
-
-    return newSimulator
+    return this
   }
 
   /** Syntactic sugar for .runTests(testSet('a500b100')) */
