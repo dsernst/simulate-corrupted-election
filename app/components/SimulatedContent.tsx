@@ -37,7 +37,7 @@ export function SimulatedContent({
       <div className="mt-4 pt-4 border-t border-gray-200">
         <div className="space-y-4">
           {/* Test History */}
-          <TestHistory {...{ testRuns }} />
+          <TestHistory {...{ testRuns: [...testRuns] }} />
 
           {/* Test Request Form */}
           <RequestTests

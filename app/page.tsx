@@ -34,7 +34,7 @@ export default function Home() {
         election={simulator.election}
         requestTests={() => {
           if (!simulator) return alert('Simulation not initialized')
-          setSimulator(simulator.runTests(requestedTests))
+          simulator.runTests(requestedTests)
           setRequestedTests(defaultRequested) // Reset form
         }}
         testRuns={simulator.testRuns}
