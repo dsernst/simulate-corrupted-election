@@ -1,4 +1,5 @@
 import { TestType } from '../utils/calculateIntersections'
+import { percentage } from './PreliminaryResults'
 
 interface TestResultCardProps {
   count: number
@@ -11,20 +12,21 @@ export function TestResultCard({
   detectedCompromised,
   testType,
 }: TestResultCardProps) {
-  const percentage =
-    count > 0 ? ((detectedCompromised / count) * 100).toFixed(1) : '0.0'
-
   return (
     <div
-      className={`bg-white p-3 rounded-lg shadow-sm ${!count && 'opacity-0'}`}
+      className={`bg-white p-3 rounded-lg shadow-sm text-xs text-black/70 ${
+        !count && 'opacity-0'
+      }`}
     >
-      <h4 className="font-medium text-blue-800 mb-2">Test {testType}</h4>
-      <p className="text-sm text-gray-600">
-        Tests Run: {count.toLocaleString()}
-      </p>
-      <p className="text-sm text-gray-600">
-        Detected Compromised: {detectedCompromised.toLocaleString()}
-        <span className="text-gray-500 ml-1">({percentage}%)</span>
+      <h4 className="font-medium text-blue-800 mb-2 text-sm">
+        Test {testType}
+      </h4>
+      <p>Tests Ran: {count.toLocaleString()}</p>
+      <p className="mt-1.5">
+        # Compromised: {detectedCompromised.toLocaleString()}
+        <span className="ml-1 font-semibold text-black/80">
+          ({percentage(detectedCompromised, count)})
+        </span>
       </p>
     </div>
   )

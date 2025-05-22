@@ -1,5 +1,9 @@
 import { ElectionResults } from '../utils/makeElection'
 
+export function percentage(size: number, total: number): string {
+  return (!total ? '0' : ((size / total) * 100).toFixed(1)) + '%'
+}
+
 export function PreliminaryResults({
   election: { runnerUpVotes, totalVotes, winnerVotes },
 }: {
@@ -12,13 +16,13 @@ export function PreliminaryResults({
       <p className="text-lg">
         Winner&apos;s Votes: {winnerVotes.toLocaleString()}
         <span className="text-gray-600 ml-2">
-          ({calculatePercentage(winnerVotes, totalVotes)}%)
+          ({percentage(winnerVotes, totalVotes)})
         </span>
       </p>
       <p className="text-lg">
         Runner&apos;s Up Votes: {runnerUpVotes.toLocaleString()}
         <span className="text-gray-600 ml-2">
-          ({calculatePercentage(runnerUpVotes, totalVotes)}%)
+          ({percentage(runnerUpVotes, totalVotes)})
         </span>
       </p>
       <p className="text-lg font-semibold">
@@ -26,9 +30,4 @@ export function PreliminaryResults({
       </p>
     </div>
   )
-}
-
-function calculatePercentage(votes: number, total: number): string {
-  if (!total) return '0'
-  return ((votes / total) * 100).toFixed(1)
 }
