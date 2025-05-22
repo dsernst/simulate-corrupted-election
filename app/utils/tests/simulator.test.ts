@@ -27,14 +27,14 @@ describe('Simulator', () => {
     const SEED = SMALL_SEED
 
     // Create first simulator and run some tests
-    let simulator1 = new Simulator(SEED)
-    simulator1 = simulator1.test('a100')
-    simulator1 = simulator1.test('b100')
+    const simulator1 = new Simulator(SEED)
+    simulator1.test('a100')
+    simulator1.test('b100')
 
     // Create second simulator with same seed and run same tests
-    let simulator2 = new Simulator(SEED)
-    simulator2 = simulator2.test('a100')
-    simulator2 = simulator2.test('b100')
+    const simulator2 = new Simulator(SEED)
+    simulator2.test('a100')
+    simulator2.test('b100')
 
     // Results should be identical
     expect(simulator1.seed).toEqual(simulator2.seed)
