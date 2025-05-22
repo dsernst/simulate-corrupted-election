@@ -5,9 +5,9 @@ import {
   LayeredStat,
   TestRun,
 } from './calculateIntersections'
-import { calculateTestResults, VoteTestResult } from './engine'
 import { ElectionResults, makeElection } from './makeElection'
 import { MT19937 } from './mt19937'
+import { simTests, VoteTestResult } from './simTests'
 import { TestSet, testSet, TestsShorthand, toTestSetString } from './testSet'
 
 type CacheKey = `${Seed}.${TestsShorthand}`
@@ -99,7 +99,7 @@ export class Simulator {
     testB: string
     testC: string
   }): Simulator {
-    const results = calculateTestResults(
+    const results = simTests(
       testCounts,
       this.election.compromisedVotes,
       this.election.totalVotes,

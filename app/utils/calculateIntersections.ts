@@ -3,7 +3,7 @@ import {
   getTestsFromKey,
   intersectionGroups,
 } from './createIntersections'
-import { TestDetectionResults } from './engine'
+import { TestDetectionResults } from './simTests'
 
 export interface LayeredStat {
   compromises: (number | undefined)[]

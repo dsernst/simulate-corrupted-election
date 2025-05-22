@@ -8,12 +8,6 @@ export interface TestDetectionResults {
   }
 }
 
-export interface TestEffectiveness {
-  testA: TestEffectivenessRates
-  testB: TestEffectivenessRates
-  testC: TestEffectivenessRates
-}
-
 export interface VoteTestResult {
   isActuallyCompromised: boolean
   testResults: {
@@ -24,9 +18,15 @@ export interface VoteTestResult {
   voteId: number
 }
 
-interface TestEffectivenessRates {
+interface Effectiveness {
   falseCleanRate: number
   falseCompromisedRate: number
+}
+
+interface TestEffectiveness {
+  testA: Effectiveness
+  testB: Effectiveness
+  testC: Effectiveness
 }
 
 interface TestResult {
@@ -35,7 +35,7 @@ interface TestResult {
   voteResults: VoteTestResult[]
 }
 
-export function calculateTestResults(
+export function simTests(
   testCounts: { testA: string; testB: string; testC: string },
   compromisedVotes: number,
   totalVotes: number,
@@ -87,7 +87,7 @@ export function calculateTestResults(
   function runUniqueTests(
     testType: 'A' | 'B' | 'C',
     count: number,
-    effectivenessRates: TestEffectivenessRates
+    effectivenessRates: Effectiveness
   ) {
     // Helper function to run a test on a single vote
     function runTestOnVote(voteId: number) {
@@ -322,10 +322,7 @@ function parseCount(val: string, label: string): number {
 }
 
 function runTest(
-  effectiveness: {
-    falseCleanRate: number
-    falseCompromisedRate: number
-  },
+  effectiveness: Effectiveness,
   isActuallyCompromised: boolean,
   mt: MT19937
 ): boolean {

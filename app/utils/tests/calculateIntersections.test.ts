@@ -2,8 +2,8 @@ import { describe, expect, it } from 'bun:test'
 
 import { calculateLayeredStats, TestRun } from '../calculateIntersections'
 import { toDisplayLabelFromKey } from '../calculateIntersections'
-import { calculateTestResults } from '../engine'
 import { MT19937 } from '../mt19937'
+import { simTests } from '../simTests'
 import { testSet } from '../testSet'
 
 // Helper to create a TestResult
@@ -181,8 +181,8 @@ describe('calculateLayeredStats - overlap scenarios', () => {
   })
 })
 
-describe('calculateLayeredStats - with calculateTestResults', () => {
-  it('realistic simulation with calculateTestResults and seeded MT19937', () => {
+describe('calculateLayeredStats - with simTests', () => {
+  it('realistic simulation with simTests and seeded MT19937', () => {
     const totalVotes = 2000
     const compromisedVotes = 500
     const mt = new MT19937(12345)
@@ -191,14 +191,14 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     // 400 A tests, 1194 B tests (batch 1)
     const testCountsA = testSet('a400')
     const testCountsB = testSet('b1194')
-    const resultsA = calculateTestResults(
+    const resultsA = simTests(
       testCountsA,
       compromisedVotes,
       totalVotes,
       mt,
       globalVoteMap
     )
-    const resultsB = calculateTestResults(
+    const resultsB = simTests(
       testCountsB,
       compromisedVotes,
       totalVotes,
@@ -208,14 +208,14 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     // Now run a second batch of 100 A and 100 B
     const testCountsA2 = testSet('a100')
     const testCountsB2 = testSet('b100')
-    const resultsA2 = calculateTestResults(
+    const resultsA2 = simTests(
       testCountsA2,
       compromisedVotes,
       totalVotes,
       mt,
       globalVoteMap
     )
-    const resultsB2 = calculateTestResults(
+    const resultsB2 = simTests(
       testCountsB2,
       compromisedVotes,
       totalVotes,
@@ -245,7 +245,7 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     const mt = new MT19937(389518)
     const globalVoteMap = new Map()
     // First test run: A=1000
-    const resultsA1 = calculateTestResults(
+    const resultsA1 = simTests(
       testSet('a1000'),
       compromisedVotes,
       totalVotes,
@@ -253,7 +253,7 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
       globalVoteMap
     )
     // Second test run: A=500 (A again)
-    const resultsA2 = calculateTestResults(
+    const resultsA2 = simTests(
       testSet('a500'),
       compromisedVotes,
       totalVotes,
@@ -277,7 +277,7 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     const voteMap = new Map()
 
     // First test run: A=1000
-    const results1 = calculateTestResults(
+    const results1 = simTests(
       testSet('a1000'),
       compromisedVotes,
       totalVotes,
@@ -286,7 +286,7 @@ describe('calculateLayeredStats - with calculateTestResults', () => {
     )
 
     // Second test run: A=500
-    const results2 = calculateTestResults(
+    const results2 = simTests(
       testSet('a500'),
       compromisedVotes,
       totalVotes,
