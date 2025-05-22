@@ -6,56 +6,54 @@ import { RevealStartOverLine } from './RevealStartOverLine'
 import { TestHistory } from './TestHistory'
 
 export function SimulatedContent({
-  onRunTests,
-  onStartOver,
-  onToggleCompromised,
-  onToggleSeedInput,
+  compromisedShown,
+  election,
   requestedTests,
-  results,
+  requestTests,
   seed,
+  seedInputShown,
   setRequestedTests,
-  showCompromised,
-  showSeedInput,
+  startOver,
   testRuns,
+  toggleCompromised,
+  toggleSeedInput,
 }: {
-  onRunTests: () => void
-  onStartOver: (newSeed?: number) => void
-  onToggleCompromised: () => void
-  onToggleSeedInput: () => void
+  compromisedShown: boolean
+  election: ElectionResults
   requestedTests: TestResults
-  results: ElectionResults
+  requestTests: () => void
   seed: number
+  seedInputShown: boolean
   setRequestedTests: (results: TestResults) => void
-  showCompromised: boolean
-  showSeedInput: boolean
+  startOver: (newSeed?: number) => void
   testRuns: TestRun[]
+  toggleCompromised: () => void
+  toggleSeedInput: () => void
 }) {
   return (
     <div className="mt-8 p-6 bg-white shadow-lg rounded-lg w-full max-w-3xl">
-      <PreliminaryResults results={results} />
+      <PreliminaryResults {...{ election }} />
 
       <div className="mt-4 pt-4 border-t border-gray-200">
         <div className="space-y-4">
           {/* Test History */}
-          <TestHistory testRuns={testRuns} />
+          <TestHistory {...{ testRuns }} />
 
           {/* Test Request Form */}
           <RequestTests
-            onSubmit={onRunTests}
-            requestedTests={requestedTests}
-            setRequestedTests={setRequestedTests}
-            totalVotes={results.totalVotes}
+            totalVotes={election.totalVotes}
+            {...{ requestedTests, requestTests, setRequestedTests }}
           />
 
           <RevealStartOverLine
             {...{
-              onStartOver,
-              onToggleCompromised,
-              onToggleSeedInput,
-              results,
+              compromisedShown,
+              election,
               seed,
-              showCompromised,
-              showSeedInput,
+              seedInputShown,
+              startOver,
+              toggleCompromised,
+              toggleSeedInput,
             }}
           />
         </div>

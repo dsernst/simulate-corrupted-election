@@ -11,18 +11,18 @@ const defaultRequested = { testA: '', testB: '', testC: '' }
 
 export default function Home() {
   const [simulator, setSimulator] = useState<null | Simulator>(null)
-  const [showCompromised, setShowCompromised] = useState(false)
-  const [showSeedInput, setShowSeedInput] = useState(false)
+  const [compromisedShown, setCompromisedShown] = useState(false)
+  const [seedInputShown, setSeedInputShown] = useState(false)
   const [requestedTests, setRequestedTests] =
     useState<TestResults>(defaultRequested)
 
-  const onStartOver = (newSeed?: number) => {
+  const startOver = (newSeed?: number) => {
     setSimulator(new Simulator(newSeed))
-    setShowCompromised(false)
+    setCompromisedShown(false)
   }
 
   // Simulate an election when the page first loads
-  useEffect(() => onStartOver(), [])
+  useEffect(() => startOver(), [])
 
   if (!simulator) return <LoadingSimulation />
 
@@ -31,21 +31,23 @@ export default function Home() {
       <Header />
 
       <SimulatedContent
-        onRunTests={() => {
+        election={simulator.election}
+        requestTests={() => {
           if (!simulator) return alert('Simulation not initialized')
           setSimulator(simulator.runTests(requestedTests))
           setRequestedTests(defaultRequested) // Reset form
         }}
-        onStartOver={onStartOver}
-        onToggleCompromised={() => setShowCompromised(!showCompromised)}
-        onToggleSeedInput={() => setShowSeedInput(!showSeedInput)}
-        requestedTests={requestedTests}
-        results={simulator.election}
-        seed={simulator.seed}
-        setRequestedTests={setRequestedTests}
-        showCompromised={showCompromised}
-        showSeedInput={showSeedInput}
         testRuns={simulator.testRuns}
+        toggleCompromised={() => setCompromisedShown(!compromisedShown)}
+        toggleSeedInput={() => setSeedInputShown(!seedInputShown)}
+        {...{
+          compromisedShown,
+          requestedTests,
+          seedInputShown,
+          setRequestedTests,
+          startOver,
+          ...simulator,
+        }}
       />
     </main>
   )

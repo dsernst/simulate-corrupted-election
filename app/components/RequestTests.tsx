@@ -37,13 +37,13 @@ const TESTS = [
 ] as const
 
 export function RequestTests({
-  onSubmit,
   requestedTests,
+  requestTests,
   setRequestedTests,
   totalVotes,
 }: {
-  onSubmit: () => void
   requestedTests: TestResults
+  requestTests: () => void
   setRequestedTests: (results: TestResults) => void
   totalVotes: number
 }) {
@@ -54,7 +54,7 @@ export function RequestTests({
   const totalCost = calculateTotalCost(requestedTests)
 
   const handleSubmit = () => {
-    if (hasValidTests) onSubmit()
+    if (hasValidTests) requestTests()
   }
 
   return (

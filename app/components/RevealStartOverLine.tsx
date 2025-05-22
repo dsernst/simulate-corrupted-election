@@ -5,36 +5,36 @@ import { ElectionResults } from '../utils/makeElection'
 import { Button } from './Button'
 
 export const RevealStartOverLine = ({
-  onStartOver,
-  onToggleCompromised,
-  onToggleSeedInput,
-  results,
+  compromisedShown,
+  election,
   seed,
-  showCompromised,
-  showSeedInput,
+  seedInputShown,
+  startOver,
+  toggleCompromised,
+  toggleSeedInput,
 }: {
-  onStartOver: (newSeed?: number) => void
-  onToggleCompromised: () => void
-  onToggleSeedInput: () => void
-  results: ElectionResults
+  compromisedShown: boolean
+  election: ElectionResults
   seed: number
-  showCompromised: boolean
-  showSeedInput: boolean
+  seedInputShown: boolean
+  startOver: (newSeed?: number) => void
+  toggleCompromised: () => void
+  toggleSeedInput: () => void
 }) => {
   const [inputSeed, setInputSeed] = useState(seed)
 
   // Sync inputSeed with seed prop when menu opens or seed changes
   useEffect(() => {
-    if (showSeedInput) setInputSeed(seed)
-  }, [showSeedInput, seed])
+    if (seedInputShown) setInputSeed(seed)
+  }, [seedInputShown, seed])
 
   return (
     <div className="space-y-2">
       <div className="h-20 flex justify-between items-center">
-        {!showCompromised ? (
+        {!compromisedShown ? (
           <Button
             className="text-sm flex-1 mr-2"
-            onClick={onToggleCompromised}
+            onClick={toggleCompromised}
             variant="outline"
           >
             👀 Reveal Compromised Votes
@@ -42,9 +42,9 @@ export const RevealStartOverLine = ({
         ) : (
           <div className="p-4 bg-red-50 rounded-lg flex-1 mr-2">
             <p className="text-lg text-red-700">
-              Compromised Votes: {results.compromisedVotes.toLocaleString()}
+              Compromised Votes: {election.compromisedVotes.toLocaleString()}
               <span className="text-red-600 ml-2">
-                ({results.compromisedPercentage.toFixed(1)}% of total)
+                ({election.compromisedPercentage.toFixed(1)}% of total)
               </span>
             </p>
           </div>
@@ -52,18 +52,18 @@ export const RevealStartOverLine = ({
         <div className="flex items-center relative">
           <Button
             className="text-sm py-2 !px-3.5 rounded-r-none"
-            onClick={() => onStartOver()}
+            onClick={() => startOver()}
             variant="outline"
           >
             ♻️ Start Over
           </Button>
           <Button
-            aria-label={showSeedInput ? 'Hide seed input' : 'Show seed input'}
+            aria-label={seedInputShown ? 'Hide seed input' : 'Show seed input'}
             className="!py-3.5 !px-1 !ml-0 rounded-l-none relative right-0.5"
-            onClick={onToggleSeedInput}
+            onClick={toggleSeedInput}
             variant="outline"
           >
-            {showSeedInput ? (
+            {seedInputShown ? (
               <IoChevronUp size={16} />
             ) : (
               <IoChevronDown size={16} />
@@ -71,7 +71,7 @@ export const RevealStartOverLine = ({
           </Button>
 
           {/* Seed input */}
-          {showSeedInput && (
+          {seedInputShown && (
             <div
               className="absolute -right-3 top-12 bg-white border border-gray-200 rounded shadow-md flex gap-2 items-center px-3 py-2 z-10"
               style={{ minWidth: 0 }}
@@ -90,7 +90,7 @@ export const RevealStartOverLine = ({
               />
               <Button
                 className="!px-3 !py-2 text-xs whitespace-nowrap"
-                onClick={() => onStartOver(inputSeed)}
+                onClick={() => startOver(inputSeed)}
                 variant="outline"
               >
                 ♻️ Start Over w/ Seed
