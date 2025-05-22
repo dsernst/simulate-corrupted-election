@@ -18,7 +18,7 @@ export const IntersectionResultsLabel = ({
   // Regex matches any segment like ' & not X' or 'not X' for fading
   const fadedRegex = /(?: ?&)? ?not [A-Z]/g
   let lastIndex = 0
-  const parts: { faded: boolean; text: string; }[] = []
+  const parts: { faded: boolean; text: string }[] = []
   let match
 
   // Split the label into faded and normal parts
@@ -43,7 +43,7 @@ export const IntersectionResultsLabel = ({
     <>
       {parts.map((part, i) => (
         <span
-          className={(part.faded && tested && `text-pink-700/30`) || ''}
+          className={(part.faded && tested && `text-pink-800/50`) || ''}
           key={i}
         >
           {part.text}
