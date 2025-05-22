@@ -77,13 +77,13 @@ describe('Simulator', () => {
   })
 
   it('should accumulate tested votes for repeated test sets', () => {
-    let simulator = new Simulator(SMALL_SEED)
+    const simulator = new Simulator(SMALL_SEED)
 
     // First test set: A=1000
-    simulator = simulator.test('a1000')
+    simulator.test('a1000')
 
     // Second test set: A=500 (A again)
-    simulator = simulator.test('a500')
+    simulator.test('a500')
 
     let testedA = 0
     // Count testedA in the vote map
