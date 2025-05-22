@@ -418,13 +418,20 @@ describe('Refactored Simulator', () => {
     expect(sim5.seed).toEqual(sim3.seed)
     expect(sim5.tests).toEqual(sim3.tests)
     expect(voteMap5).toEqual(voteMap3)
+  })
 
-    // Or even:
-    const sim6 = new Simulator(SMALL_SEED, 'a10b5c10')
-    const voteMap6 = new Map(sim6.voteMap)
-    expect(sim6.seed).toEqual(sim3.seed)
-    expect(sim6.tests).not.toEqual(sim3.tests) // The 'tests' string has extra '-' separators
-    expect(voteMap6).not.toEqual(voteMap3) // But the voteMaps should still be the same   // FIXME this is only temporarily not.equal. We want it to be equal.
+  it('should get the same results for a10-b10-c10 as a10b10c10', () => {
+    const sim1 = new Simulator(SMALL_SEED, 'a10-b10-c10')
+    const sim2 = new Simulator(SMALL_SEED, 'a10b10c10')
+
+    // Spot check it ran the right tests
+    ;['A', 'B', 'C'].forEach((test) => {
+      expect(sim1.get(test).tested).toBe(10)
+      expect(sim2.get(test).tested).toBe(10)
+    })
+
+    // And that they got the same deterministic results
+    expect(sim1.getIntersections()).toEqual(sim2.getIntersections())
   })
 
   it('should mutate in place', () => {
