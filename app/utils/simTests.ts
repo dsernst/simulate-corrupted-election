@@ -1,42 +1,34 @@
 import { MT19937 } from './mt19937'
 
-export interface TestDetectionResults {
-  testBreakdown: {
-    testA: TestResult
-    testB: TestResult
-    testC: TestResult
-  }
-}
-
-export interface VoteTestResult {
+export type TestDetectionResults = { testBreakdown: TestBreakdown }
+export type VoteTestResult = {
   isActuallyCompromised: boolean
   testResults: {
-    testA?: boolean // true if detected as compromised
-    testB?: boolean
-    testC?: boolean
+    [key in LongKey]?: boolean // true if detected as compromised
   }
   voteId: number
 }
 
-interface Effectiveness {
-  falseCleanRate: number
-  falseCompromisedRate: number
+type Effectiveness = { falseCleanRate: number; falseCompromisedRate: number }
+type LongKey = `test${TestType}`
+type TestBreakdown = {
+  [key in LongKey]: TestResult
 }
-
-interface TestEffectiveness {
-  testA: Effectiveness
-  testB: Effectiveness
-  testC: Effectiveness
+type TestEffectiveness = {
+  [key in LongKey]: Effectiveness
 }
-
-interface TestResult {
+type TestResult = {
   count: number
   detectedCompromised: number
   voteResults: VoteTestResult[]
 }
+/** Types of tests available. */
+type TestType = 'A' | 'B' | 'C'
+const TEST_TYPES: TestType[] = ['A', 'B', 'C']
 
+/** Simulates running tests on votes to detect compromised votes. */
 export function simTests(
-  testCounts: { testA: string; testB: string; testC: string },
+  testCounts: { [key in LongKey]: string },
   compromisedVotes: number,
   totalVotes: number,
   mt: MT19937,
@@ -66,27 +58,15 @@ export function simTests(
 
   // Initialize test breakdown with vote tracking
   const testBreakdown = {
-    testA: {
-      count: 0,
-      detectedCompromised: 0,
-      voteResults: [] as VoteTestResult[],
-    },
-    testB: {
-      count: 0,
-      detectedCompromised: 0,
-      voteResults: [] as VoteTestResult[],
-    },
-    testC: {
-      count: 0,
-      detectedCompromised: 0,
-      voteResults: [] as VoteTestResult[],
-    },
-  }
+    testA: { count: 0, detectedCompromised: 0, voteResults: [] },
+    testB: { count: 0, detectedCompromised: 0, voteResults: [] },
+    testC: { count: 0, detectedCompromised: 0, voteResults: [] },
+  } as TestBreakdown
 
-  // Helper to run a test on a single vote and update state
+  /** Helper: run a test on a single vote and update state */
   function runTestOnVote(
     voteId: number,
-    testType: 'A' | 'B' | 'C',
+    testType: TestType,
     effectiveness: Effectiveness
   ) {
     let voteResult = voteMap.get(voteId)
@@ -112,9 +92,9 @@ export function simTests(
     testBreakdown[`test${testType}`].voteResults.push(voteResult)
   }
 
-  // Generic batch runner for a test type
+  /** Generic batch runner for a test type */
   function runTestBatch(
-    testType: 'A' | 'B' | 'C',
+    testType: TestType,
     count: number,
     effectiveness: Effectiveness,
     getEligibleVotes: () => number[]
@@ -127,7 +107,7 @@ export function simTests(
     }
   }
 
-  // Helper: sample only from never-before-tested votes
+  /** Helper: sample only from never-before-tested votes */
   function sampleNeverTested(
     neverTested: number[],
     n: number,
@@ -136,7 +116,7 @@ export function simTests(
     return getRandomSample(neverTested, Math.min(n, neverTested.length), mt)
   }
 
-  // Helper: even split sample for B tests
+  /** Helper: even split samples for B tests */
   function evenSplitSample(
     groups: { [key: string]: number[] },
     total: number,
@@ -168,27 +148,14 @@ export function simTests(
     return result
   }
 
-  // Run A tests (only never-before-tested by A)
+  // Run A tests on never-before-tested by A
   runTestBatch('A', counts.testA, effectiveness.testA, () => {
-    const neverTested: number[] = []
-    for (let i = 1; i <= totalVotes; i++) {
-      const voteResult = voteMap.get(i)
-      if (voteResult?.testResults.testA === undefined) {
-        neverTested.push(i)
-      }
-    }
-    return sampleNeverTested(neverTested, counts.testA, mt)
+    return sampleNeverTested(getNeverTested('A'), counts.testA, mt)
   })
 
-  // Run B tests (only never-before-tested by B, then even split between aTested/aUntested)
+  // Run B tests on never-before-tested by B, then even split between A & !A
   runTestBatch('B', counts.testB, effectiveness.testB, () => {
-    const neverTested: number[] = []
-    for (let i = 1; i <= totalVotes; i++) {
-      const voteResult = voteMap.get(i)
-      if (voteResult?.testResults.testB === undefined) {
-        neverTested.push(i)
-      }
-    }
+    const neverTested = getNeverTested('B')
     const groups = { aTested: [], aUntested: [] } as { [key: string]: number[] }
     for (const id of neverTested) {
       const voteResult = voteMap.get(id)
@@ -201,7 +168,7 @@ export function simTests(
     return evenSplitSample(groups, counts.testB, mt)
   })
 
-  // Run C tests (only never-before-tested by C, then group for even distribution)
+  // Run C tests on never-before-tested by C, then group for even distribution
   runTestBatch('C', counts.testC, effectiveness.testC, () => {
     // Group all eligible votes into quadrants first
     const quadrants: { [key: string]: number[] } = {
@@ -210,22 +177,32 @@ export function simTests(
       'A&!B': [],
       'A&B': [],
     }
+    for (const id of getNeverTested('C')) {
+      const voteResult = voteMap.get(id)
+      const aTested = voteResult?.testResults.testA !== undefined
+      const bTested = voteResult?.testResults.testB !== undefined
+      const key = `${aTested ? 'A' : '!A'}&${bTested ? 'B' : '!B'}`
+      quadrants[key].push(id)
+    }
+    return groupedSample(quadrants, counts.testC, mt)
+  })
+
+  /** Get never-before-tested votes for a test type */
+  function getNeverTested(testType: TestType): number[] {
+    const testKey = `test${testType}` as const
+    const neverTested: number[] = []
     for (let i = 1; i <= totalVotes; i++) {
       const voteResult = voteMap.get(i)
-      if (voteResult?.testResults.testC === undefined) {
-        const aTested = voteResult?.testResults.testA !== undefined
-        const bTested = voteResult?.testResults.testB !== undefined
-        const key = `${aTested ? 'A' : '!A'}&${bTested ? 'B' : '!B'}`
-        quadrants[key].push(i)
+      if (voteResult?.testResults[testKey] === undefined) {
+        neverTested.push(i)
       }
     }
-    const sampled = groupedSample(quadrants, counts.testC, mt)
-    return sampled
-  })
+    return neverTested
+  }
 
   // Update test breakdown with all votes that have been tested
   for (const [voteId, voteResult] of voteMap.entries()) {
-    for (const testType of ['A', 'B', 'C'] as const) {
+    for (const testType of TEST_TYPES) {
       const testKey = `test${testType}` as const
       // Only include results for tests actually requested in this run
       if (
@@ -242,7 +219,7 @@ export function simTests(
   }
 
   // Update counts based on vote results
-  for (const testType of ['A', 'B', 'C'] as const) {
+  for (const testType of TEST_TYPES) {
     const testKey = `test${testType}` as const
     // Only count votes for tests actually requested in this run
     if (counts[testKey] > 0) {
@@ -260,6 +237,7 @@ export function simTests(
   return { testBreakdown }
 }
 
+/** Returns a random sample of n elements from arr using the provided PRNG. */
 function getRandomSample<T>(arr: T[], n: number, mt: MT19937): T[] {
   // Fisher-Yates shuffle for reproducible random sampling
   const a = arr.slice()
@@ -270,7 +248,7 @@ function getRandomSample<T>(arr: T[], n: number, mt: MT19937): T[] {
   return a.slice(0, n)
 }
 
-// Utility: grouped sampling from groups of votes
+/** Utility: sample from groups evenly, for C votes */
 function groupedSample<T>(
   groups: { [key: string]: T[] },
   total: number,
@@ -314,6 +292,7 @@ function groupedSample<T>(
   return result
 }
 
+/** Parses a string count, throws if invalid. */
 function parseCount(val: string, label: string): number {
   const n = parseInt(val || '0', 10)
   if (isNaN(n) || n < 0)
@@ -321,6 +300,7 @@ function parseCount(val: string, label: string): number {
   return n
 }
 
+/** Simulates running a test on a vote, returns true if detected as compromised. */
 function runTest(
   effectiveness: Effectiveness,
   isActuallyCompromised: boolean,
@@ -337,6 +317,7 @@ function runTest(
   }
 }
 
+/** Randomly determines if a vote is compromised. */
 function sampleVote(
   compromisedVotes: number,
   totalVotes: number,
