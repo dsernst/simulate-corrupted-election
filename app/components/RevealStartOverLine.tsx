@@ -44,7 +44,7 @@ export const RevealStartOverLine = ({
             <p className="text-lg text-red-700">
               Compromised Votes: {election.compromisedVotes.toLocaleString()}
               <span className="text-red-600 ml-2">
-                ({election.compromisedPercentage.toFixed(1)}% of total)
+                ({election.compromisedPercentage.toFixed(2)}% of total)
               </span>
             </p>
           </div>
