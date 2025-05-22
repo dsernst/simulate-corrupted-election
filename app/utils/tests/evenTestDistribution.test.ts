@@ -2,8 +2,8 @@ import { describe, expect, it } from 'bun:test'
 
 import { Simulator } from '../simulator'
 
-/** This seed has 45k votes: relatively small, for faster tests. */
-export const SMALL_SEED = 54801
+/** This seed has 11k votes: quite small, for faster tests. */
+export const SMALL_SEED = 689696
 
 describe('Even test distribution', () => {
   it('should split B tests 50/50 between A and !A tested votes', () => {
