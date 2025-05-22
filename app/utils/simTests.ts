@@ -127,52 +127,83 @@ export function simTests(
     }
   }
 
-  // Run A tests
-  runTestBatch('A', counts.testA, effectiveness.testA, () => {
-    const eligible: number[] = []
-    for (let i = 1; i <= totalVotes; i++) {
-      const voteResult = voteMap.get(i)
-      if (voteResult?.testResults.testA !== undefined) continue
-      eligible.push(i)
-    }
-    return eligible
-  })
+  // Helper: sample only from never-before-tested votes
+  function sampleNeverTested(
+    neverTested: number[],
+    n: number,
+    mt: MT19937
+  ): number[] {
+    return getRandomSample(neverTested, Math.min(n, neverTested.length), mt)
+  }
 
-  // Run B tests (50/50 split between A-tested and A-untested)
-  runTestBatch('B', counts.testB, effectiveness.testB, () => {
-    const aTested: number[] = []
-    const aUntested: number[] = []
+  // Helper: even split sample for B tests
+  function evenSplitSample(
+    groups: { [key: string]: number[] },
+    total: number,
+    mt: MT19937
+  ): number[] {
+    const keys = Object.keys(groups)
+    let result: number[] = []
+    let remaining = total
+    const half = Math.floor(total / 2)
+    for (const key of keys) {
+      const n = Math.min(half, groups[key].length)
+      const sampledFromThisGroup = getRandomSample(groups[key], n, mt)
+      result = result.concat(sampledFromThisGroup)
+      groups[key] = groups[key].filter(
+        (id) => !sampledFromThisGroup.includes(id)
+      )
+      remaining -= n
+    }
+    while (remaining > 0) {
+      const available = keys.filter((key) => groups[key].length > 0)
+      if (available.length === 0) break
+      available.sort((a, b) => groups[b].length - groups[a].length)
+      const key = available[0]
+      const [sampledId] = getRandomSample(groups[key], 1, mt)
+      result = result.concat(sampledId)
+      groups[key] = groups[key].filter((id) => id !== sampledId)
+      remaining--
+    }
+    return result
+  }
+
+  // Run A tests (only never-before-tested by A)
+  runTestBatch('A', counts.testA, effectiveness.testA, () => {
+    const neverTested: number[] = []
     for (let i = 1; i <= totalVotes; i++) {
       const voteResult = voteMap.get(i)
-      if (voteResult?.testResults.testB !== undefined) continue
-      if (voteResult?.testResults.testA !== undefined) {
-        aTested.push(i)
-      } else {
-        aUntested.push(i)
+      if (voteResult?.testResults.testA === undefined) {
+        neverTested.push(i)
       }
     }
-    // 50/50 split logic
-    const halfCount = Math.floor(counts.testB / 2)
-    const aTestedCount = Math.min(halfCount, aTested.length)
-    const aUntestedCount = Math.min(halfCount, aUntested.length)
-    const remainingCount = counts.testB - aTestedCount - aUntestedCount
-    const selected: number[] = []
-    selected.push(...getRandomSample(aTested, aTestedCount, mt))
-    selected.push(...getRandomSample(aUntested, aUntestedCount, mt))
-    if (remainingCount > 0) {
-      const remainingGroup =
-        aTested.length > aUntested.length ? aTested : aUntested
-      const alreadySelected = new Set(selected)
-      const remainingPool = remainingGroup.filter(
-        (id) => !alreadySelected.has(id)
-      )
-      selected.push(...getRandomSample(remainingPool, remainingCount, mt))
-    }
-    return selected
+    return sampleNeverTested(neverTested, counts.testA, mt)
   })
 
-  // Run C tests (even split across A/B quadrants)
+  // Run B tests (only never-before-tested by B, then even split between aTested/aUntested)
+  runTestBatch('B', counts.testB, effectiveness.testB, () => {
+    const neverTested: number[] = []
+    for (let i = 1; i <= totalVotes; i++) {
+      const voteResult = voteMap.get(i)
+      if (voteResult?.testResults.testB === undefined) {
+        neverTested.push(i)
+      }
+    }
+    const groups = { aTested: [], aUntested: [] } as { [key: string]: number[] }
+    for (const id of neverTested) {
+      const voteResult = voteMap.get(id)
+      if (voteResult?.testResults.testA !== undefined) {
+        groups.aTested.push(id)
+      } else {
+        groups.aUntested.push(id)
+      }
+    }
+    return evenSplitSample(groups, counts.testB, mt)
+  })
+
+  // Run C tests (only never-before-tested by C, then group for even distribution)
   runTestBatch('C', counts.testC, effectiveness.testC, () => {
+    // Group all eligible votes into quadrants first
     const quadrants: { [key: string]: number[] } = {
       '!A&!B': [],
       '!A&B': [],
@@ -181,62 +212,15 @@ export function simTests(
     }
     for (let i = 1; i <= totalVotes; i++) {
       const voteResult = voteMap.get(i)
-      if (voteResult?.testResults.testC !== undefined) continue
-      const aTested = voteResult?.testResults.testA !== undefined
-      const bTested = voteResult?.testResults.testB !== undefined
-      const key = `${aTested ? 'A' : '!A'}&${bTested ? 'B' : '!B'}`
-      quadrants[key].push(i)
-    }
-    let availableQuadrants = Object.entries(quadrants).filter(
-      ([, votes]) => votes.length > 0
-    )
-    const numQuadrants = availableQuadrants.length
-    if (numQuadrants === 0) return []
-    if (counts.testC <= numQuadrants) {
-      // Shuffle quadrants for fairness
-      const shuffled = getRandomSample(
-        availableQuadrants,
-        availableQuadrants.length,
-        mt
-      )
-      const selected: number[] = []
-      for (let i = 0; i < counts.testC; i++) {
-        const [, votes] = shuffled[i]
-        if (votes.length > 0) {
-          selected.push(...getRandomSample(votes, 1, mt))
-        }
-      }
-      return selected
-    }
-    // Calculate base number of tests per quadrant
-    const basePerQuadrant = Math.floor(counts.testC / numQuadrants)
-    let remainder = counts.testC - basePerQuadrant * numQuadrants
-    const testsToAssign: { [key: string]: number } = {}
-    for (const [key, votes] of availableQuadrants) {
-      testsToAssign[key] = Math.min(basePerQuadrant, votes.length)
-    }
-    // Distribute the remainder one by one to quadrants with most available votes left
-    while (remainder > 0) {
-      availableQuadrants = availableQuadrants.filter(
-        ([key, votes]) => votes.length > testsToAssign[key]
-      )
-      if (availableQuadrants.length === 0) break
-      availableQuadrants.sort(
-        ([, aVotes], [, bVotes]) => bVotes.length - aVotes.length
-      )
-      const [key] = availableQuadrants[0]
-      testsToAssign[key]++
-      remainder--
-    }
-    // Now actually assign the tests
-    const selected: number[] = []
-    for (const [key, votes] of Object.entries(quadrants)) {
-      const n = testsToAssign[key] || 0
-      if (n > 0 && votes.length > 0) {
-        selected.push(...getRandomSample(votes, n, mt))
+      if (voteResult?.testResults.testC === undefined) {
+        const aTested = voteResult?.testResults.testA !== undefined
+        const bTested = voteResult?.testResults.testB !== undefined
+        const key = `${aTested ? 'A' : '!A'}&${bTested ? 'B' : '!B'}`
+        quadrants[key].push(i)
       }
     }
-    return selected
+    const sampled = groupedSample(quadrants, counts.testC, mt)
+    return sampled
   })
 
   // Update test breakdown with all votes that have been tested
@@ -284,6 +268,50 @@ function getRandomSample<T>(arr: T[], n: number, mt: MT19937): T[] {
     ;[a[i], a[j]] = [a[j], a[i]]
   }
   return a.slice(0, n)
+}
+
+// Utility: grouped sampling from groups of votes
+function groupedSample<T>(
+  groups: { [key: string]: T[] },
+  total: number,
+  mt: MT19937
+): T[] {
+  const groupKeys = Object.keys(groups).filter((k) => groups[k].length > 0)
+  const nGroups = groupKeys.length
+  if (nGroups === 0) return []
+  const base = Math.floor(total / nGroups)
+  let assignedTotal = 0
+  const toAssign: { [key: string]: number } = {}
+  for (const key of groupKeys) {
+    toAssign[key] = Math.min(base, groups[key].length)
+    assignedTotal += toAssign[key]
+  }
+  let remainder = total - assignedTotal
+  // Distribute remainder to any group with available votes
+  while (remainder > 0) {
+    // Sort groups by available votes descending
+    groupKeys.sort(
+      (a, b) =>
+        groups[b].length - toAssign[b] - (groups[a].length - toAssign[a])
+    )
+    let assigned = false
+    for (const key of groupKeys) {
+      if (groups[key].length > toAssign[key]) {
+        toAssign[key]++
+        remainder--
+        assigned = true
+        if (remainder === 0) break
+      }
+    }
+    if (!assigned) break // No more available votes in any group
+  }
+  let result: T[] = []
+  for (const key of groupKeys) {
+    if (toAssign[key] > 0) {
+      result = result.concat(getRandomSample(groups[key], toAssign[key], mt))
+    }
+  }
+  return result
 }
 
 function parseCount(val: string, label: string): number {
