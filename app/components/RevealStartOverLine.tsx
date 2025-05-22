@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { IoChevronDown, IoChevronUp, IoDiceOutline } from 'react-icons/io5'
 
-import { ElectionResults } from '../utils/engine'
+import { ElectionResults } from '../utils/makeElection'
 import { Button } from './Button'
 
 export const RevealStartOverLine = ({

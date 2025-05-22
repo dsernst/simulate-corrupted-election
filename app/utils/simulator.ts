@@ -5,12 +5,8 @@ import {
   LayeredStat,
   TestRun,
 } from './calculateIntersections'
-import {
-  calculateTestResults,
-  ElectionResults,
-  makeElection,
-  VoteTestResult,
-} from './engine'
+import { calculateTestResults, VoteTestResult } from './engine'
+import { ElectionResults, makeElection } from './makeElection'
 import { MT19937 } from './mt19937'
 import { TestSet, testSet, TestsShorthand, toTestSetString } from './testSet'
 

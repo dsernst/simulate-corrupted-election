@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 
-import { makeElection } from '../engine'
+import { makeElection } from '../makeElection'
 import { MT19937 } from '../mt19937'
 
 describe('makeElection', () => {

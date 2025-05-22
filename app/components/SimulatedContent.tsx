@@ -1,5 +1,5 @@
 import { TestRun } from '../utils/calculateIntersections'
-import { ElectionResults } from '../utils/engine'
+import { ElectionResults } from '../utils/makeElection'
 import { PreliminaryResults } from './PreliminaryResults'
 import { RequestTests, TestResults } from './RequestTests'
 import { RevealStartOverLine } from './RevealStartOverLine'

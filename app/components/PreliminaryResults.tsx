@@ -1,4 +1,4 @@
-import { ElectionResults } from '../utils/engine'
+import { ElectionResults } from '../utils/makeElection'
 
 export function PreliminaryResults({ results }: { results: ElectionResults }) {
   return (
