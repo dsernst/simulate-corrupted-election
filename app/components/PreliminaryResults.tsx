@@ -1,7 +1,7 @@
 import { ElectionResults } from '../utils/makeElection'
 
-export function percentage(size: number, total: number): string {
-  return (!total ? '0' : ((size / total) * 100).toFixed(1)) + '%'
+export function percentage(count: number, total: number): string {
+  return (!total ? '0' : Math.round((count / total) * 1000) / 10) + '%'
 }
 
 export function PreliminaryResults({
