@@ -367,6 +367,42 @@ describe('Refactored Simulator', () => {
     expect(sim._voteMap).toBe(sim.voteMap)
   })
 
+  it.failing('should get the same results for the same seed & tests', () => {
+    // A single seed & test:
+    const sim1 = new Simulator(SMALL_SEED, 'a10')
+    const voteMap1 = new Map(sim1.voteMap)
+    const sim2 = new Simulator(SMALL_SEED, 'a10')
+    const voteMap2 = new Map(sim2.voteMap)
+    expect(sim1.seed).toEqual(sim2.seed)
+    expect(sim1.tests).toEqual(sim2.tests)
+    expect(voteMap1).toEqual(voteMap2)
+
+    // Multiple seeds & tests:
+    const sim3 = new Simulator(SMALL_SEED, 'a10-b5-c10')
+    const voteMap3 = new Map(sim3.voteMap)
+    const sim4 = new Simulator(SMALL_SEED, 'a10-b5-c10')
+    const voteMap4 = new Map(sim4.voteMap)
+    expect(sim3.seed).toEqual(sim4.seed)
+    expect(sim3.tests).toEqual(sim4.tests)
+    expect(voteMap3).toEqual(voteMap4)
+
+    // Which could also be written sequentially as:
+    const sim5 = new Simulator(SMALL_SEED, 'a10')
+    sim5.test('b5')
+    sim5.test('c10')
+    const voteMap5 = new Map(sim5.voteMap)
+    expect(sim5.seed).toEqual(sim3.seed)
+    expect(sim5.tests).toEqual(sim3.tests)
+    expect(voteMap5).toEqual(voteMap3)
+
+    // Or even:
+    const sim6 = new Simulator(SMALL_SEED, 'a10b5c10')
+    const voteMap6 = new Map(sim6.voteMap)
+    expect(sim6.seed).toEqual(sim3.seed)
+    expect(sim6.tests).not.toEqual(sim3.tests) // The 'tests' string has extra '-' separators
+    expect(voteMap6).toEqual(voteMap3) // But the voteMaps should still be the same
+  })
+
   it.failing('should mutate in place', () => {
     const sim = new Simulator(SMALL_SEED)
     expect(sim.testRuns.length).toBe(0)
