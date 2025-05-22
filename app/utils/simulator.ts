@@ -125,6 +125,7 @@ export class Simulator {
       ...this.state,
       _testRuns: [...this.testRuns, testRun],
     }
+    newSimulator._voteMap = this._voteMap
 
     return newSimulator
   }

@@ -352,7 +352,7 @@ describe('Refactored Simulator', () => {
   })
 
   it('could update internal voteMap via the getter', () => {
-    // We don't really want to enable this,
+    // We don't really want to do stuff like this,
     // just want to test & debug accessing the underlying private state.
 
     const sim = new Simulator(SMALL_SEED)
@@ -361,10 +361,10 @@ describe('Refactored Simulator', () => {
       testResults: {},
       voteId: 1,
     })
-    // console.log(sim.voteMap)
-    // console.log(sim.getState()._voteMap)
+
     expect(sim.voteMap.get(1)?.isActuallyCompromised).toBe(true)
-    expect(sim.getState()._voteMap).toBe(sim.voteMap)
+    // @ts-expect-error - intentionally accessing private state
+    expect(sim._voteMap).toBe(sim.voteMap)
   })
 
   it.failing('should mutate in place', () => {
