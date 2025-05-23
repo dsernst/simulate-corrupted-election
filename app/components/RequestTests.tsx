@@ -1,3 +1,6 @@
+import { useState } from 'react'
+
+import { useSimulator } from '../useSimulator'
 import {
   calculateTotalCost,
   DEFAULT_TEST_COSTS,
@@ -36,17 +39,13 @@ const TESTS = [
   },
 ] as const
 
-export function RequestTests({
-  requestedTests,
-  requestTests,
-  setRequestedTests,
-  totalVotes,
-}: {
-  requestedTests: TestResults
-  requestTests: () => void
-  setRequestedTests: (results: TestResults) => void
-  totalVotes: number
-}) {
+const defaultRequested = { testA: '', testB: '', testC: '' }
+export function RequestTests() {
+  const { simulator } = useSimulator()
+
+  const [requestedTests, setRequestedTests] =
+    useState<TestResults>(defaultRequested)
+
   const hasValidTests = Object.values(requestedTests).some(
     (value) => parseInt(value) > 0
   )
@@ -54,7 +53,9 @@ export function RequestTests({
   const totalCost = calculateTotalCost(requestedTests)
 
   const handleSubmit = () => {
-    if (hasValidTests) requestTests()
+    if (!hasValidTests) return
+    simulator.runTests(requestedTests)
+    setRequestedTests(defaultRequested)
   }
 
   return (
@@ -62,7 +63,7 @@ export function RequestTests({
       <h3 className="text-lg font-semibold mb-4">
         Request Tests{' '}
         <span className="text-gray-500 text-xs ml-2 font-normal">
-          (Total Votes: {totalVotes.toLocaleString()})
+          (Total Votes: {simulator?.election?.totalVotes.toLocaleString()})
         </span>
       </h3>
       <div className="space-y-4">

@@ -1,14 +1,14 @@
-import { ElectionResults } from '../utils/makeElection'
+import { useSimulator } from '../useSimulator'
 
 export function percentage(count: number, total: number): string {
   return (!total ? '0' : Math.round((count / total) * 1000) / 10) + '%'
 }
 
-export function PreliminaryResults({
-  election: { runnerUpVotes, totalVotes, winnerVotes },
-}: {
-  election: ElectionResults
-}) {
+export function PreliminaryResults() {
+  const {
+    election: { runnerUpVotes, totalVotes, winnerVotes },
+  } = useSimulator()
+
   return (
     <div className="space-y-2 mb-8">
       <h2 className="text-2xl font-bold mb-4">Preliminary Results</h2>

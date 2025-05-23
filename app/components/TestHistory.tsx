@@ -1,3 +1,4 @@
+import { useSimulator } from '../useSimulator'
 import { TestRun, type TestType } from '../utils/calculateIntersections'
 import {
   calculateTotalTestRunsCost,
@@ -6,7 +7,9 @@ import {
 import { IntersectionResults } from './IntersectionResults'
 import { TestResultCard } from './TestResultCard'
 
-export const TestHistory = ({ testRuns }: { testRuns: TestRun[] }) => {
+export const TestHistory = () => {
+  const { testRuns } = useSimulator()
+
   if (!testRuns.length) return null
 
   const totalCost = calculateTotalTestRunsCost(testRuns)

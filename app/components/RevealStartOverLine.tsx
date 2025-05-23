@@ -1,27 +1,16 @@
 import { useEffect, useState } from 'react'
 import { IoChevronDown, IoChevronUp, IoDiceOutline } from 'react-icons/io5'
 
-import { ElectionResults } from '../utils/makeElection'
+import { useSimulator } from '../useSimulator'
 import { Button } from './Button'
 
-export const RevealStartOverLine = ({
-  compromisedShown,
-  election,
-  seed,
-  seedInputShown,
-  startOver,
-  toggleCompromised,
-  toggleSeedInput,
-}: {
-  compromisedShown: boolean
-  election: ElectionResults
-  seed: number
-  seedInputShown: boolean
-  startOver: (newSeed?: number) => void
-  toggleCompromised: () => void
-  toggleSeedInput: () => void
-}) => {
+export const RevealStartOverLine = () => {
+  const { simulator, startOver } = useSimulator()
+  const { election, seed } = simulator
+
   const [inputSeed, setInputSeed] = useState(seed)
+  const [seedInputShown, setSeedInputShown] = useState(false)
+  const [compromisedShown, setCompromisedShown] = useState(false)
 
   // Sync inputSeed with seed prop when menu opens or seed changes
   useEffect(() => {
@@ -34,7 +23,7 @@ export const RevealStartOverLine = ({
         {!compromisedShown ? (
           <Button
             className="text-sm flex-1 mr-2"
-            onClick={toggleCompromised}
+            onClick={() => setCompromisedShown(!compromisedShown)}
             variant="outline"
           >
             👀 Reveal Compromised Votes
@@ -52,7 +41,10 @@ export const RevealStartOverLine = ({
         <div className="flex items-center relative">
           <Button
             className="text-sm py-2 !px-3.5 rounded-r-none"
-            onClick={() => startOver()}
+            onClick={() => {
+              startOver()
+              setCompromisedShown(false)
+            }}
             variant="outline"
           >
             ♻️ Start Over
@@ -60,7 +52,7 @@ export const RevealStartOverLine = ({
           <Button
             aria-label={seedInputShown ? 'Hide seed input' : 'Show seed input'}
             className="!py-3.5 !px-1 !ml-0 rounded-l-none relative right-0.5"
-            onClick={toggleSeedInput}
+            onClick={() => setSeedInputShown(!seedInputShown)}
             variant="outline"
           >
             {seedInputShown ? (
@@ -90,7 +82,10 @@ export const RevealStartOverLine = ({
               />
               <Button
                 className="!px-3 !py-2 text-xs whitespace-nowrap"
-                onClick={() => startOver(inputSeed)}
+                onClick={() => {
+                  startOver(inputSeed)
+                  setCompromisedShown(false)
+                }}
                 variant="outline"
               >
                 ♻️ Start Over w/ Seed
