@@ -6,7 +6,6 @@ import {
   calculateTotalTestRunsCost,
   formatCost,
 } from '../utils/costCalculation'
-import { IntersectionResults } from './IntersectionResults'
 import { TestResultCard } from './TestResultCard'
 
 export const TestHistory = () => {
@@ -27,7 +26,6 @@ export const TestHistory = () => {
       {testRuns.map((run) => (
         <TestRunDisplay key={run.id} run={run} />
       ))}
-      <IntersectionResults testRuns={testRuns} />
     </div>
   )
 }

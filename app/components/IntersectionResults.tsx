@@ -1,3 +1,4 @@
+import { useSimulator } from '../useSimulator'
 import {
   calculateConfusionMatrix,
   calculateLayeredStats,
@@ -7,11 +8,8 @@ import { getIndentFromKey } from '../utils/createIntersections'
 import ConfusionMatrix from './ConfusionMatrix'
 import { IntersectionResultsLabel } from './IntersectionResultsLabel'
 
-interface IntersectionResultsProps {
-  testRuns: TestRun[]
-}
-
-export function IntersectionResults({ testRuns }: IntersectionResultsProps) {
+export function IntersectionResults() {
+  const { testRuns } = useSimulator()
   const ran = ranAtLeastOneTestOf(testRuns)
   if (!ranAtLeastTwoTypes(ran)) return null
 

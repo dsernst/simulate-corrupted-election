@@ -1,3 +1,4 @@
+import { IntersectionResults } from './IntersectionResults'
 import { PreliminaryResults } from './PreliminaryResults'
 import { RequestTests } from './RequestTests'
 import { RevealStartOverLine } from './RevealStartOverLine'
@@ -11,6 +12,7 @@ export function SimulatedContent() {
       <div className="mt-4 pt-4 border-t border-gray-200">
         <div className="space-y-4">
           <TestHistory />
+          <IntersectionResults />
           <RequestTests />
           <RevealStartOverLine />
         </div>
