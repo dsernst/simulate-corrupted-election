@@ -41,7 +41,7 @@ const TESTS = [
 
 const defaultRequested = { testA: '', testB: '', testC: '' }
 export function RequestTests() {
-  const { simulator } = useSimulator()
+  const { rerender, simulator } = useSimulator()
 
   const [requestedTests, setRequestedTests] =
     useState<TestResults>(defaultRequested)
@@ -56,6 +56,7 @@ export function RequestTests() {
     if (!hasValidTests) return
     simulator.runTests(requestedTests)
     setRequestedTests(defaultRequested)
+    rerender()
   }
 
   return (

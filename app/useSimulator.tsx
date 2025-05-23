@@ -11,8 +11,10 @@ import { LoadingSimulation } from './components/LoadingSimulation'
 import { Simulator } from './utils/simulator'
 
 const SimulatorContext = createContext<null | {
+  rerender: () => void
   setSimulator: (simulator: Simulator) => void
   simulator: Simulator
+  version: number
 }>(null)
 
 export function SimulatorContextProvider({
@@ -21,7 +23,10 @@ export function SimulatorContextProvider({
   children: React.ReactNode
 }) {
   const [simulator, setSimulator] = useState<null | Simulator>(null)
+  const [version, setVersion] = useState(0)
   useEffect(() => setSimulator(new Simulator()), [])
+
+  const rerender = useCallback(() => setVersion((v) => v + 1), [])
 
   return (
     <>
@@ -36,7 +41,9 @@ export function SimulatorContextProvider({
           key="content"
           layout
         >
-          <SimulatorContext.Provider value={{ setSimulator, simulator }}>
+          <SimulatorContext.Provider
+            value={{ rerender, setSimulator, simulator, version }}
+          >
             {children}
           </SimulatorContext.Provider>
         </motion.div>
@@ -50,15 +57,17 @@ export function useSimulator() {
   if (!ctx)
     throw new Error('useSimulator must be used within SimulatorContextProvider')
 
-  const { setSimulator, simulator } = ctx
+  const { rerender, setSimulator, simulator, version } = ctx
 
   return {
     election: simulator.election,
+    rerender,
     simulator,
     startOver: useCallback(
       (newSeed?: number) => setSimulator(new Simulator(newSeed)),
       [setSimulator]
     ),
     testRuns: simulator.testRuns,
+    version,
   }
 }
