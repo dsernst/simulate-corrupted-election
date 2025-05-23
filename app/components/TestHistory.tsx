@@ -1,3 +1,5 @@
+import { motion } from 'motion/react'
+
 import { useSimulator } from '../useSimulator'
 import { TestRun, type TestType } from '../utils/calculateIntersections'
 import {
@@ -32,7 +34,7 @@ export const TestHistory = () => {
 
 const TEST_TYPES: TestType[] = ['A', 'B', 'C']
 const TestRunDisplay = ({ run }: { run: TestRun }) => (
-  <div className="p-4 bg-blue-50 rounded-lg">
+  <motion.div className="p-4 bg-blue-50 rounded-lg" layout>
     <div className="flex justify-between items-center mb-2">
       <h3 className="text-lg font-semibold text-blue-800">
         Test Set #{run.id}
@@ -57,5 +59,5 @@ const TestRunDisplay = ({ run }: { run: TestRun }) => (
         )
       })}
     </div>
-  </div>
+  </motion.div>
 )
