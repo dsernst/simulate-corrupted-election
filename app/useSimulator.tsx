@@ -1,3 +1,4 @@
+import { motion } from 'motion/react'
 import {
   createContext,
   useCallback,
@@ -22,14 +23,20 @@ export function SimulatorContextProvider({
   const [simulator, setSimulator] = useState<null | Simulator>(null)
   useEffect(() => setSimulator(new Simulator()), [])
 
-  if (!simulator) return <LoadingSimulation />
-
   return (
-    <SimulatorContext.Provider
-      value={simulator ? { setSimulator, simulator } : null}
-    >
-      {children}
-    </SimulatorContext.Provider>
+    <>
+      {!simulator ? (
+        <motion.div key="loading" layout>
+          <LoadingSimulation />
+        </motion.div>
+      ) : (
+        <motion.div key="content" layout>
+          <SimulatorContext.Provider value={{ setSimulator, simulator }}>
+            {children}
+          </SimulatorContext.Provider>
+        </motion.div>
+      )}
+    </>
   )
 }
 
