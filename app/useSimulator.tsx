@@ -30,7 +30,12 @@ export function SimulatorContextProvider({
           <LoadingSimulation />
         </motion.div>
       ) : (
-        <motion.div key="content" layout>
+        <motion.div
+          animate={{ opacity: 1 }}
+          initial={{ opacity: 0 }}
+          key="content"
+          layout
+        >
           <SimulatorContext.Provider value={{ setSimulator, simulator }}>
             {children}
           </SimulatorContext.Provider>
