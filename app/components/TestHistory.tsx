@@ -9,13 +9,13 @@ import {
 import { TestResultCard } from './TestResultCard'
 
 export const TestHistory = () => {
-  const { testRuns, version } = useSimulator()
+  const { testRuns } = useSimulator()
   if (!testRuns.length) return null
 
   const totalCost = calculateTotalTestRunsCost(testRuns)
 
   return (
-    <div className="space-y-6" key={version}>
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Test History</h3>
         <div className="text-sm text-gray-600">
