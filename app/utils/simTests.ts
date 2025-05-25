@@ -96,6 +96,7 @@ export function simTests(
     effectiveness: Effectiveness,
     getEligibleVotes: () => number[]
   ) {
+    if (!count) return
     const eligible = getEligibleVotes()
     const samples = Math.min(count, eligible.length)
     const sampleIds = getRandomSample(eligible, samples, mt)
