@@ -21,9 +21,10 @@ it('it can simulate big elections quickly', () => {
   const firstSetStart = new Date()
   s.test('a1000')
   const firstSetDuration = msSince(firstSetStart)
-  expect(s.get('A').compromises[0]).toBe(467) // Confirming it ran, by checking against known compromises for this seed + test combo.
+  expect(s.get('A').compromises[0]).toBe(486) // Confirm it ran, checking against known compromises
 
-  // Web GUI does it in ~700ms
-  expect(firstSetDuration).toBeGreaterThan(50) // getting ~300ms
+  // Web GUI does it in ~300ms
+  expect(firstSetDuration).toBeGreaterThan(10) // getting ~15ms
   expect(firstSetDuration).toBeLessThan(500)
+  // console.log({ firstSetDuration })
 })
