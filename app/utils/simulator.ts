@@ -43,6 +43,16 @@ export class Simulator {
     return this.tests.split('-').map(testSet)
   }
 
+  public get totalCompromisesSeen(): number {
+    let total = 0
+    this.testRuns.forEach((run) => {
+      Object.values(run.results.testBreakdown).forEach((test) => {
+        total += test.detectedCompromised
+      })
+    })
+    return total
+  }
+
   public get voteMap(): VoteMap {
     return this._voteMap
   }

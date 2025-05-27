@@ -64,6 +64,7 @@ describe('speed tests', () => {
 
   moreTestCases.forEach(([testCase, expectedTime, expectedCompromises]) => {
     it(`quickly simulates ${testCase}`, () => {
+      // Set up election
       const initStart = new Date()
       const s = new Simulator(BIG_SEED)
       const { totalVotes } = s.election
@@ -73,18 +74,14 @@ describe('speed tests', () => {
       // Initializes in less than 5ms
       expect(initDuration).toBeLessThan(10)
 
+      // Confirm tests run fast enough
       const testSetStart = new Date()
       s.test(testCase)
       const testSetDuration = msSince(testSetStart)
-
       expect(testSetDuration).toBeLessThan(+expectedTime)
 
-      const totalCompromises = ['A', 'B', 'C'].reduce((sum, type) => {
-        const testResults = s.get(type)
-        // console.log({ testResults, testCase, type })
-        return sum + (testResults.compromises[0] || 0)
-      }, 0)
-      expect(totalCompromises).toBe(expectedCompromises)
+      // And confirm expected compromises #s
+      expect(s.totalCompromisesSeen).toBe(expectedCompromises)
     })
   })
 })
