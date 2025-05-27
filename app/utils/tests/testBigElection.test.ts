@@ -46,7 +46,7 @@ it('it can simulate big elections with lots of tests quickly', () => {
   const testSetDuration = msSince(testSetStart)
   expect(s.get('A').compromises[0]).toBe(24701) // Confirm it ran, checking against known compromises
 
-  // Web GUI does it in ~950ms
+  // Web GUI does it in ~480ms
   expect(testSetDuration).toBeGreaterThan(5) // getting ~230ms
   expect(testSetDuration).toBeLessThan(350)
   console.log({ testSetDuration })

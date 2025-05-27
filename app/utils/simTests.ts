@@ -159,9 +159,7 @@ export function simTests(
   // Cache A-tested vote IDs
   const aTestedIds = new Set<number>()
   for (const [id, result] of voteMap.entries()) {
-    if (result.testResults.testA !== undefined) {
-      aTestedIds.add(id)
-    }
+    if (result.testResults.testA !== undefined) aTestedIds.add(id)
   }
 
   // Run B tests on never-before-tested by B, then even split between A & !A
@@ -183,6 +181,12 @@ export function simTests(
     return evenSplitSample(groups, counts.testB, mt)
   })
 
+  // Cache B-tested vote IDs
+  const bTestedIds = new Set<number>()
+  for (const [id, result] of voteMap.entries()) {
+    if (result.testResults.testB !== undefined) bTestedIds.add(id)
+  }
+
   // Run C tests on never-before-tested by C, then group for even distribution
   runTestBatch('C', counts.testC, effectiveness.testC, () => {
     // Group all eligible votes into quadrants first
@@ -193,9 +197,8 @@ export function simTests(
       'A&B': [],
     }
     for (const id of getNeverTested('C', totalVotes, voteMap)) {
-      const voteResult = voteMap.get(id)
-      const aTested = voteResult?.testResults.testA !== undefined
-      const bTested = voteResult?.testResults.testB !== undefined
+      const aTested = aTestedIds.has(id)
+      const bTested = bTestedIds.has(id)
       const key = `${aTested ? 'A' : '!A'}&${bTested ? 'B' : '!B'}`
       quadrants[key].push(id)
     }
