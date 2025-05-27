@@ -53,16 +53,16 @@ describe('speed tests', () => {
     // console.log({ testSetDuration })
   })
 
-  const moreTestCases: [string, number][] = [
-    ['b2000', 50], // B only
-    ['c50000', 130], // Quadrant logic edge case
-    ['a10b10c10', 140], // Light load sanity check
-    ['a50000b1000c1000', 300], // Higher C test volume
-    ['a2000000', 6000], // Stress test run A perf & sampler
-    ['a1000000b1000000c1000000', 9000], // Max concurrency potential
+  const moreTestCases: [string, number, number][] = [
+    ['b2000', 50, 1473], // B only
+    ['c50000', 130, 39572], // Quadrant logic edge case
+    ['a10 b10 c10', 140, 22], // Light load sanity check
+    ['a50000 b1000 c1000', 300, 26_211], // Higher C test volume
+    ['a2000000', 6000, 991_039], // Stress test run A perf & sampler
+    ['a1000000 b1000000 c1000000', 9000, 2_009_191], // Max concurrency potential
   ]
 
-  moreTestCases.forEach(([testCase, expectedTime]) => {
+  moreTestCases.forEach(([testCase, expectedTime, expectedCompromises]) => {
     it(`quickly simulates ${testCase}`, () => {
       const initStart = new Date()
       const s = new Simulator(BIG_SEED)
@@ -78,6 +78,13 @@ describe('speed tests', () => {
       const testSetDuration = msSince(testSetStart)
 
       expect(testSetDuration).toBeLessThan(+expectedTime)
+
+      const totalCompromises = ['A', 'B', 'C'].reduce((sum, type) => {
+        const testResults = s.get(type)
+        // console.log({ testResults, testCase, type })
+        return sum + (testResults.compromises[0] || 0)
+      }, 0)
+      expect(totalCompromises).toBe(expectedCompromises)
     })
   })
 })
