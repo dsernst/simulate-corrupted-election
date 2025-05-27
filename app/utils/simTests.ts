@@ -110,47 +110,6 @@ export function simTests(
     return getRandomSample(neverTested, Math.min(n, neverTested.length), mt)
   }
 
-  /** Helper: even split samples for B tests */
-  function evenSplitSample(
-    groups: { [key: string]: number[] },
-    total: number,
-    mt: MT19937
-  ): number[] {
-    const keys = Object.keys(groups)
-    let result: number[] = []
-    let remaining = total
-    const half = Math.floor(total / 2)
-
-    for (const key of keys) {
-      const n = Math.min(half, groups[key].length)
-      const sampled = getRandomSample(groups[key], n, mt)
-      result = result.concat(sampled)
-
-      const sampledSet = new Set(sampled)
-      groups[key] = groups[key].filter((id) => !sampledSet.has(id))
-
-      remaining -= n
-    }
-
-    while (remaining > 0) {
-      const available = keys.filter((key) => groups[key].length > 0)
-      if (available.length === 0) break
-
-      available.sort((a, b) => groups[b].length - groups[a].length)
-      const key = available[0]
-
-      const [sampledId] = getRandomSample(groups[key], 1, mt)
-      result.push(sampledId)
-
-      const i = groups[key].indexOf(sampledId)
-      if (i !== -1) groups[key].splice(i, 1)
-
-      remaining--
-    }
-
-    return result
-  }
-
   // Run A tests on never-before-tested by A
   runTestBatch('A', counts.testA, effectiveness.testA, () => {
     const neverTested = getNeverTested('A', totalVotes, voteMap)
@@ -178,7 +137,8 @@ export function simTests(
     }
     const groups = { aTested, aUntested }
 
-    return evenSplitSample(groups, counts.testB, mt)
+    const result = groupedSample(groups, counts.testB, mt)
+    return result
   })
 
   // Cache B-tested vote IDs
@@ -302,7 +262,7 @@ function getRandomSampleViaFisherYates<T>(
   return a.slice(0, n)
 }
 
-/** Utility: sample from groups evenly, for C votes */
+/** Utility: sample from already-tested groups evenly */
 function groupedSample<T>(
   groups: { [key: string]: T[] },
   total: number,

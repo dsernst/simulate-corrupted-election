@@ -48,13 +48,13 @@ describe('speed tests', () => {
     expect(s.get('A').compromises[0]).toBe(24701) // Confirm it ran, checking against known compromises
 
     // Web GUI does it in ~480ms
-    expect(testSetDuration).toBeGreaterThan(5) // getting ~230ms
+    expect(testSetDuration).toBeGreaterThan(5) // getting ~200ms
     expect(testSetDuration).toBeLessThan(350)
     // console.log({ testSetDuration })
   })
 
   const moreTestCases: [string, number][] = [
-    ['b2000', 2400], // B only
+    ['b2000', 50], // B only
     ['c50000', 130], // Quadrant logic edge case
     ['a10b10c10', 140], // Light load sanity check
     ['a50000b1000c1000', 300], // Higher C test volume
