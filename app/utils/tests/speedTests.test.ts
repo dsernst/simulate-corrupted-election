@@ -24,9 +24,9 @@ describe('speed tests', () => {
     const firstSetDuration = msSince(firstSetStart)
     expect(s.totalCompromisesSeen).toBe(486) // Confirm it ran, checking against known compromises
 
-    // Web GUI does it in ~300ms
-    expect(firstSetDuration).toBeGreaterThan(5) // getting ~15ms
-    expect(firstSetDuration).toBeLessThan(50)
+    // Web GUI does it in ~25ms
+    expect(firstSetDuration).toBeGreaterThan(5)
+    expect(firstSetDuration).toBeLessThan(35) // getting ~15ms
     // console.log({ firstSetDuration })
   })
 
@@ -47,9 +47,9 @@ describe('speed tests', () => {
     const testSetDuration = msSince(testSetStart)
     expect(s.totalCompromisesSeen).toBe(25476) // Confirm it ran, checking against known compromises
 
-    // Web GUI does it in ~480ms
-    expect(testSetDuration).toBeGreaterThan(5) // getting ~200ms
-    expect(testSetDuration).toBeLessThan(350)
+    // Web GUI does it in ~450ms
+    expect(testSetDuration).toBeGreaterThan(5)
+    expect(testSetDuration).toBeLessThan(250) // getting ~170ms
     // console.log({ testSetDuration })
   })
 

@@ -113,6 +113,10 @@ export function simTests(
     const neverTested = getNeverTested('A', totalVotes, voteMap)
     return sampleNeverTested(neverTested, counts.testA, mt)
   })
+
+  // Stop early if no more tests needed
+  if (counts.testB + counts.testC === 0) return { testBreakdown }
+
   // Cache A-tested vote IDs
   const aTestedIds = new Set<number>()
   for (const [id, result] of voteMap.entries()) {
@@ -138,6 +142,9 @@ export function simTests(
     const result = groupedSample(groups, counts.testB, mt)
     return result
   })
+
+  // Stop early if no more tests needed
+  if (counts.testC === 0) return { testBreakdown }
 
   // Cache B-tested vote IDs
   const bTestedIds = new Set<number>()
