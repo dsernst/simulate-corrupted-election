@@ -124,25 +124,34 @@ export function simTests(
     let result: number[] = []
     let remaining = total
     const half = Math.floor(total / 2)
+
     for (const key of keys) {
       const n = Math.min(half, groups[key].length)
-      const sampledFromThisGroup = getRandomSample(groups[key], n, mt)
-      result = result.concat(sampledFromThisGroup)
-      groups[key] = groups[key].filter(
-        (id) => !sampledFromThisGroup.includes(id)
-      )
+      const sampled = getRandomSample(groups[key], n, mt)
+      result = result.concat(sampled)
+
+      const sampledSet = new Set(sampled)
+      groups[key] = groups[key].filter((id) => !sampledSet.has(id))
+
       remaining -= n
     }
+
     while (remaining > 0) {
       const available = keys.filter((key) => groups[key].length > 0)
       if (available.length === 0) break
+
       available.sort((a, b) => groups[b].length - groups[a].length)
       const key = available[0]
+
       const [sampledId] = getRandomSample(groups[key], 1, mt)
-      result = result.concat(sampledId)
-      groups[key] = groups[key].filter((id) => id !== sampledId)
+      result.push(sampledId)
+
+      const i = groups[key].indexOf(sampledId)
+      if (i !== -1) groups[key].splice(i, 1)
+
       remaining--
     }
+
     return result
   }
 
