@@ -285,7 +285,7 @@ function getRandomSample<T>(array: T[], n: number, mt: MT19937): T[] {
 
 /** Returns a random sample of `n` elements from `array` using the provided PRNG,
     using Fisher-Yates in-place swap. May be faster than getRandomSample() above,
-    when n is significant fraction of array.length? Unclear.
+    when n is significant fraction of array.length? Like > 80%?
     Testing could help. Leaving here as a backup. May want to remove later if still unused. */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getRandomSampleViaFisherYates<T>(
