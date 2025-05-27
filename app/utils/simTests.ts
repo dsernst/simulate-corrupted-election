@@ -163,32 +163,28 @@ export function simTests(
     return groupedSample(quadrants, counts.testC, mt)
   })
 
-  /** Get never-before-tested votes for a test type */
-  function getNeverTested(
-    testType: TestType,
-    totalVotes: number,
-    voteMap: Map<number, VoteTestResult>
-  ): number[] {
-    const testKey = `test${testType}` as const
-    const testedIds = new Set<number>()
+  return { testBreakdown }
+}
 
-    for (const [id, result] of voteMap.entries()) {
-      if (result.testResults[testKey] !== undefined) {
-        testedIds.add(id)
-      }
-    }
-
-    const neverTested = new Array<number>()
-    for (let i = 1; i <= totalVotes; i++) {
-      if (!testedIds.has(i)) {
-        neverTested.push(i)
-      }
-    }
-
-    return neverTested
+/** Get never-before-tested votes for a test type */
+function getNeverTested(
+  testType: TestType,
+  totalVotes: number,
+  voteMap: Map<number, VoteTestResult>
+): number[] {
+  // First, build quick lookup for already-tested IDs
+  const testedIds = new Set<number>()
+  for (const [id, result] of voteMap.entries()) {
+    if (result.testResults[`test${testType}`] !== undefined) testedIds.add(id)
   }
 
-  return { testBreakdown }
+  // Then, everything else, up to `totalVotes`, is never-tested
+  const neverTested = new Array<number>()
+  for (let i = 1; i <= totalVotes; i++) {
+    if (!testedIds.has(i)) neverTested.push(i)
+  }
+
+  return neverTested
 }
 
 /** Gets a random sample of `n` unique elements from `array` using the provided PRNG. */
