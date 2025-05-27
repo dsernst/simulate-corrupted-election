@@ -58,6 +58,14 @@ describe('testSet', () => {
       testC: '300',
     })
   })
+
+  it('should allow spaces: a100 b200 c300', () => {
+    expect(testSet('a100 b200 c300')).toEqual({
+      testA: '100',
+      testB: '200',
+      testC: '300',
+    })
+  })
 })
 
 describe('toTestSetString', () => {
