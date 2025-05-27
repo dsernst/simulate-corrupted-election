@@ -156,19 +156,30 @@ export function simTests(
     const neverTested = getNeverTested('A', totalVotes, voteMap)
     return sampleNeverTested(neverTested, counts.testA, mt)
   })
+  // Cache A-tested vote IDs
+  const aTestedIds = new Set<number>()
+  for (const [id, result] of voteMap.entries()) {
+    if (result.testResults.testA !== undefined) {
+      aTestedIds.add(id)
+    }
+  }
 
   // Run B tests on never-before-tested by B, then even split between A & !A
   runTestBatch('B', counts.testB, effectiveness.testB, () => {
     const neverTested = getNeverTested('B', totalVotes, voteMap)
-    const groups = { aTested: [], aUntested: [] } as { [key: string]: number[] }
-    for (const id of neverTested) {
-      const voteResult = voteMap.get(id)
-      if (voteResult?.testResults.testA !== undefined) {
-        groups.aTested.push(id)
+
+    const aTested = new Array<number>()
+    const aUntested = new Array<number>()
+    for (let i = 0; i < neverTested.length; i++) {
+      const id = neverTested[i]
+      if (aTestedIds.has(id)) {
+        aTested.push(id)
       } else {
-        groups.aUntested.push(id)
+        aUntested.push(id)
       }
     }
+    const groups = { aTested, aUntested }
+
     return evenSplitSample(groups, counts.testB, mt)
   })
 
