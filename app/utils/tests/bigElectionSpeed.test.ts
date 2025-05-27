@@ -22,7 +22,7 @@ describe('speed tests', () => {
     const firstSetStart = new Date()
     s.test('a1k')
     const firstSetDuration = msSince(firstSetStart)
-    expect(s.get('A').compromises[0]).toBe(486) // Confirm it ran, checking against known compromises
+    expect(s.totalCompromisesSeen).toBe(486) // Confirm it ran, checking against known compromises
 
     // Web GUI does it in ~300ms
     expect(firstSetDuration).toBeGreaterThan(5) // getting ~15ms
@@ -45,7 +45,7 @@ describe('speed tests', () => {
     const testSetStart = new Date()
     s.test('a50k b1k c50')
     const testSetDuration = msSince(testSetStart)
-    expect(s.get('A').compromises[0]).toBe(24701) // Confirm it ran, checking against known compromises
+    expect(s.totalCompromisesSeen).toBe(25476) // Confirm it ran, checking against known compromises
 
     // Web GUI does it in ~480ms
     expect(testSetDuration).toBeGreaterThan(5) // getting ~200ms
