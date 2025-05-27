@@ -121,12 +121,11 @@ export class Simulator {
     const newTests = toTestSetString(testCounts)
     this.tests = [this.tests, newTests].filter(Boolean).join('-')
     const timestamp = new Date()
-    const testTime = timestamp.getTime() - startTime.getTime()
 
     this._testRuns.push({
       id: this.tests.split('-').length,
       results,
-      testTime,
+      testTime: timestamp.getTime() - startTime.getTime(),
       timestamp,
     })
 
