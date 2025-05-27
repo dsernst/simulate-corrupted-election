@@ -190,25 +190,6 @@ export function simTests(
     return neverTested
   }
 
-  // Update test breakdown with all votes that have been tested
-  for (const testType of TEST_TYPES) {
-    const testKey = `test${testType}` as const
-    const existingVoteIds = new Set(
-      testBreakdown[testKey].voteResults.map((v) => v.voteId)
-    )
-
-    for (const [voteId, voteResult] of voteMap.entries()) {
-      if (
-        counts[testKey] > 0 &&
-        voteResult.testResults[testKey] !== undefined &&
-        !existingVoteIds.has(voteId)
-      ) {
-        testBreakdown[testKey].voteResults.push(voteResult)
-        existingVoteIds.add(voteId)
-      }
-    }
-  }
-
   // Update counts based on vote results
   for (const testType of TEST_TYPES) {
     const testKey = `test${testType}` as const
