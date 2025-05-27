@@ -7,7 +7,7 @@ const BIG_SEED = 790006 // 2m total_votes
 const msSince = (startDate: Date) => new Date().getTime() - startDate.getTime()
 
 describe('speed tests', () => {
-  it('simulates a big election quickly', () => {
+  it('quickly simulates big election + a1k', () => {
     const initStart = new Date()
     // Initialize election
     const s = new Simulator(BIG_SEED)
@@ -30,7 +30,7 @@ describe('speed tests', () => {
     // console.log({ firstSetDuration })
   })
 
-  it('simulates a big election & 50k tests quickly', () => {
+  it('quickly simulates big election + a50k b1k c50', () => {
     const initStart = new Date()
     // Initialize election
     const s = new Simulator(BIG_SEED)
@@ -63,7 +63,7 @@ describe('speed tests', () => {
   ]
 
   moreTestCases.forEach(([testCase, expectedTime]) => {
-    it(`simulates ${testCase} tests quickly`, () => {
+    it(`quickly simulates ${testCase}`, () => {
       const initStart = new Date()
       const s = new Simulator(BIG_SEED)
       const { totalVotes } = s.election
