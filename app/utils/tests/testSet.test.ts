@@ -67,9 +67,17 @@ describe('testSet', () => {
     })
   })
 
-  it('should treat k as shorthand for 1000', () => {
+  it('should treat k as shorthand for 1,000', () => {
     expect(testSet('a50k')).toEqual({
       testA: '50000',
+      testB: '',
+      testC: '',
+    })
+  })
+
+  it('should treat m as shorthand for 1,000,000', () => {
+    expect(testSet('a2m')).toEqual({
+      testA: '2000000',
       testB: '',
       testC: '',
     })

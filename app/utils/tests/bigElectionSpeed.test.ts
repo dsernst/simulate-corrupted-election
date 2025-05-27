@@ -58,8 +58,8 @@ describe('speed tests', () => {
     ['c50k', 130, 39572], // Quadrant logic edge case
     ['a10 b10 c10', 140, 22], // Light load sanity check
     ['a50k b1k c1k', 300, 26_211], // Higher C test volume
-    ['a2000000', 6000, 991_039], // Stress test run A perf & sampler
-    ['a1000000 b1000000 c1000000', 9000, 2_009_191], // Max concurrency potential
+    ['a2m', 6000, 991_039], // Stress test run A perf & sampler
+    ['a1m b1m c1m', 9000, 2_009_191], // Max concurrency potential
   ]
 
   moreTestCases.forEach(([testCase, expectedTime, expectedCompromises]) => {
