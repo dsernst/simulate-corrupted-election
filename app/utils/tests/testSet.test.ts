@@ -66,6 +66,14 @@ describe('testSet', () => {
       testC: '300',
     })
   })
+
+  it('should treat k as shorthand for 1000', () => {
+    expect(testSet('a50k')).toEqual({
+      testA: '50000',
+      testB: '',
+      testC: '',
+    })
+  })
 })
 
 describe('toTestSetString', () => {

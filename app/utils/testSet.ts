@@ -24,7 +24,7 @@ export function testSet(shorthand: TestsShorthand): TestSet {
   const pattern = /([abc])(\d+)/g
   let match
 
-  while ((match = pattern.exec(shorthand)) !== null) {
+  while ((match = pattern.exec(shorthand.replaceAll('k', '000'))) !== null) {
     const [, test, count] = match
     switch (test) {
       case 'a':

@@ -20,7 +20,7 @@ describe('speed tests', () => {
 
     // Simulate 1k A tests
     const firstSetStart = new Date()
-    s.test('a1000')
+    s.test('a1k')
     const firstSetDuration = msSince(firstSetStart)
     expect(s.get('A').compromises[0]).toBe(486) // Confirm it ran, checking against known compromises
 
@@ -43,7 +43,7 @@ describe('speed tests', () => {
 
     // Simulate: a50k b1k c50
     const testSetStart = new Date()
-    s.test('a50000b1000c50')
+    s.test('a50k b1k c50')
     const testSetDuration = msSince(testSetStart)
     expect(s.get('A').compromises[0]).toBe(24701) // Confirm it ran, checking against known compromises
 
@@ -54,10 +54,10 @@ describe('speed tests', () => {
   })
 
   const moreTestCases: [string, number, number][] = [
-    ['b2000', 50, 1473], // B only
-    ['c50000', 130, 39572], // Quadrant logic edge case
+    ['b2k', 50, 1473], // B only
+    ['c50k', 130, 39572], // Quadrant logic edge case
     ['a10 b10 c10', 140, 22], // Light load sanity check
-    ['a50000 b1000 c1000', 300, 26_211], // Higher C test volume
+    ['a50k b1k c1k', 300, 26_211], // Higher C test volume
     ['a2000000', 6000, 991_039], // Stress test run A perf & sampler
     ['a1000000 b1000000 c1000000', 9000, 2_009_191], // Max concurrency potential
   ]
