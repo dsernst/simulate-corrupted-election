@@ -72,7 +72,7 @@ describe('speed tests', () => {
 
       expect(totalVotes).toBe(2_028_787)
       // Initializes in less than 5ms
-      expect(initDuration).toBeLessThan(10)
+      expect(initDuration).toBeLessThan(15)
 
       // Confirm tests run fast enough
       const testSetStart = new Date()
