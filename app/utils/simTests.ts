@@ -12,12 +12,8 @@ export type VoteTestResult = {
 
 type Effectiveness = { falseCleanRate: number; falseCompromisedRate: number }
 type LongKey = `test${TestType}`
-type TestBreakdown = {
-  [key in LongKey]: TestResult
-}
-type TestEffectiveness = {
-  [key in LongKey]: Effectiveness
-}
+type TestBreakdown = { [key in LongKey]: TestResult }
+type TestEffectiveness = { [key in LongKey]: Effectiveness }
 type TestResult = {
   count: number
   detectedCompromised: number
@@ -157,12 +153,13 @@ export function simTests(
 
   // Run A tests on never-before-tested by A
   runTestBatch('A', counts.testA, effectiveness.testA, () => {
-    return sampleNeverTested(getNeverTested('A'), counts.testA, mt)
+    const neverTested = getNeverTested('A', totalVotes, voteMap)
+    return sampleNeverTested(neverTested, counts.testA, mt)
   })
 
   // Run B tests on never-before-tested by B, then even split between A & !A
   runTestBatch('B', counts.testB, effectiveness.testB, () => {
-    const neverTested = getNeverTested('B')
+    const neverTested = getNeverTested('B', totalVotes, voteMap)
     const groups = { aTested: [], aUntested: [] } as { [key: string]: number[] }
     for (const id of neverTested) {
       const voteResult = voteMap.get(id)
@@ -184,7 +181,7 @@ export function simTests(
       'A&!B': [],
       'A&B': [],
     }
-    for (const id of getNeverTested('C')) {
+    for (const id of getNeverTested('C', totalVotes, voteMap)) {
       const voteResult = voteMap.get(id)
       const aTested = voteResult?.testResults.testA !== undefined
       const bTested = voteResult?.testResults.testB !== undefined
@@ -195,15 +192,27 @@ export function simTests(
   })
 
   /** Get never-before-tested votes for a test type */
-  function getNeverTested(testType: TestType): number[] {
+  function getNeverTested(
+    testType: TestType,
+    totalVotes: number,
+    voteMap: Map<number, VoteTestResult>
+  ): number[] {
     const testKey = `test${testType}` as const
-    const neverTested: number[] = []
+    const testedIds = new Set<number>()
+
+    for (const [id, result] of voteMap.entries()) {
+      if (result.testResults[testKey] !== undefined) {
+        testedIds.add(id)
+      }
+    }
+
+    const neverTested = new Array<number>()
     for (let i = 1; i <= totalVotes; i++) {
-      const voteResult = voteMap.get(i)
-      if (voteResult?.testResults[testKey] === undefined) {
+      if (!testedIds.has(i)) {
         neverTested.push(i)
       }
     }
+
     return neverTested
   }
 
