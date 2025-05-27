@@ -21,7 +21,6 @@ type TestResult = {
 }
 /** Types of tests available. */
 type TestType = 'A' | 'B' | 'C'
-const TEST_TYPES: TestType[] = ['A', 'B', 'C']
 
 /** Simulates running tests on votes to detect compromised votes. */
 export function simTests(
@@ -79,9 +78,8 @@ export function simTests(
     )
     voteResult.testResults[`test${testType}`] = isDetectedCompromised
     testBreakdown[`test${testType}`].count++
-    if (isDetectedCompromised) {
+    if (isDetectedCompromised)
       testBreakdown[`test${testType}`].detectedCompromised++
-    }
     testBreakdown[`test${testType}`].voteResults.push(voteResult)
   }
 
@@ -188,22 +186,6 @@ export function simTests(
     }
 
     return neverTested
-  }
-
-  // Update counts based on vote results
-  for (const testType of TEST_TYPES) {
-    const testKey = `test${testType}` as const
-    // Only count votes for tests actually requested in this run
-    if (counts[testKey] > 0) {
-      testBreakdown[testKey].count = testBreakdown[testKey].voteResults.length
-      testBreakdown[testKey].detectedCompromised = testBreakdown[
-        testKey
-      ].voteResults.filter((v) => v.testResults[testKey] === true).length
-    } else {
-      testBreakdown[testKey].count = 0
-      testBreakdown[testKey].detectedCompromised = 0
-      testBreakdown[testKey].voteResults = []
-    }
   }
 
   return { testBreakdown }
