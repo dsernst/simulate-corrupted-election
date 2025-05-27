@@ -52,4 +52,32 @@ describe('speed tests', () => {
     expect(testSetDuration).toBeLessThan(350)
     // console.log({ testSetDuration })
   })
+
+  const moreTestCases: [string, number][] = [
+    ['b2000', 2400], // B only
+    ['c50000', 130], // Quadrant logic edge case
+    ['a10b10c10', 140], // Light load sanity check
+    ['a50000b1000c1000', 300], // Higher C test volume
+    ['a2000000', 6000], // Stress test run A perf & sampler
+    ['a1000000b1000000c1000000', 9000], // Max concurrency potential
+  ]
+
+  moreTestCases.forEach(([testCase, expectedTime]) => {
+    it(`simulates ${testCase} tests quickly`, () => {
+      const initStart = new Date()
+      const s = new Simulator(BIG_SEED)
+      const { totalVotes } = s.election
+      const initDuration = msSince(initStart)
+
+      expect(totalVotes).toBe(2_028_787)
+      // Initializes in less than 5ms
+      expect(initDuration).toBeLessThan(10)
+
+      const testSetStart = new Date()
+      s.test(testCase)
+      const testSetDuration = msSince(testSetStart)
+
+      expect(testSetDuration).toBeLessThan(+expectedTime)
+    })
+  })
 })
