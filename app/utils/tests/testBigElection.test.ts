@@ -24,8 +24,8 @@ it('it can simulate big elections quickly', () => {
   expect(s.get('A').compromises[0]).toBe(486) // Confirm it ran, checking against known compromises
 
   // Web GUI does it in ~300ms
-  expect(firstSetDuration).toBeGreaterThan(10) // getting ~15ms
-  expect(firstSetDuration).toBeLessThan(500)
+  expect(firstSetDuration).toBeGreaterThan(5) // getting ~15ms
+  expect(firstSetDuration).toBeLessThan(50)
   // console.log({ firstSetDuration })
 })
 
@@ -46,8 +46,8 @@ it('it can simulate big elections with lots of tests quickly', () => {
   const testSetDuration = msSince(testSetStart)
   expect(s.get('A').compromises[0]).toBe(24701) // Confirm it ran, checking against known compromises
 
-  // Web GUI does it in ~12700ms
-  expect(testSetDuration).toBeGreaterThan(10) // getting ~2400ms
-  expect(testSetDuration).toBeLessThan(2500)
+  // Web GUI does it in ~2700ms
+  expect(testSetDuration).toBeGreaterThan(5) // getting ~700ms
+  expect(testSetDuration).toBeLessThan(1000)
   console.log({ testSetDuration })
 })
