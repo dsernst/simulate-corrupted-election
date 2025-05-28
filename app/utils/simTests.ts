@@ -64,9 +64,8 @@ export function simTests(
   ) {
     let voteResult = voteMap.get(voteId)
     if (!voteResult) {
-      const isActuallyCompromised = sampleVote(compromisedVotes, totalVotes, mt)
       voteResult = {
-        isActuallyCompromised,
+        isActuallyCompromised: sampleVote(compromisedVotes, totalVotes, mt),
         testResults: {},
         voteId,
       }
