@@ -100,19 +100,14 @@ export function simTests(
     }
   }
 
-  /** Helper: sample only from never-before-tested votes */
-  function sampleNeverTested(
-    neverTested: number[],
-    n: number,
-    mt: MT19937
-  ): number[] {
-    return getRandomSample(neverTested, Math.min(n, neverTested.length), mt)
-  }
-
   // Run A tests on never-before-tested by A
   runTestBatch('A', counts.testA, effectiveness.testA, () => {
     const neverTested = getNeverTested('A', totalVotes, voteMap)
-    return sampleNeverTested(neverTested, counts.testA, mt)
+    return getRandomSample(
+      neverTested,
+      Math.min(counts.testA, neverTested.length),
+      mt
+    )
   })
 
   // Stop early if no more tests needed
