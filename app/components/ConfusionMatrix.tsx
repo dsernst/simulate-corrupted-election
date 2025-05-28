@@ -33,26 +33,27 @@ const ConfusionMatrix = ({
   const topRightColor = 'bg-blue-200/65'
 
   return (
-    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 flex items-center font-bold text-gray-800">
-      {/* Vertical axis label outside the table */}
+    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 flex items-center text-gray-800">
+      {/* Rotated left-side label outside the table */}
       <div
-        className="text-base mr-2 border border-gray-400/70 relative top-[73px] left-2 h-[153px] text-center bg-yellow-100 rotate-180"
-        style={{
-          letterSpacing: '0.05em',
-          writingMode: 'vertical-rl',
-        }}
+        className="text-base mr-2 border border-gray-400/70 relative top-[73px] left-2 h-[153px] text-center bg-yellow-100 rotate-180 font-bold"
+        style={{ letterSpacing: '0.05em', writingMode: 'vertical-rl' }}
       >
         Test {first}
       </div>
 
       <div>
-        <div className="font-extrabold text-lg mb-2 text-center">
+        {/* A vs B (n = 1000) label */}
+        <div className="font-bold text-lg mb-2 text-center">
           {first} vs {second}{' '}
           <span className="text-xs text-gray-500">
             (n = {grandTotal.toLocaleString()})
           </span>
         </div>
-        <table className="min-w-[16em] text-base text-center overflow-hidden border-separate border-spacing-0 font-extrabold">
+
+        {/* Main table */}
+        <table className="min-w-[16em] text-base text-center overflow-hidden border-separate border-spacing-0">
+          {/* Header rows */}
           <thead>
             <tr>
               <th
@@ -92,9 +93,12 @@ const ConfusionMatrix = ({
               </th>
             </tr>
           </thead>
-          <tbody>
+
+          {/* Content rows */}
+          <tbody className="font-semibold text-black/80">
+            {/* 2nd from bottom row */}
             <tr>
-              <th className="bg-yellow-200/70 font-extrabold border border-gray-300 px-6 py-4">
+              <th className="bg-yellow-200/70 font-extrabold border border-gray-300 py-4">
                 Clean
                 <div className="text-xs text-gray-600 font-normal mt-0.5">
                   {(
@@ -102,19 +106,15 @@ const ConfusionMatrix = ({
                   ).toLocaleString()}
                 </div>
               </th>
-              <td
-                className="bg-green-50 border border-gray-300 px-4 py-3"
-                style={{ minWidth: '3em' }}
-              >
+              <td className="bg-green-50 border border-gray-300 px-4 py-3">
                 {matrix.clean_clean.toLocaleString()}
               </td>
-              <td
-                className="bg-red-50 border border-gray-300 px-4 py-3"
-                style={{ minWidth: '3em' }}
-              >
+              <td className="bg-red-50 border border-gray-300 px-4 py-3">
                 {matrix.clean_compromised.toLocaleString()}
               </td>
             </tr>
+
+            {/* Bottom row */}
             <tr>
               <th className="bg-yellow-200/70 font-extrabold border border-gray-300 px-6 py-4">
                 Compromised
@@ -124,16 +124,10 @@ const ConfusionMatrix = ({
                   ).toLocaleString()}
                 </div>
               </th>
-              <td
-                className="bg-red-50 border border-gray-300 px-4 py-3"
-                style={{ minWidth: '3em' }}
-              >
+              <td className="bg-red-50 border border-gray-300">
                 {matrix.compromised_clean.toLocaleString()}
               </td>
-              <td
-                className="bg-green-50 border border-gray-300 font-bold px-4 py-3"
-                style={{ minWidth: '3em' }}
-              >
+              <td className="bg-green-50 border border-gray-300">
                 {matrix.compromised_compromised.toLocaleString()}
               </td>
             </tr>
