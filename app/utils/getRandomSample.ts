@@ -1,14 +1,16 @@
 import { MT19937 } from './mt19937'
 
+/** Gets a random sample of `n` unique elements from `array` using the provided PRNG. */
 export function getRandomSample<T>(array: T[], n: number, mt: MT19937): T[] {
   const ratio = n / array.length
 
-  if (ratio < 0.2) return getRandomSampleCustom(array, n, mt)
+  if (ratio < 0.5) return getRandomSampleCustom(array, n, mt)
 
   return getRandomSampleViaFisherYates(array, n, mt)
 }
 
-/** Gets a random sample of `n` unique elements from `array` using the provided PRNG. */
+/** Only picks up to `n` unique elements from `array` using the provided PRNG.
+    Fast when `n` is < 50% of `array.length`. */
 export function getRandomSampleCustom<T>(
   array: T[],
   n: number,
@@ -27,9 +29,8 @@ export function getRandomSampleCustom<T>(
   return [...randomSample]
 }
 
-/** Returns a random sample of `n` elements from `array` using the provided PRNG,
-    using Fisher-Yates in-place swap. Faster than getRandomSampleCustom()
-    when n is significant fraction of array.length. */
+/** First shuffles `array` using Fisher-Yates in-place swap. Then returns a random sample of `n` elements.
+    Fast when `n` is > 50% of `array.length`. */
 export function getRandomSampleViaFisherYates<T>(
   arr: T[],
   n: number,
