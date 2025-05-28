@@ -1,7 +1,6 @@
 import { useSimulator } from '../useSimulator'
 import {
   calculateConfusionMatrix,
-  calculateLayeredStats,
   TestRun,
 } from '../utils/calculateIntersections'
 import { getIndentFromKey } from '../utils/createIntersections'
@@ -9,11 +8,13 @@ import ConfusionMatrix from './ConfusionMatrix'
 import { IntersectionResultsLabel } from './IntersectionResultsLabel'
 
 export function IntersectionResults() {
-  const { testRuns } = useSimulator()
+  const { simulator, testRuns } = useSimulator()
   const ran = ranAtLeastOneTestOf(testRuns)
   if (!ranAtLeastTwoTypes(ran)) return null
 
-  const layeredStats = calculateLayeredStats(testRuns)
+  console.time('getIntersections')
+  const layeredStats = simulator.getIntersections()
+  console.timeEnd('getIntersections')
 
   // Confusion matrices for all pairs
   const pairs = [
@@ -21,11 +22,13 @@ export function IntersectionResults() {
     { first: 'A', second: 'C' },
     { first: 'B', second: 'C' },
   ] as const
+  console.time('calculateConfusionMatrix')
   const confusionMatrices = pairs.map(({ first, second }) => ({
     first,
     matrix: calculateConfusionMatrix(testRuns, first, second),
     second,
   }))
+  console.timeEnd('calculateConfusionMatrix')
 
   return (
     <div className="mt-8 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
