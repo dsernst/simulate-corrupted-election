@@ -4,8 +4,8 @@ import { MT19937 } from './mt19937'
 export function getRandomSample<T>(array: T[], n: number, mt: MT19937): T[] {
   const ratio = n / array.length
 
-  if (ratio < 0.5) return getRandomSampleCustom(array, n, mt)
-
+  // See getRandomSamples.test.ts for profiling code that found 0.6 as a good crossover point
+  if (ratio < 0.6) return getRandomSampleCustom(array, n, mt)
   return getRandomSampleViaFisherYates(array, n, mt)
 }
 

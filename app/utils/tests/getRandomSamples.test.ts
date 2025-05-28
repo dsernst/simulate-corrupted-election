@@ -7,35 +7,49 @@ import {
 import { MT19937 } from '../mt19937'
 
 it('benchmarks getRandomSample techniques', () => {
-  const arraySize = 100_000
-  const ratios = [0.0001, 0.1, 0.25, 0.5, 0.6, 0.75, 0.9]
-  const trials = 2
-  const mt = new MT19937(0)
-  const array = Array.from({ length: arraySize }, (_, i) => i)
+  // This test is for tuning the getRandomSample crossover point
+  // It takes 2min to run, so we disable, except for when we want to run it again
 
-  console.log('ratio\tSet-based\tFisher-Yates\tDiff')
+  // The observed result is that both `bun` and Safari, at nearly all >300k array lengths (where sampling time begins to matter), "crossover" around a ratio of 0.6.
+  // Below that, the our "custom" Set based method is faster.
+  // Above that, doing an in-place Fisher-Yates, then taking a slice is faster.
 
-  for (const ratio of ratios) {
-    const n = Math.floor(ratio * arraySize)
-    let timeCustom = 0
-    let timeFisherYates = 0
+  return
 
-    for (let i = 0; i < trials; i++) {
-      mt.seed(i)
+  const arraySizes = [1e4, 1e5, 3.3e5, 6.6e5, 1e6, 3.3e6, 6.6e6, 1e7] // 10k -> 10M
 
-      timeCustom += time(() => getRandomSampleCustom(array, n, mt)).time
+  for (const arraySize of arraySizes) {
+    console.log(`\nArray size: ${arraySize}`)
 
-      mt.seed(i)
-      timeFisherYates += time(() =>
-        getRandomSampleViaFisherYates(array, n, mt)
-      ).time
+    const ratios = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    const trials = 3
+    const mt = new MT19937(0)
+    const array = Array.from({ length: arraySize }, (_, i) => i)
+
+    console.log('ratio\tSet-based\tFisher-Yates\tDiff')
+
+    for (const ratio of ratios) {
+      const n = Math.floor(ratio * arraySize)
+      let timeCustom = 0
+      let timeFisherYates = 0
+
+      for (let i = 0; i < trials; i++) {
+        mt.seed(i)
+
+        timeCustom += time(() => getRandomSampleCustom(array, n, mt)).time
+
+        mt.seed(i)
+        timeFisherYates += time(() =>
+          getRandomSampleViaFisherYates(array, n, mt)
+        ).time
+      }
+
+      console.log(
+        `${ratio}\t${(timeCustom / trials).toFixed(1)}ms\t\t${(
+          timeFisherYates / trials
+        ).toFixed(1)}ms\t\t${(timeCustom / timeFisherYates).toFixed(3)}x`
+      )
     }
-
-    console.log(
-      `${ratio}\t${(timeCustom / trials).toFixed(1)}ms\t\t${(
-        timeFisherYates / trials
-      ).toFixed(1)}ms\t\t${(timeCustom / timeFisherYates).toFixed(3)}x`
-    )
   }
 })
 
