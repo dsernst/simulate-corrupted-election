@@ -42,6 +42,7 @@ const TESTS = [
 const defaultRequested = { testA: '', testB: '', testC: '' }
 export function RequestTests() {
   const { rerender, simulator } = useSimulator()
+  const [isRunning, setIsRunning] = useState(false)
 
   const [requestedTests, setRequestedTests] =
     useState<TestResults>(defaultRequested)
@@ -54,9 +55,18 @@ export function RequestTests() {
 
   const handleSubmit = () => {
     if (!hasValidTests) return
-    simulator.runTests(requestedTests)
-    setRequestedTests(defaultRequested)
-    rerender()
+
+    setIsRunning(true)
+
+    // Allow React to flush + browser to paint
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        simulator.runTests(requestedTests)
+        setRequestedTests(defaultRequested)
+        rerender()
+        setIsRunning(false)
+      }, 0)
+    })
   }
 
   return (
@@ -103,10 +113,10 @@ export function RequestTests() {
           </div>
           <Button
             className="px-6"
-            disabled={!hasValidTests}
+            disabled={!hasValidTests || isRunning}
             onClick={handleSubmit}
           >
-            Run Tests
+            {isRunning ? 'Running...' : 'Run Tests'}
           </Button>
         </div>
       </div>
