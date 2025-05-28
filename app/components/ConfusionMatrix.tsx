@@ -1,9 +1,15 @@
+const testColors = {
+  A: 'bg-yellow-200/70',
+  B: 'bg-blue-200/65',
+  C: 'bg-purple-200/60',
+}
+
 const ConfusionMatrix = ({
   first,
   matrix,
   second,
 }: {
-  first: string
+  first: keyof typeof testColors
   matrix: {
     clean_clean: number
     clean_compromised: number
@@ -11,7 +17,7 @@ const ConfusionMatrix = ({
     compromised_compromised: number
     total: number
   }
-  second: string
+  second: keyof typeof testColors
 }) => {
   const grandTotal =
     matrix.clean_clean +
@@ -30,8 +36,8 @@ const ConfusionMatrix = ({
     )
   }
 
-  const topRightColor = 'bg-blue-200/65'
-  const bottomLeftColor = 'bg-yellow-200/70'
+  const topRightColor = testColors[second]
+  const bottomLeftColor = testColors[first]
 
   return (
     <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 flex items-center text-gray-800">
