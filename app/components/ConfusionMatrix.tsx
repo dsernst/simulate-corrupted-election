@@ -48,7 +48,9 @@ const ConfusionMatrix = ({
       <div>
         <div className="font-extrabold text-lg mb-2 text-center">
           {first} vs {second}{' '}
-          <span className="text-xs text-gray-500">(n={grandTotal})</span>
+          <span className="text-xs text-gray-500">
+            (n={grandTotal.toLocaleString()})
+          </span>
         </div>
         <table className="min-w-[16em] text-base text-center overflow-hidden border-separate border-spacing-0 font-extrabold">
           <thead>
@@ -60,9 +62,14 @@ const ConfusionMatrix = ({
               >
                 Total
                 <div className="text-xs text-gray-600 font-normal mt-1">
-                  {matrix.clean_clean + matrix.clean_compromised} +{' '}
-                  {matrix.compromised_clean + matrix.compromised_compromised} ={' '}
-                  {grandTotal}
+                  {(
+                    matrix.clean_clean + matrix.clean_compromised
+                  ).toLocaleString()}{' '}
+                  +{' '}
+                  {(
+                    matrix.compromised_clean + matrix.compromised_compromised
+                  ).toLocaleString()}{' '}
+                  = {grandTotal.toLocaleString()}
                 </div>
               </th>
               <th
@@ -94,13 +101,13 @@ const ConfusionMatrix = ({
                 className="bg-green-50 border border-gray-300 px-4 py-3"
                 style={{ minWidth: '3em' }}
               >
-                {matrix.clean_clean}
+                {matrix.clean_clean.toLocaleString()}
               </td>
               <td
                 className="bg-red-50 border border-gray-300 px-4 py-3"
                 style={{ minWidth: '3em' }}
               >
-                {matrix.clean_compromised}
+                {matrix.clean_compromised.toLocaleString()}
               </td>
             </tr>
             <tr>
@@ -111,13 +118,13 @@ const ConfusionMatrix = ({
                 className="bg-red-50 border border-gray-300 px-4 py-3"
                 style={{ minWidth: '3em' }}
               >
-                {matrix.compromised_clean}
+                {matrix.compromised_clean.toLocaleString()}
               </td>
               <td
                 className="bg-green-50 border border-gray-300 font-bold px-4 py-3"
                 style={{ minWidth: '3em' }}
               >
-                {matrix.compromised_compromised}
+                {matrix.compromised_compromised.toLocaleString()}
               </td>
             </tr>
           </tbody>
