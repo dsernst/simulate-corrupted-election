@@ -17,6 +17,11 @@ export const RevealStartOverLine = () => {
     if (seedInputShown) setInputSeed(seed)
   }, [seedInputShown, seed])
 
+  const startOverWithSeed = () => {
+    startOver(inputSeed)
+    setSeedInputShown(false)
+  }
+
   return (
     <div className="space-y-2">
       <div className="h-20 flex justify-between items-center">
@@ -76,16 +81,14 @@ export const RevealStartOverLine = () => {
                 className="pl-8 px-3 py-2 border border-gray-400 rounded text-sm w-32"
                 name="seed"
                 onChange={(e) => setInputSeed(Number(e.target.value))}
+                onKeyDown={(e) => e.key === 'Enter' && startOverWithSeed()}
                 placeholder="Enter seed"
                 type="number"
                 value={inputSeed}
               />
               <Button
                 className="!px-3 !py-2 text-xs whitespace-nowrap"
-                onClick={() => {
-                  startOver(inputSeed)
-                  setCompromisedShown(false)
-                }}
+                onClick={startOverWithSeed}
                 variant="outline"
               >
                 ♻️ Start Over w/ Seed
