@@ -31,12 +31,13 @@ const ConfusionMatrix = ({
   }
 
   const topRightColor = 'bg-blue-200/65'
+  const bottomLeftColor = 'bg-yellow-200/70'
 
   return (
     <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 flex items-center text-gray-800">
       {/* Rotated left-side label outside the table */}
       <div
-        className="text-base mr-2 border border-gray-400/70 relative top-[73px] left-2 h-[153px] text-center bg-yellow-100 rotate-180 font-bold"
+        className={`${bottomLeftColor} text-base mr-2 border border-gray-400/70 relative top-[73px] left-2 h-[153px] text-center rotate-180 font-bold`}
         style={{ letterSpacing: '0.05em', writingMode: 'vertical-rl' }}
       >
         Test {first}
@@ -98,7 +99,9 @@ const ConfusionMatrix = ({
           <tbody className="font-semibold text-black/80">
             {/* 2nd from bottom row */}
             <tr>
-              <th className="bg-yellow-200/70 font-extrabold border border-gray-300 py-4">
+              <th
+                className={`${bottomLeftColor} font-extrabold border border-gray-300 py-4`}
+              >
                 Clean
                 <div className="text-xs text-gray-600 font-normal mt-0.5">
                   {(
@@ -116,7 +119,9 @@ const ConfusionMatrix = ({
 
             {/* Bottom row */}
             <tr>
-              <th className="bg-yellow-200/70 font-extrabold border border-gray-300 px-6 py-4">
+              <th
+                className={`${bottomLeftColor} font-extrabold border border-gray-300 px-6 py-4`}
+              >
                 Compromised
                 <div className="text-xs text-gray-600 font-normal mt-0.5">
                   {(
