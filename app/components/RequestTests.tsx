@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ImSpinner3 } from 'react-icons/im'
 
 import { useSimulator } from '../useSimulator'
 import {
@@ -116,7 +117,13 @@ export function RequestTests() {
             disabled={!hasValidTests || isRunning}
             onClick={handleSubmit}
           >
-            {isRunning ? 'Running...' : 'Run Tests'}
+            {isRunning ? (
+              <div className="flex items-center">
+                <ImSpinner3 className="animate-spin mr-1.5" /> Running...
+              </div>
+            ) : (
+              'Run Tests'
+            )}
           </Button>
         </div>
       </div>
