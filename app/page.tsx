@@ -2,6 +2,7 @@
 
 import { LayoutGroup, motion } from 'motion/react'
 
+import { Footer } from './components/Footer'
 import { Header } from './components/Header'
 import { SimulatedContent } from './components/SimulatedContent'
 import { SimulatorContextProvider } from './useSimulator'
@@ -18,6 +19,8 @@ export default function Home() {
           <SimulatedContent />
         </SimulatorContextProvider>
       </LayoutGroup>
+
+      <Footer />
     </main>
   )
 }
