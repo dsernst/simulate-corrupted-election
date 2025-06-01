@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euo pipefail
+
+export NEXT_PUBLIC_GIT_COMMIT_SHA="${VERCEL_GIT_COMMIT_SHA:-unknown}"
+export NEXT_PUBLIC_GIT_BRANCH="${VERCEL_GIT_COMMIT_REF:-unknown}"
+export NEXT_PUBLIC_BUILD_TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
+next build

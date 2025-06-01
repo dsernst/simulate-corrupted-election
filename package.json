@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "NEXT_PUBLIC_BUILD_TIMESTAMP=$(date -u +\"%Y-%m-%dT%H:%M:%SZ\") next build",
+    "build": ". scripts/build",
     "start": "next start",
     "lint": "next lint",
     "test": "bun test",
