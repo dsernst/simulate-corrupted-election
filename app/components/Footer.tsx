@@ -21,9 +21,11 @@ export const Footer = () => {
               {gitHash?.slice(0, 7)}
             </a>
           </span>
-          <span>·</span>
           {branch && !['main', 'unknown'].includes(branch) && (
-            <span>Branch: {branch}</span>
+            <>
+              <span>·</span>
+              <span>Branch: {branch}</span>
+            </>
           )}
         </>
       )}
