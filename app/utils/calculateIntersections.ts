@@ -1,3 +1,5 @@
+import { LRUCache } from 'lru-cache'
+
 import {
   getFilterFromKey,
   getTestsFromKey,
@@ -65,7 +67,7 @@ export function calculateAllConfusionMatrices(
 export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
   // Build voteMap
   // console.time('build voteMap')
-  const voteMap = buildVoteMap(testRuns)
+  const voteMap = buildVoteMapMemoized(testRuns)
   // console.timeEnd('build voteMap')
 
   // Create results object for each group
@@ -135,7 +137,16 @@ export function toDisplayLabelFromKey(key: string): string {
     .join(' & ')
 }
 
-function buildVoteMap(testRuns: TestRun[]) {
+const _voteMapCache = new LRUCache<string, Map<number, VoteResult>>({ max: 10 })
+const makeVoteMapCacheKey = (testRuns: TestRun[]) =>
+  testRuns.map((run) => `${run.id}-${run.timestamp.getTime()}`).join('|')
+
+function buildVoteMapMemoized(testRuns: TestRun[]) {
+  const cacheKey = makeVoteMapCacheKey(testRuns)
+
+  // Use cache if available
+  if (_voteMapCache.has(cacheKey)) return _voteMapCache.get(cacheKey)!
+
   const voteMap = new Map<number, VoteResult>()
   testRuns.forEach((run) => {
     Object.entries(run.results.testBreakdown).forEach(([testKey, test]) => {
@@ -157,6 +168,10 @@ function buildVoteMap(testRuns: TestRun[]) {
       })
     })
   })
+
+  // Cache the result
+  _voteMapCache.set(cacheKey, voteMap)
+
   return voteMap
 }
 
@@ -165,7 +180,7 @@ function calculateConfusionMatrix(
   testType1: TestType,
   testType2: TestType
 ): ConfusionMatrix {
-  const voteMap = buildVoteMap(testRuns)
+  const voteMap = buildVoteMapMemoized(testRuns)
 
   let clean_clean = 0
   let clean_compromised = 0
