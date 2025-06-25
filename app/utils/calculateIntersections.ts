@@ -96,7 +96,7 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
     const compromises = getMarginalCompromisedCounts(votes, tests)
     // console.timeEnd(key + ': getMarginalCompromisedCounts')
     // console.time(key + ': getMarginalCompromisedPercents')
-    const percentages = getMarginalCompromisedPercents(votes, tests)
+    const percentages = getMarginalCompromisedPercents(votes, compromises)
     // console.timeEnd(key + ': getMarginalCompromisedPercents')
 
     return {
@@ -119,13 +119,11 @@ export function getMarginalCompromisedCounts(
 
 export function getMarginalCompromisedPercents(
   votes: VoteResult[],
-  tests: ('A' | 'B' | 'C')[]
+  compromises: number[]
 ) {
   const total = votes.length
-  if (total === 0) return tests.map(() => undefined)
-  return getMarginalCompromisedCounts(votes, tests).map(
-    (count) => Math.round((count / total) * 1000) / 10
-  )
+  if (total === 0) return compromises.map(() => undefined)
+  return compromises.map((count) => Math.round((count / total) * 1000) / 10)
 }
 
 /** Utility: Convert canonical group key to display label */
