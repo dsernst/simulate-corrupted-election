@@ -85,7 +85,7 @@ describe('speed tests', () => {
     })
   })
 
-  it('quickly calculates intersections too', () => {
+  it.only('quickly calculates intersections too', () => {
     const s = new Simulator(BIG_SEED)
     s.test('a300k b1k c50')
 
@@ -99,6 +99,7 @@ describe('speed tests', () => {
     expect(intersections[0].compromises[0]).toBe(148319)
 
     // And that it was fast
-    expect(duration).toBeLessThan(500) // Getting ~1000ms
+    // console.log({ duration })
+    expect(duration).toBeLessThan(450) // Getting ~330ms
   })
 })

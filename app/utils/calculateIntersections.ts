@@ -98,6 +98,7 @@ export function calculateConfusionMatrix(
 
 export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
   // Build voteMap
+  // console.time('build voteMap')
   const voteMap = new Map<number, VoteResult>()
   testRuns.forEach((run) => {
     Object.entries(run.results.testBreakdown).forEach(([testKey, test]) => {
@@ -119,27 +120,43 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
       })
     })
   })
+  // console.timeEnd('build voteMap')
+
+  // Create results object for each group
+  // console.time('create groups')
+  const groups = intersectionGroups.map((key) => ({
+    includes: getFilterFromKey(key),
+    key,
+    tests: getTestsFromKey(key),
+    votes: [] as VoteResult[],
+  }))
+  // console.timeEnd('create groups')
+
+  // Test each vote for membership in each group
+  // console.time('assign votes to groups')
+  for (const vote of voteMap.values()) {
+    for (const group of groups) {
+      if (group.includes(vote)) group.votes.push(vote)
+    }
+  }
+  // console.timeEnd('assign votes to groups')
 
   // Calculate stats for each group
-  return intersectionGroups.map((key) => {
-    // Filter votes by which tests were run on them
-    const votes = Array.from(voteMap.values()).filter(
-      (v) => !!v && getFilterFromKey(key)(v)
-    )
-
-    const tested = votes.length
-    const tests = getTestsFromKey(key)
-
+  return groups.map(({ key, tests, votes }) => {
     // For single-test groups, compromised is just that test; for intersections, use marginal counts
+    // console.time(key + ': getMarginalCompromisedCounts')
     const compromises = getMarginalCompromisedCounts(votes, tests)
+    // console.timeEnd(key + ': getMarginalCompromisedCounts')
+    // console.time(key + ': getMarginalCompromisedPercents')
     const percentages = getMarginalCompromisedPercents(votes, tests)
+    // console.timeEnd(key + ': getMarginalCompromisedPercents')
 
     return {
       compromises,
       key,
       label: key, // For now, label is an alias to key
       percentages,
-      tested,
+      tested: votes.length,
     }
   })
 }
