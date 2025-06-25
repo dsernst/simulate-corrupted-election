@@ -43,28 +43,7 @@ export function calculateConfusionMatrix(
   compromised_compromised: number
   total: number
 } {
-  // Build voteMap as before
-  const voteMap = new Map<number, VoteResult>()
-  testRuns.forEach((run) => {
-    Object.entries(run.results.testBreakdown).forEach(([testKey, test]) => {
-      const tType = testKey.slice(-1) as TestType
-      test.voteResults.forEach((vote) => {
-        const existing = voteMap.get(vote.voteId) || {
-          testA: undefined,
-          testB: undefined,
-          testC: undefined,
-          testedA: false,
-          testedB: false,
-          testedC: false,
-        }
-        voteMap.set(vote.voteId, {
-          ...existing,
-          [`test${tType}`]: vote.testResults[`test${tType}`],
-          [`tested${tType}`]: true,
-        })
-      })
-    })
-  })
+  const voteMap = buildVoteMap(testRuns)
 
   let clean_clean = 0
   let clean_compromised = 0
@@ -99,27 +78,7 @@ export function calculateConfusionMatrix(
 export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
   // Build voteMap
   // console.time('build voteMap')
-  const voteMap = new Map<number, VoteResult>()
-  testRuns.forEach((run) => {
-    Object.entries(run.results.testBreakdown).forEach(([testKey, test]) => {
-      const testType = testKey.slice(-1) as TestType
-      test.voteResults.forEach((vote) => {
-        const existing = voteMap.get(vote.voteId) || {
-          testA: undefined,
-          testB: undefined,
-          testC: undefined,
-          testedA: false,
-          testedB: false,
-          testedC: false,
-        }
-        voteMap.set(vote.voteId, {
-          ...existing,
-          [`test${testType}`]: vote.testResults[`test${testType}`],
-          [`tested${testType}`]: true,
-        })
-      })
-    })
-  })
+  const voteMap = buildVoteMap(testRuns)
   // console.timeEnd('build voteMap')
 
   // Create results object for each group
@@ -187,4 +146,29 @@ export function toDisplayLabelFromKey(key: string): string {
   return parts
     .map((part) => (part.startsWith('!') ? `not ${part[1]}` : part))
     .join(' & ')
+}
+
+function buildVoteMap(testRuns: TestRun[]) {
+  const voteMap = new Map<number, VoteResult>()
+  testRuns.forEach((run) => {
+    Object.entries(run.results.testBreakdown).forEach(([testKey, test]) => {
+      const testType = testKey.slice(-1) as TestType
+      test.voteResults.forEach((vote) => {
+        const existing = voteMap.get(vote.voteId) || {
+          testA: undefined,
+          testB: undefined,
+          testC: undefined,
+          testedA: false,
+          testedB: false,
+          testedC: false,
+        }
+        voteMap.set(vote.voteId, {
+          ...existing,
+          [`test${testType}`]: vote.testResults[`test${testType}`],
+          [`tested${testType}`]: true,
+        })
+      })
+    })
+  })
+  return voteMap
 }
