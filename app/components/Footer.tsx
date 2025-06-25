@@ -1,6 +1,6 @@
 import TimeAgo from 'timeago-react'
 
-import { version } from '../../package.json'
+import packageJson from '../../package.json'
 
 export const Footer = () => {
   const buildTimestamp = process.env.NEXT_PUBLIC_BUILD_TIMESTAMP
@@ -9,7 +9,7 @@ export const Footer = () => {
 
   return (
     <footer className="opacity-30 text-xs inline-flex gap-3">
-      <span>v{version}</span>
+      <span>v{packageJson.version}</span>
       {buildTimestamp && (
         <>
           <span>·</span>
