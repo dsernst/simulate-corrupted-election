@@ -48,6 +48,8 @@ type ConfusionMatrix = {
   total: number
 }
 
+type TestBreakdown = TestDetectionResults['testBreakdown']
+
 export function calculateAllConfusionMatrices(
   testRuns: TestRun[]
 ): ConfusionMatrices {
@@ -155,23 +157,41 @@ function buildVoteMapMemoized(testRuns: TestRun[]) {
   if (_voteMapCache.has(cacheKey)) return _voteMapCache.get(cacheKey)!
 
   const voteMap = new Map<number, VoteResult>()
+
+  // Pre-create the default object once
+  const defaultVoteResult: VoteResult = {
+    testA: undefined,
+    testB: undefined,
+    testC: undefined,
+    testedA: false,
+    testedB: false,
+    testedC: false,
+  }
+
+  // Pre-define property access patterns to avoid string template literals
+  const toTested = {
+    testA: 'testedA',
+    testB: 'testedB',
+    testC: 'testedC',
+  } as const
+
   testRuns.forEach((run) => {
-    Object.entries(run.results.testBreakdown).forEach(([testKey, test]) => {
-      const testType = testKey.slice(-1) as TestType
+    ;(
+      Object.entries(run.results.testBreakdown) as [
+        keyof TestBreakdown,
+        TestBreakdown['testA']
+      ][]
+    ).forEach(([testKey, test]) => {
       test.voteResults.forEach((vote) => {
-        const existing = voteMap.get(vote.voteId) || {
-          testA: undefined,
-          testB: undefined,
-          testC: undefined,
-          testedA: false,
-          testedB: false,
-          testedC: false,
+        let existing = voteMap.get(vote.voteId)
+        if (!existing) {
+          existing = { ...defaultVoteResult }
+          voteMap.set(vote.voteId, existing)
         }
-        voteMap.set(vote.voteId, {
-          ...existing,
-          [`test${testType}`]: vote.testResults[`test${testType}`],
-          [`tested${testType}`]: true,
-        })
+
+        // Update voteMap
+        existing[testKey] = vote.testResults[testKey]
+        existing[toTested[testKey]] = true
       })
     })
   })
