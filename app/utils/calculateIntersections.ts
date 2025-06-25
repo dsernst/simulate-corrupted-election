@@ -58,10 +58,10 @@ export function calculateConfusionMatrix(
       const result1 = v[`test${testType1}`]
       const result2 = v[`test${testType2}`]
       // true = compromised, false = clean
-      if (result1 === false && result2 === false) clean_clean++
-      else if (result1 === false && result2 === true) clean_compromised++
-      else if (result1 === true && result2 === false) compromised_clean++
-      else if (result1 === true && result2 === true) compromised_compromised++
+      if (!result1 && !result2) clean_clean++
+      else if (!result1 && result2) clean_compromised++
+      else if (result1 && !result2) compromised_clean++
+      else if (result1 && result2) compromised_compromised++
       total++
     }
   })
