@@ -86,8 +86,8 @@ describe('speed tests', () => {
   })
 
   const intersectionCases: [string, number, number][] = [
-    ['a300k b1k c50', 148319, 250], // Getting ~125ms
-    // ['a1m b1m', 495555, 2000], // Getting ~1650ms
+    ['a300k b1k c50', 148319, 150], // Getting ~90ms
+    // ['a1m b1m', 495555, 1000], // Getting ~700ms
   ]
 
   intersectionCases.forEach(([testCase, expectedCompromises, expectedTime]) => {

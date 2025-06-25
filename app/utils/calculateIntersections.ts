@@ -110,12 +110,20 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
   return stats
 }
 
-// Utility: Marginal count for each test (votes where test detected compromise, regardless of others)
+/** For each test, count compromises seen */
 export function getMarginalCompromisedCounts(
   votes: VoteResult[],
   tests: ('A' | 'B' | 'C')[]
 ) {
-  return tests.map((t) => votes.filter((v) => v[`test${t}`] === true).length)
+  // Loop through the votes just once
+  const counts = [0, 0, 0] // [A, B, C]
+  for (const vote of votes) {
+    if (vote.testA === true) counts[0]++
+    if (vote.testB === true) counts[1]++
+    if (vote.testC === true) counts[2]++
+  }
+
+  return tests.map((test) => counts[test === 'A' ? 0 : test === 'B' ? 1 : 2])
 }
 
 export function getMarginalCompromisedPercents(
