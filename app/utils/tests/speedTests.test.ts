@@ -100,6 +100,6 @@ describe('speed tests', () => {
 
     // And that it was fast
     // console.log({ duration })
-    expect(duration).toBeLessThan(450) // Getting ~330ms
+    expect(duration).toBeLessThan(250) // Getting ~160ms
   })
 })

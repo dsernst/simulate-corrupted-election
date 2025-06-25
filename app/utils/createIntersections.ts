@@ -83,18 +83,35 @@ export function generateIntersectingGroups(tests: TestType[]): string[] {
   return groups
 }
 
+// Memoize filter functions to avoid recreating them, only 19 possible
+const filterCache = new Map<string, (v: VoteResult) => boolean>()
+
 /** Derive filter function from key: 'B!A' -> (v) => v.testedB && !v.testedA */
 export function getFilterFromKey(key: string): (v: VoteResult) => boolean {
+  // Use cached filter if available
+  if (filterCache.has(key)) return filterCache.get(key)!
+
   const included = getTestsFromKey(key)
 
-  // Get all letters in the key
+  // excluded = allLetters - included
   const allLetters = key.replaceAll('!', '').split('') as TestType[]
-  // Then subtract `included`, to get `excluded`
   const excluded = allLetters.filter((letter) => !included.includes(letter))
 
-  return (v: VoteResult) =>
-    included.every((t) => v[`tested${t}`]) &&
-    excluded.every((t) => !v[`tested${t}`])
+  // Precompute property access paths to avoid string interpolation
+  const includedPaths = included.map((t) => `tested${t}` as keyof VoteResult)
+  const excludedPaths = excluded.map((t) => `tested${t}` as keyof VoteResult)
+
+  /** Fast filter function: exit as soon as possible */
+  const filter = (v: VoteResult) => {
+    for (const path of includedPaths) if (!v[path]) return false
+    for (const path of excludedPaths) if (v[path]) return false
+    return true
+  }
+
+  // Cache the filter function
+  filterCache.set(key, filter)
+
+  return filter
 }
 
 /** Derive indent level from key: 'A' -> 0, 'AB' -> 1, 'AB!C' -> 2 */
