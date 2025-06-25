@@ -95,15 +95,12 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
     // console.time(key + ': getMarginalCompromisedCounts')
     const compromises = getMarginalCompromisedCounts(votes, tests)
     // console.timeEnd(key + ': getMarginalCompromisedCounts')
-    // console.time(key + ': getMarginalCompromisedPercents')
-    const percentages = getMarginalCompromisedPercents(votes, compromises)
-    // console.timeEnd(key + ': getMarginalCompromisedPercents')
 
     return {
       compromises,
       key,
       label: key, // For now, label is an alias to key
-      percentages,
+      percentages: getMarginalCompromisedPercents(votes, compromises),
       tested: votes.length,
     }
   })
