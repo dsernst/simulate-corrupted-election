@@ -90,7 +90,8 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
   // console.timeEnd('assign votes to groups')
 
   // Calculate stats for each group
-  return groups.map(({ key, tests, votes }) => {
+  // console.time('calculate stats')
+  const stats = groups.map(({ key, tests, votes }) => {
     // For single-test groups, compromised is just that test; for intersections, use marginal counts
     // console.time(key + ': getMarginalCompromisedCounts')
     const compromises = getMarginalCompromisedCounts(votes, tests)
@@ -104,6 +105,9 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
       tested: votes.length,
     }
   })
+  // console.timeEnd('calculate stats')
+
+  return stats
 }
 
 // Utility: Marginal count for each test (votes where test detected compromise, regardless of others)

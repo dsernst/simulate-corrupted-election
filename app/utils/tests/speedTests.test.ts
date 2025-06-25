@@ -85,21 +85,31 @@ describe('speed tests', () => {
     })
   })
 
-  it.only('quickly calculates intersections too', () => {
-    const s = new Simulator(BIG_SEED)
-    s.test('a300k b1k c50')
+  const intersectionCases: [string, number, number][] = [
+    ['a300k b1k c50', 148319, 250], // Getting ~125ms
+    // ['a1m b1m', 495555, 2000], // Getting ~1650ms
+  ]
 
-    // Calc intersections
-    const startTime = new Date()
-    const intersections = s.getIntersections()
-    const duration = msSince(startTime)
+  intersectionCases.forEach(([testCase, expectedCompromises, expectedTime]) => {
+    it.only(`quickly calcs intersections: ${testCase}`, () => {
+      const s = new Simulator(BIG_SEED)
+      // const initTime = new Date()
+      s.test(testCase)
+      // const testDuration = msSince(initTime)
+      // console.log({ testDuration })
 
-    // Confirm it calc'd intersections properly
-    expect(intersections.length).toBe(19)
-    expect(intersections[0].compromises[0]).toBe(148319)
+      // Calc intersections
+      const startIntersections = new Date()
+      const intersections = s.getIntersections()
+      const intersectionsDuration = msSince(startIntersections)
 
-    // And that it was fast
-    // console.log({ duration })
-    expect(duration).toBeLessThan(250) // Getting ~125ms
+      // Confirm it calc'd intersections properly
+      expect(intersections.length).toBe(19)
+      expect(intersections[0].compromises[0]).toBe(expectedCompromises)
+
+      // And that it was fast
+      // console.log({ intersectionsDuration })
+      expect(intersectionsDuration).toBeLessThan(expectedTime)
+    })
   })
 })
