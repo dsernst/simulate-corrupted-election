@@ -1,8 +1,5 @@
 import { useSimulator } from '../useSimulator'
-import {
-  calculateConfusionMatrix,
-  TestRun,
-} from '../utils/calculateIntersections'
+import { TestRun } from '../utils/calculateIntersections'
 import { getIndentFromKey } from '../utils/createIntersections'
 import ConfusionMatrix from './ConfusionMatrix'
 import { IntersectionResultsLabel } from './IntersectionResultsLabel'
@@ -17,17 +14,8 @@ export function IntersectionResults() {
   console.timeEnd('getIntersections')
 
   // Confusion matrices for all pairs
-  const pairs = [
-    { first: 'A', second: 'B' },
-    { first: 'A', second: 'C' },
-    { first: 'B', second: 'C' },
-  ] as const
   console.time('calculateConfusionMatrix')
-  const confusionMatrices = pairs.map(({ first, second }) => ({
-    first,
-    matrix: calculateConfusionMatrix(testRuns, first, second),
-    second,
-  }))
+  const confusionMatrices = simulator.getConfusionMatrices()
   console.timeEnd('calculateConfusionMatrix')
 
   return (

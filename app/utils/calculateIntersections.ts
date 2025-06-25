@@ -5,6 +5,12 @@ import {
 } from './createIntersections'
 import { TestDetectionResults } from './simTests'
 
+export type ConfusionMatrices = {
+  first: TestType
+  matrix: ConfusionMatrix
+  second: TestType
+}[]
+
 export interface LayeredStat {
   compromises: (number | undefined)[]
   key: string
@@ -32,47 +38,28 @@ export interface VoteResult {
   testedC: boolean | undefined
 }
 
-export function calculateConfusionMatrix(
-  testRuns: TestRun[],
-  testType1: TestType,
-  testType2: TestType
-): {
+type ConfusionMatrix = {
   clean_clean: number
   clean_compromised: number
   compromised_clean: number
   compromised_compromised: number
   total: number
-} {
-  const voteMap = buildVoteMap(testRuns)
+}
 
-  let clean_clean = 0
-  let clean_compromised = 0
-  let compromised_clean = 0
-  let compromised_compromised = 0
-  let total = 0
+export function calculateAllConfusionMatrices(
+  testRuns: TestRun[]
+): ConfusionMatrices {
+  const pairs = [
+    { first: 'A', second: 'B' },
+    { first: 'A', second: 'C' },
+    { first: 'B', second: 'C' },
+  ] as const
 
-  voteMap.forEach((v) => {
-    const tested1 = v[`tested${testType1}`]
-    const tested2 = v[`tested${testType2}`]
-    if (tested1 && tested2) {
-      const result1 = v[`test${testType1}`]
-      const result2 = v[`test${testType2}`]
-      // true = compromised, false = clean
-      if (!result1 && !result2) clean_clean++
-      else if (!result1 && result2) clean_compromised++
-      else if (result1 && !result2) compromised_clean++
-      else if (result1 && result2) compromised_compromised++
-      total++
-    }
-  })
-
-  return {
-    clean_clean,
-    clean_compromised,
-    compromised_clean,
-    compromised_compromised,
-    total,
-  }
+  return pairs.map(({ first, second }) => ({
+    first,
+    matrix: calculateConfusionMatrix(testRuns, first, second),
+    second,
+  }))
 }
 
 export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
@@ -171,4 +158,41 @@ function buildVoteMap(testRuns: TestRun[]) {
     })
   })
   return voteMap
+}
+
+function calculateConfusionMatrix(
+  testRuns: TestRun[],
+  testType1: TestType,
+  testType2: TestType
+): ConfusionMatrix {
+  const voteMap = buildVoteMap(testRuns)
+
+  let clean_clean = 0
+  let clean_compromised = 0
+  let compromised_clean = 0
+  let compromised_compromised = 0
+  let total = 0
+
+  voteMap.forEach((v) => {
+    const tested1 = v[`tested${testType1}`]
+    const tested2 = v[`tested${testType2}`]
+    if (tested1 && tested2) {
+      const result1 = v[`test${testType1}`]
+      const result2 = v[`test${testType2}`]
+      // true = compromised, false = clean
+      if (!result1 && !result2) clean_clean++
+      else if (!result1 && result2) clean_compromised++
+      else if (result1 && !result2) compromised_clean++
+      else if (result1 && result2) compromised_compromised++
+      total++
+    }
+  })
+
+  return {
+    clean_clean,
+    clean_compromised,
+    compromised_clean,
+    compromised_compromised,
+    total,
+  }
 }

@@ -1,7 +1,9 @@
 import { LRUCache } from 'lru-cache'
 
 import {
+  calculateAllConfusionMatrices,
   calculateLayeredStats,
+  ConfusionMatrices,
   LayeredStat,
   TestRun,
 } from './calculateIntersections'
@@ -16,6 +18,9 @@ type VoteMap = Map<number, VoteTestResult>
 
 const _electionCache = new LRUCache<Seed, ElectionResults>({ max: 50 })
 const _intersectionCache = new LRUCache<CacheKey, LayeredStat[]>({ max: 20 })
+const _confusionMatricesCache = new LRUCache<CacheKey, ConfusionMatrices>({
+  max: 20,
+})
 
 const makeCacheKey = (seed: Seed, tests: TestsShorthand): CacheKey =>
   `${seed}.${tests}`
@@ -90,6 +95,21 @@ export class Simulator {
         tested: 0,
       }
     )
+  }
+
+  getConfusionMatrices(): ConfusionMatrices {
+    // Calc cache key from `seed` & `tests`
+    const cacheKey = makeCacheKey(this.seed, this.tests)
+
+    // Create cached copy on first access
+    if (!_confusionMatricesCache.has(cacheKey))
+      _confusionMatricesCache.set(
+        cacheKey,
+        calculateAllConfusionMatrices(this.testRuns)
+      )
+
+    // Always return cached copy
+    return _confusionMatricesCache.get(cacheKey)!
   }
 
   getIntersections(): LayeredStat[] {
