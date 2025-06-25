@@ -98,30 +98,15 @@ export class Simulator {
   }
 
   getConfusionMatrices(): ConfusionMatrices {
-    // Calc cache key from `seed` & `tests`
-    const cacheKey = makeCacheKey(this.seed, this.tests)
-
-    // Create cached copy on first access
-    if (!_confusionMatricesCache.has(cacheKey))
-      _confusionMatricesCache.set(
-        cacheKey,
-        calculateAllConfusionMatrices(this.testRuns)
-      )
-
-    // Always return cached copy
-    return _confusionMatricesCache.get(cacheKey)!
+    return this._getCachedResult(_confusionMatricesCache, () =>
+      calculateAllConfusionMatrices(this.testRuns)
+    )
   }
 
   getIntersections(): LayeredStat[] {
-    // Calc cache key from `seed` & `tests`
-    const cacheKey = makeCacheKey(this.seed, this.tests)
-
-    // Create cached copy on first access
-    if (!_intersectionCache.has(cacheKey))
-      _intersectionCache.set(cacheKey, calculateLayeredStats(this.testRuns))
-
-    // Always return cached copy
-    return _intersectionCache.get(cacheKey)!
+    return this._getCachedResult(_intersectionCache, () =>
+      calculateLayeredStats(this.testRuns)
+    )
   }
 
   runTests(testCounts: {
@@ -155,6 +140,20 @@ export class Simulator {
   /** Syntactic sugar for .runTests(testSet('a500b100')) */
   test(testsString: TestsShorthand): Simulator {
     return this.runTests(testSet(testsString))
+  }
+
+  /** Private helper to handle caching logic */
+  private _getCachedResult<T extends object>(
+    cache: LRUCache<CacheKey, T>,
+    calculateFn: () => T
+  ): T {
+    const cacheKey = makeCacheKey(this.seed, this.tests)
+
+    // Create cached copy on first access
+    if (!cache.has(cacheKey)) cache.set(cacheKey, calculateFn())
+
+    // Always return cached copy
+    return cache.get(cacheKey)!
   }
 }
 
