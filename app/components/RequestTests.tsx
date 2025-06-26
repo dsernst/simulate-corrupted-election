@@ -19,7 +19,7 @@ export interface TestResults {
 const TESTS = [
   {
     accuracy: 'Lowest',
-    accuracy_color: 'text-red-600',
+    accuracy_color: 'text-red-700',
     cost: DEFAULT_TEST_COSTS.testA,
     cost_color: 'text-green-700',
     cost_text: 'Lowest',
@@ -41,7 +41,7 @@ const TESTS = [
     accuracy: 'Perfect',
     accuracy_color: 'text-green-700',
     cost: DEFAULT_TEST_COSTS.testC,
-    cost_color: 'text-red-600',
+    cost_color: 'text-red-700',
     cost_text: 'High',
     key: 'testC' as const,
     label: 'Test C',
