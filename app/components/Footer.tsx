@@ -9,7 +9,7 @@ export const Footer = () => {
 
   return (
     <footer className="opacity-30 text-xs inline-flex gap-3">
-      <span>v{packageJson.version}</span>
+      <span>v{packageJson.version.replace(/\.0$/, '')}</span>
       {buildTimestamp && (
         <>
           <span>·</span>
