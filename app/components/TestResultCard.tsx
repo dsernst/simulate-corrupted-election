@@ -20,7 +20,7 @@ export function TestResultCard({
     >
       <h4 className="font-medium text-blue-800 mb-2">Test {testType}</h4>
       <p>Tests Ran: {count.toLocaleString()}</p>
-      <p className="mt-1.5">
+      <p className="mt-1.5 wrap-break-word">
         # Compromised: {detectedCompromised.toLocaleString()}
         <span className="ml-1 font-semibold text-black/80">
           ({percentage(detectedCompromised, count)})
