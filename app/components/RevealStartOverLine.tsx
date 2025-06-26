@@ -24,8 +24,9 @@ export const RevealStartOverLine = () => {
 
   return (
     <div className="space-y-2">
-      <div className="h-20 flex justify-between items-center">
+      <div className="h-30 flex justify-between items-center">
         {!compromisedShown ? (
+          // Button to reveal compromised votes
           <Button
             className="text-sm flex-1 mr-2"
             onClick={() => setCompromisedShown(!compromisedShown)}
@@ -34,15 +35,16 @@ export const RevealStartOverLine = () => {
             👀 Reveal Compromised Votes
           </Button>
         ) : (
-          <div className="p-4 bg-red-50 rounded-lg flex-1 mr-2">
-            <p className="text-lg text-red-700">
-              Compromised Votes: {election.compromisedVotes.toLocaleString()}
-              <span className="text-red-600 ml-2">
-                ({election.compromisedPercentage.toFixed(2)}% of total)
-              </span>
-            </p>
+          // Revealed Compromised Votes
+          <div className="p-3 bg-red-50 rounded-lg flex-1 mr-2 sm:text-lg text-sm text-red-700 gap-2 flex sm:flex-row flex-col justify-center text-center">
+            Compromised Votes: {election.compromisedVotes.toLocaleString()}
+            <span className="text-red-600">
+              ({election.compromisedPercentage.toFixed(2)}% of total)
+            </span>
           </div>
         )}
+
+        {/* Start Over w/ Dropdown*/}
         <div className="flex items-center relative">
           <Button
             className="text-sm py-2 !px-3.5 rounded-r-none"
@@ -54,6 +56,8 @@ export const RevealStartOverLine = () => {
           >
             ♻️ Start Over
           </Button>
+
+          {/* Dropdown */}
           <Button
             aria-label={seedInputShown ? 'Hide seed input' : 'Show seed input'}
             className="!py-3.5 !px-1 !ml-0 rounded-l-none relative right-0.5"
