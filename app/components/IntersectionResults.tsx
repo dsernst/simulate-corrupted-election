@@ -1,3 +1,5 @@
+import { BsTabletLandscape } from 'react-icons/bs'
+
 import { useSimulator } from '../useSimulator'
 import { TestRun } from '../utils/calculateIntersections'
 import { getIndentFromKey } from '../utils/createIntersections'
@@ -23,76 +25,91 @@ export function IntersectionResults() {
       <h3 className="text-xl font-semibold text-gray-800 mb-4">
         Intersection Results
       </h3>
-      <div className="overflow-x-auto mb-8">
-        <table className="min-w-full text-sm text-center">
-          <thead>
-            <tr className="bg-gray-100 font-semibold text-gray-700">
-              <th className="px-4 py-2 text-left">Tested By</th>
-              <th className="px-4 py-2">% Compromised</th>
-              <th className="px-4 py-2"># Compromised</th>
-              <th className="px-4 py-2"># Tested</th>
-            </tr>
-          </thead>
-          <tbody>
-            {layeredStats.map(({ compromises, key, percentages, tested }) => {
-              // Hide intersection rows for tests that were never run
-              for (const [ranKey, value] of Object.entries(ran)) {
-                if (!value && key.includes(ranKey)) return null
-              }
 
-              return (
-                <tr
-                  className={`${
-                    !tested && 'opacity-20'
-                  } border-t border-gray-200`}
-                  key={key}
-                >
-                  <td
-                    className="px-4 py-2 whitespace-nowrap text-left"
-                    style={{
-                      paddingLeft: `${Math.max(
-                        getIndentFromKey(key) * 2,
-                        0.5
-                      )}em`,
-                    }}
-                  >
-                    <IntersectionResultsLabel label={key} tested={tested} />
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    {percentages
-                      .map((s) => (s !== undefined ? `${s}%` : null))
-                      .filter(Boolean)
-                      .join(' | ')}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    {compromises
-                      .map((s) => (s !== undefined ? s.toLocaleString() : null))
-                      .filter(Boolean)
-                      .join(' | ')}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    {tested.toLocaleString()}
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+      {/* ScreenTooNarrow error */}
+      <div className="sm:hidden block text-center text-gray-600">
+        Screen too narrow
+        <div className="animate-pulse flex items-center justify-center text-orange-800">
+          <BsTabletLandscape className="inline mr-2" />
+          Rotate device to show results
+        </div>
       </div>
 
-      {/* Confusion Matrices Section */}
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">
-        Pairwise Confusion Matrices
-      </h3>
-      <div className="flex flex-col items-center">
-        {confusionMatrices.map(({ first, matrix, second }) => (
-          <div
-            className="overflow-x-auto max-w-full mb-8"
-            key={`${first}-${second}`}
-          >
-            <ConfusionMatrix first={first} matrix={matrix} second={second} />
-          </div>
-        ))}
+      {/* Main content */}
+      <div className="sm:block hidden">
+        <div className="overflow-x-auto mb-8">
+          <table className="min-w-full text-sm text-center">
+            <thead>
+              <tr className="bg-gray-100 font-semibold text-gray-700">
+                <th className="px-4 py-2 text-left">Tested By</th>
+                <th className="px-4 py-2">% Compromised</th>
+                <th className="px-4 py-2"># Compromised</th>
+                <th className="px-4 py-2"># Tested</th>
+              </tr>
+            </thead>
+            <tbody>
+              {layeredStats.map(({ compromises, key, percentages, tested }) => {
+                // Hide intersection rows for tests that were never run
+                for (const [ranKey, value] of Object.entries(ran)) {
+                  if (!value && key.includes(ranKey)) return null
+                }
+
+                return (
+                  <tr
+                    className={`${
+                      !tested && 'opacity-20'
+                    } border-t border-gray-200`}
+                    key={key}
+                  >
+                    <td
+                      className="px-4 py-2 whitespace-nowrap text-left"
+                      style={{
+                        paddingLeft: `${Math.max(
+                          getIndentFromKey(key) * 2,
+                          0.5
+                        )}em`,
+                      }}
+                    >
+                      <IntersectionResultsLabel label={key} tested={tested} />
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {percentages
+                        .map((s) => (s !== undefined ? `${s}%` : null))
+                        .filter(Boolean)
+                        .join(' | ')}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {compromises
+                        .map((s) =>
+                          s !== undefined ? s.toLocaleString() : null
+                        )
+                        .filter(Boolean)
+                        .join(' | ')}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {tested.toLocaleString()}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Confusion Matrices Section */}
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          Pairwise Confusion Matrices
+        </h3>
+        <div className="flex flex-col items-center">
+          {confusionMatrices.map(({ first, matrix, second }) => (
+            <div
+              className="overflow-x-auto max-w-full mb-8"
+              key={`${first}-${second}`}
+            >
+              <ConfusionMatrix first={first} matrix={matrix} second={second} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
