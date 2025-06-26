@@ -67,4 +67,24 @@ describe('makeElection', () => {
     const result2 = makeElection(mt2)
     expect(result2).not.toBeEmptyObject()
   })
+
+  it('should create roughly 50/50 odds of flipping the election', () => {
+    const mt = new MT19937(42)
+    let flips = 0
+    const trials = 10000
+
+    for (let i = 0; i < trials; i++) {
+      const result = makeElection(mt)
+      const marginOfVictory = result.winnerVotes - result.runnerUpVotes
+      const marginToFlip = marginOfVictory / 2
+      if (result.compromisedVotes >= marginToFlip) flips++
+    }
+
+    const flipRate = flips / trials
+    // Should be roughly 50% (allowing for some variance)
+    const variance = 0.02
+    expect(flipRate).toBeGreaterThan(0.5 - variance)
+    expect(flipRate).toBeLessThan(0.5 + variance)
+    expect(flipRate).not.toBe(0.5) // But not exactly 50%
+  })
 })
