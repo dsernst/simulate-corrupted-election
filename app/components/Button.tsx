@@ -11,7 +11,7 @@ export function Button({
   disabled?: boolean
   fullWidth?: boolean
   onClick: () => void
-  variant?: 'outline' | 'primary' | 'success'
+  variant?: 'outline' | 'primary'
 }) {
   const baseClasses =
     'px-6 py-3 rounded-lg transition-colors text-lg font-semibold'
@@ -19,7 +19,6 @@ export function Button({
     outline:
       'bg-white text-purple-800 border-2 border-purple-600 hover:bg-purple-50',
     primary: 'bg-purple-600 hover:bg-purple-700 text-white',
-    success: 'bg-green-600 hover:bg-green-700 text-white',
   }
   const widthClass = fullWidth ? 'w-full' : ''
   const disabledClass = disabled
