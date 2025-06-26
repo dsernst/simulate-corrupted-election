@@ -10,7 +10,7 @@ export function PreliminaryResults() {
   } = useSimulator()
 
   return (
-    <div className="space-y-2 mb-8">
+    <div className="space-y-2">
       <h2 className="text-2xl font-bold mb-4">Preliminary Results</h2>
 
       <p className="text-lg">

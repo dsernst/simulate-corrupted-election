@@ -6,17 +6,16 @@ import { TestHistory } from './TestHistory'
 
 export function SimulatedContent() {
   return (
-    <div className="mt-8 p-6 bg-white shadow-lg rounded-lg w-full max-w-3xl">
+    <div className="mt-8 p-6 shadow-lg rounded-lg w-full max-w-3xl border border-gray-200/80">
       <PreliminaryResults />
 
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <div className="space-y-4">
-          <TestHistory />
-          <IntersectionResults />
-          <RequestTests />
-          <RevealStartOverLine />
-        </div>
-      </div>
+      {/* Gray divider */}
+      <div className="border-t border-gray-200 my-8" />
+
+      <TestHistory />
+      <IntersectionResults />
+      <RequestTests />
+      <RevealStartOverLine />
     </div>
   )
 }
