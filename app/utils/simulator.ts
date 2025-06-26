@@ -61,7 +61,7 @@ export class Simulator {
   private _voteMap: VoteMap
 
   constructor(seed?: number, tests = '') {
-    const initialSeed = seed ?? generateRandomSeed()
+    const initialSeed = seed ?? Math.floor(Math.random() * 0x100000)
 
     // Init public state
     this.seed = initialSeed
@@ -150,8 +150,4 @@ export class Simulator {
     // Always return cached copy
     return cache.get(cacheKey)!
   }
-}
-
-function generateRandomSeed(): number {
-  return Math.floor(Math.random() * 0x100000)
 }
