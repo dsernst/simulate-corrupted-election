@@ -16,11 +16,10 @@ type CacheKey = `${Seed}.${TestsShorthand}`
 type Seed = number
 type VoteMap = Map<number, VoteTestResult>
 
-const _electionCache = new LRUCache<CacheKey, ElectionResults>({ max: 50 })
-const _intersectionCache = new LRUCache<CacheKey, LayeredStat[]>({ max: 20 })
-const _confusionMatricesCache = new LRUCache<CacheKey, ConfusionMatrices>({
-  max: 20,
-})
+const makeCache = <T extends object>() => new LRUCache<CacheKey, T>({ max: 20 })
+const _electionCache = makeCache<ElectionResults>()
+const _intersectionCache = makeCache<LayeredStat[]>()
+const _confusionMatricesCache = makeCache<ConfusionMatrices>()
 
 const makeCacheKey = (seed: Seed, tests: TestsShorthand): CacheKey =>
   `${seed}.${tests}`
