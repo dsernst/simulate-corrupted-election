@@ -48,7 +48,7 @@ export const RevealStartOverLine = () => {
         {/* Start Over w/ Dropdown*/}
         <div className="flex items-center relative">
           <Button
-            className="text-sm py-2 !px-3.5 rounded-r-none"
+            className="text-sm min-[413px]:!py-3 !py-8 !px-3.5 rounded-r-none"
             onClick={() => {
               startOver()
               setCompromisedShown(false)
@@ -61,7 +61,7 @@ export const RevealStartOverLine = () => {
           {/* Dropdown */}
           <Button
             aria-label={seedInputShown ? 'Hide seed input' : 'Show seed input'}
-            className="!py-3.5 !px-1 !ml-0 rounded-l-none relative right-0.5"
+            className="min-[413px]:!py-3.5 !py-8.5 !px-1 !ml-0 rounded-l-none relative right-0.5"
             onClick={() => setSeedInputShown(!seedInputShown)}
             variant="outline"
           >
@@ -75,7 +75,7 @@ export const RevealStartOverLine = () => {
           {/* Seed input */}
           {seedInputShown && (
             <div
-              className="absolute -right-3 top-12 bg-white border border-gray-200 rounded shadow-md flex gap-2 items-center px-3 py-2 z-10"
+              className="absolute -right-3 min-[413px]:top-12 top-23 bg-white border border-gray-200 rounded shadow-md flex gap-2 items-center px-3 py-2 z-10"
               style={{ minWidth: 0 }}
             >
               <IoDiceOutline
