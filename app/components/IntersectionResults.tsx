@@ -19,7 +19,7 @@ export function IntersectionResults() {
   console.timeEnd('calculateConfusionMatrix')
 
   return (
-    <div className="mt-8 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="mt-8 p-6 rounded-lg shadow-sm border border-gray-200">
       <h3 className="text-xl font-semibold text-gray-800 mb-4">
         Intersection Results
       </h3>
