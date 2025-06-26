@@ -81,7 +81,7 @@ export function IntersectionResults() {
       </div>
 
       {/* Confusion Matrices Section */}
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">
         Pairwise Confusion Matrices
       </h3>
       <div className="flex flex-col items-center">

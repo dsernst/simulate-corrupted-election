@@ -87,7 +87,7 @@ const ConfusionMatrix = ({
                 </div>
               </th>
               <th
-                className={` border border-gray-300 px-6 py-4 ${topRightColor}`}
+                className={`border border-gray-300 px-6 py-4 ${topRightColor}`}
               >
                 Compromised
                 <div className="text-xs text-gray-600 font-normal mt-0.5">
