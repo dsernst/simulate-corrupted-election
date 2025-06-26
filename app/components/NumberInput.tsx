@@ -22,7 +22,7 @@ export function NumberInput({
       </label>
       <input
         autoFocus={autoFocus}
-        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
         id={id}
         inputMode="numeric"
         onChange={(e) => onChange(parseNumberInput(e.target.value))}
@@ -33,7 +33,7 @@ export function NumberInput({
           }
         }}
         pattern="[0-9,kmKM]*"
-        placeholder="Enter count"
+        placeholder="Count?"
         type="text"
         value={formatNumberWithCommas(value)}
       />
