@@ -21,9 +21,6 @@ const _electionCache = makeCache<ElectionResults>()
 const _intersectionCache = makeCache<LayeredStat[]>()
 const _confusionMatricesCache = makeCache<ConfusionMatrices>()
 
-const makeCacheKey = (seed: Seed, tests: TestsShorthand): CacheKey =>
-  `${seed}.${tests}`
-
 export class Simulator {
   public seed: number
   public tests: TestsShorthand = ''
@@ -143,7 +140,9 @@ export class Simulator {
     calculateFn: () => T,
     options: { seedOnly?: boolean } = {}
   ): T {
-    const cacheKey = makeCacheKey(this.seed, options.seedOnly ? '' : this.tests)
+    const cacheKey = `${this.seed}.${
+      !options.seedOnly ? this.tests : ''
+    }` as CacheKey
 
     // Create cached copy on first access
     if (!cache.has(cacheKey)) cache.set(cacheKey, calculateFn())
