@@ -16,7 +16,7 @@ type CacheKey = `${Seed}.${TestsShorthand}`
 type Seed = number
 type VoteMap = Map<number, VoteTestResult>
 
-const _electionCache = new LRUCache<Seed, ElectionResults>({ max: 50 })
+const _electionCache = new LRUCache<CacheKey, ElectionResults>({ max: 50 })
 const _intersectionCache = new LRUCache<CacheKey, LayeredStat[]>({ max: 20 })
 const _confusionMatricesCache = new LRUCache<CacheKey, ConfusionMatrices>({
   max: 20,
@@ -31,12 +31,11 @@ export class Simulator {
 
   /** Memoized election results from seed */
   public get election(): ElectionResults {
-    // Create cached copy on first access
-    if (!_electionCache.has(this.seed))
-      _electionCache.set(this.seed, makeElection(new MT19937(this.seed)))
-
-    // Always return cached copy
-    return _electionCache.get(this.seed)!
+    return this._getCachedResult(
+      _electionCache,
+      () => makeElection(new MT19937(this.seed)),
+      { seedOnly: true }
+    )
   }
 
   public get testRuns(): TestRun[] {
@@ -142,9 +141,10 @@ export class Simulator {
   /** Private helper to handle caching logic */
   private _getCachedResult<T extends object>(
     cache: LRUCache<CacheKey, T>,
-    calculateFn: () => T
+    calculateFn: () => T,
+    options: { seedOnly?: boolean } = {}
   ): T {
-    const cacheKey = makeCacheKey(this.seed, this.tests)
+    const cacheKey = makeCacheKey(this.seed, options.seedOnly ? '' : this.tests)
 
     // Create cached copy on first access
     if (!cache.has(cacheKey)) cache.set(cacheKey, calculateFn())
