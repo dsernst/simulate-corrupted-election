@@ -63,15 +63,7 @@ const ConfusionMatrix = ({
           {/* Header rows */}
           <thead>
             <tr>
-              <th
-                className="bg-gray-300/80 border border-gray-400/70"
-                rowSpan={2}
-              >
-                Total
-                <div className="text-xs text-gray-600 font-normal mt-0.5">
-                  {grandTotal.toLocaleString()}
-                </div>
-              </th>
+              <th />
               <th
                 className={`border border-gray-400/65 py-1 ${topRightColor}`}
                 colSpan={2}
@@ -80,6 +72,12 @@ const ConfusionMatrix = ({
               </th>
             </tr>
             <tr>
+              <th className="bg-gray-300/80 border border-gray-400/70">
+                Total
+                <div className="text-xs text-gray-600 font-normal mt-0.5">
+                  {grandTotal.toLocaleString()}
+                </div>
+              </th>
               <th className={`border border-gray-300 px-6 ${topRightColor}`}>
                 Clean
                 <div className="text-xs text-gray-600 font-normal mt-0.5">
