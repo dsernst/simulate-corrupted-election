@@ -4,7 +4,7 @@ const testColors = {
   C: 'bg-purple-200/60',
 }
 
-const ConfusionMatrix = ({
+export const ConfusionMatrix = ({
   first,
   matrix,
   second,
@@ -146,5 +146,3 @@ const ConfusionMatrix = ({
     </div>
   )
 }
-
-export default ConfusionMatrix

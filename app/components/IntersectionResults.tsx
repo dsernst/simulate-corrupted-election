@@ -1,7 +1,7 @@
 import { useSimulator } from '../useSimulator'
 import { TestRun } from '../utils/calculateIntersections'
 import { getIndentFromKey } from '../utils/createIntersections'
-import ConfusionMatrix from './ConfusionMatrix'
+import { ConfusionMatrix } from './ConfusionMatrix'
 import { IntersectionResultsLabel } from './IntersectionResultsLabel'
 
 export function IntersectionResults() {
