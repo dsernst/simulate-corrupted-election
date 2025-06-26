@@ -18,22 +18,31 @@ export interface TestResults {
 
 const TESTS = [
   {
+    accuracy: 'Lowest',
+    accuracy_color: 'text-red-600',
     cost: DEFAULT_TEST_COSTS.testA,
-    description: 'Easiest, but least reliable',
+    cost_color: 'text-green-700',
+    cost_text: 'Lowest',
     key: 'testA' as const,
     label: 'Test A',
     subtitle: 'Voter Autonomous',
   },
   {
+    accuracy: 'Medium',
+    accuracy_color: 'text-yellow-600',
     cost: DEFAULT_TEST_COSTS.testB,
-    description: 'Medium cost & reliability',
+    cost_color: 'text-yellow-600',
+    cost_text: 'Medium',
     key: 'testB' as const,
     label: 'Test B',
     subtitle: 'Guided by Auditor',
   },
   {
+    accuracy: 'Perfect',
+    accuracy_color: 'text-green-700',
     cost: DEFAULT_TEST_COSTS.testC,
-    description: 'Highest cost, perfect accuracy',
+    cost_color: 'text-red-600',
+    cost_text: 'High',
     key: 'testC' as const,
     label: 'Test C',
     subtitle: 'Vs In-person Paper',
@@ -80,31 +89,57 @@ export function RequestTests() {
       </h3>
       <div className="space-y-4">
         <div className="grid grid-cols-3 gap-4">
-          {TESTS.map(({ cost, description, key, label, subtitle }, index) => (
-            <div key={key}>
-              <div className="mb-2">
-                <div className="text-xs text-gray-500">{subtitle}</div>
-                <div className="text-sm text-gray-600">
-                  {description}
-                  <div className="mt-2">
-                    <span className="border-2 border-green-600/40 px-1 py-0.5 text-gray-500 rounded-lg">
-                      {formatCost(cost)} / vote
-                    </span>
+          {TESTS.map(
+            (
+              {
+                accuracy,
+                accuracy_color,
+                cost,
+                cost_color,
+                cost_text,
+                key,
+                label,
+                subtitle,
+              },
+              index
+            ) => (
+              <div key={key}>
+                <div className="mb-2">
+                  <div className="text-xs text-gray-600">{subtitle}</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    <span className={`${accuracy_color} font-semibold`}>
+                      {accuracy}
+                    </span>{' '}
+                    accuracy
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    <span className={`${cost_color} font-semibold`}>
+                      {cost_text}
+                    </span>{' '}
+                    cost
+                  </div>
+
+                  <div className="text-sm text-gray-600">
+                    <div className="mt-2">
+                      <span className="border-2 border-green-600/40 px-1 py-0.5 text-gray-500 rounded-lg">
+                        {formatCost(cost)} / vote
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <NumberInput
+                  autoFocus={index === 0}
+                  id={key}
+                  label={label}
+                  onChange={(value) =>
+                    setRequestedTests({ ...requestedTests, [key]: value })
+                  }
+                  onEnterKey={handleSubmit}
+                  value={requestedTests[key]}
+                />
               </div>
-              <NumberInput
-                autoFocus={index === 0}
-                id={key}
-                label={label}
-                onChange={(value) =>
-                  setRequestedTests({ ...requestedTests, [key]: value })
-                }
-                onEnterKey={handleSubmit}
-                value={requestedTests[key]}
-              />
-            </div>
-          ))}
+            )
+          )}
         </div>
         <div className="flex justify-between items-center">
           <div className="text-sm text-gray-600">
