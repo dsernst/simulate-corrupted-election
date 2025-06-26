@@ -101,7 +101,6 @@ export function RequestTests() {
                   setRequestedTests({ ...requestedTests, [key]: value })
                 }
                 onEnterKey={handleSubmit}
-                placeholder="Enter count"
                 value={requestedTests[key]}
               />
             </div>

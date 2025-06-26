@@ -4,7 +4,6 @@ interface NumberInputProps {
   label: string
   onChange: (value: string) => void
   onEnterKey?: () => void
-  placeholder?: string
   value: string
 }
 
@@ -14,7 +13,6 @@ export function NumberInput({
   label,
   onChange,
   onEnterKey,
-  placeholder = 'Enter quantity',
   value,
 }: NumberInputProps) {
   return (
@@ -35,7 +33,7 @@ export function NumberInput({
           }
         }}
         pattern="[0-9,kmKM]*"
-        placeholder={placeholder}
+        placeholder="Enter count"
         type="text"
         value={formatNumberWithCommas(value)}
       />
