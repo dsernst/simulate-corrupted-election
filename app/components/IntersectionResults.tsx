@@ -34,52 +34,48 @@ export function IntersectionResults() {
             </tr>
           </thead>
           <tbody>
-            {layeredStats.map(
-              ({ compromises, key, label, percentages, tested }) => {
-                // Hide intersection rows for tests that were never run
-                for (const [key, value] of Object.entries(ran)) {
-                  if (!value && label.includes(key)) return null
-                }
-
-                return (
-                  <tr
-                    className={`${
-                      !tested && 'opacity-20'
-                    } border-t border-gray-200`}
-                    key={label}
-                  >
-                    <td
-                      className="px-4 py-2 whitespace-nowrap text-left"
-                      style={{
-                        paddingLeft: `${Math.max(
-                          getIndentFromKey(key) * 2,
-                          0.5
-                        )}em`,
-                      }}
-                    >
-                      <IntersectionResultsLabel label={label} tested={tested} />
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap">
-                      {percentages
-                        .map((s) => (s !== undefined ? `${s}%` : null))
-                        .filter(Boolean)
-                        .join(' | ')}
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap">
-                      {compromises
-                        .map((s) =>
-                          s !== undefined ? s.toLocaleString() : null
-                        )
-                        .filter(Boolean)
-                        .join(' | ')}
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap">
-                      {tested.toLocaleString()}
-                    </td>
-                  </tr>
-                )
+            {layeredStats.map(({ compromises, key, percentages, tested }) => {
+              // Hide intersection rows for tests that were never run
+              for (const [ranKey, value] of Object.entries(ran)) {
+                if (!value && key.includes(ranKey)) return null
               }
-            )}
+
+              return (
+                <tr
+                  className={`${
+                    !tested && 'opacity-20'
+                  } border-t border-gray-200`}
+                  key={key}
+                >
+                  <td
+                    className="px-4 py-2 whitespace-nowrap text-left"
+                    style={{
+                      paddingLeft: `${Math.max(
+                        getIndentFromKey(key) * 2,
+                        0.5
+                      )}em`,
+                    }}
+                  >
+                    <IntersectionResultsLabel label={key} tested={tested} />
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    {percentages
+                      .map((s) => (s !== undefined ? `${s}%` : null))
+                      .filter(Boolean)
+                      .join(' | ')}
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    {compromises
+                      .map((s) => (s !== undefined ? s.toLocaleString() : null))
+                      .filter(Boolean)
+                      .join(' | ')}
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    {tested.toLocaleString()}
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>

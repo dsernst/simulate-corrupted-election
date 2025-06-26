@@ -16,7 +16,6 @@ export type ConfusionMatrices = {
 export interface LayeredStat {
   compromises: (number | undefined)[]
   key: string
-  label: string
   percentages: (number | undefined)[]
   tested: number
 }
@@ -102,7 +101,6 @@ export function calculateLayeredStats(testRuns: TestRun[]): LayeredStat[] {
     return {
       compromises,
       key,
-      label: key, // For now, label is an alias to key
       percentages: getMarginalCompromisedPercents(votes, compromises),
       tested: votes.length,
     }

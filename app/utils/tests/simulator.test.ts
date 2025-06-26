@@ -360,7 +360,7 @@ describe('Refactored Simulator', () => {
 
     // Manual way:
     const stats = sim.getIntersections()
-    const get = (label: string) => stats.find((g) => g.label === label)
+    const get = (key: string) => stats.find((g) => g.key === key)
     expect(get('A')?.tested).toBe(10)
     expect(get('B')?.tested).toBe(0)
     expect(get('AB')?.tested).toBe(0)

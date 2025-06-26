@@ -57,7 +57,7 @@ describe('calculateLayeredStats', () => {
     ].map(makeTestRun)
 
     const stats = calculateLayeredStats(testRuns)
-    const get = (label: string) => stats.find((g) => g.label === label)
+    const get = (key: string) => stats.find((g) => g.key === key)
 
     expect(get('A')?.tested).toBe(2)
     expect(get('B')?.tested).toBe(2)
@@ -81,7 +81,7 @@ describe('calculateLayeredStats', () => {
     ].map(makeTestRun)
 
     const stats = calculateLayeredStats(testRuns)
-    const get = (label: string) => stats.find((g) => g.label === label)
+    const get = (key: string) => stats.find((g) => g.key === key)
 
     expect(get('A')?.tested).toBe(3) // votes 1,2,4
     expect(get('B')?.tested).toBe(4) // votes 1,2,3,5
@@ -107,7 +107,7 @@ describe('calculateLayeredStats - overlap scenarios', () => {
     }))
     const testRuns: TestRun[] = [makeTestRun({ A: votes, B: votes })]
     const stats = calculateLayeredStats(testRuns)
-    const get = (label: string) => stats.find((g) => g.label === label)
+    const get = (key: string) => stats.find((g) => g.key === key)
     expect(get('A')?.tested).toBe(400)
     expect(get('B')?.tested).toBe(400)
     expect(get('AB')?.tested).toBe(400)
@@ -128,7 +128,7 @@ describe('calculateLayeredStats - overlap scenarios', () => {
     }))
     const testRuns: TestRun[] = [makeTestRun({ A: votesA, B: votesB })]
     const stats = calculateLayeredStats(testRuns)
-    const get = (label: string) => stats.find((g) => g.label === label)
+    const get = (key: string) => stats.find((g) => g.key === key)
     expect(get('A')?.tested).toBe(400)
     expect(get('B')?.tested).toBe(400)
     expect(get('AB')?.tested).toBe(0)
@@ -149,7 +149,7 @@ describe('calculateLayeredStats - overlap scenarios', () => {
     }))
     const testRuns: TestRun[] = [makeTestRun({ A: votesA, B: votesB })]
     const stats = calculateLayeredStats(testRuns)
-    const get = (label: string) => stats.find((g) => g.label === label)
+    const get = (key: string) => stats.find((g) => g.key === key)
     expect(get('A')?.tested).toBe(400)
     expect(get('B')?.tested).toBe(400)
     expect(get('AB')?.tested).toBe(200) // 201-400
@@ -170,7 +170,7 @@ describe('calculateLayeredStats - overlap scenarios', () => {
     }))
     const testRuns: TestRun[] = [makeTestRun({ A: votesA, B: votesB })]
     const stats = calculateLayeredStats(testRuns)
-    const get = (label: string) => stats.find((g) => g.label === label)
+    const get = (key: string) => stats.find((g) => g.key === key)
     expect(get('A')?.tested).toBe(400)
     expect(get('B')?.tested).toBe(1194)
     // Overlap is 201-400 (200 votes)
@@ -231,7 +231,7 @@ describe('calculateLayeredStats - with simTests', () => {
       { id: 4, results: resultsB2, testTime: 1, timestamp: new Date() },
     ]
     const stats = calculateLayeredStats(testRuns)
-    const get = (label: string) => stats.find((g) => g.label === label)
+    const get = (key: string) => stats.find((g) => g.key === key)
     // The number of unique votes tested by A should be 400 + 100 = 500
     expect(get('A')?.tested).toBe(500)
     // The number of unique votes tested by B should be 1194 + 100 = 1294
@@ -268,7 +268,7 @@ describe('calculateLayeredStats - with simTests', () => {
     ]
 
     const stats = calculateLayeredStats(testRuns)
-    const get = (label: string) => stats.find((g) => g.label === label)
+    const get = (key: string) => stats.find((g) => g.key === key)
     expect(get('A')?.tested).toBe(1500)
   })
 
@@ -302,7 +302,7 @@ describe('calculateLayeredStats - with simTests', () => {
       { id: 2, results: results2, testTime: 1, timestamp: new Date() },
     ]
     const stats = calculateLayeredStats(testRuns)
-    const get = (label: string) => stats.find((g) => g.label === label)
+    const get = (key: string) => stats.find((g) => g.key === key)
     expect(get('A')?.tested).toBe(1500)
   })
 })

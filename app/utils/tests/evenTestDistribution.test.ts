@@ -19,7 +19,7 @@ describe('Even test distribution', () => {
 
     // Get intersections
     const intersections = simulator.getIntersections()
-    const get = (label: string) => intersections.find((g) => g.label === label)
+    const get = (key: string) => intersections.find((g) => g.key === key)
 
     // Verify B tests are split roughly 50/50
     const AB = get('AB')?.tested ?? 0
@@ -41,7 +41,7 @@ describe('Even test distribution', () => {
 
     // Get intersections
     const intersections = simulator.getIntersections()
-    const get = (label: string) => intersections.find((g) => g.label === label)
+    const get = (key: string) => intersections.find((g) => g.key === key)
 
     // Get the intersection counts for C tests
     const ABC = get('ABC')?.tested ?? 0

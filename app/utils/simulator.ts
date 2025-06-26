@@ -85,12 +85,9 @@ export class Simulator {
   /** Syntactic sugar for .getIntersections().find(stat => stat.label === testSetShorthand) */
   get(intersectionKey: TestsShorthand): LayeredStat {
     return (
-      this.getIntersections().find(
-        (stat) => stat.label === intersectionKey
-      ) || {
+      this.getIntersections().find((stat) => stat.key === intersectionKey) || {
         compromises: [],
         key: intersectionKey,
-        label: intersectionKey,
         percentages: [],
         tested: 0,
       }
