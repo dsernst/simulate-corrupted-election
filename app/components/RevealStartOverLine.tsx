@@ -20,6 +20,7 @@ export const RevealStartOverLine = () => {
   const startOverWithSeed = () => {
     startOver(inputSeed)
     setSeedInputShown(false)
+    setCompromisedShown(false)
   }
 
   return (
