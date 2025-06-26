@@ -84,6 +84,8 @@ export function calculateTotalTestRunsCost(
  * @returns Formatted cost string (e.g. "$1,234" or "$1,234.56")
  */
 export function formatCost(cost: number): string {
+  if (cost && cost < 1) return (cost * 100).toLocaleString() + '¢'
+
   // If the number has any decimal places, show exactly 2
   const hasDecimals = cost % 1 !== 0
   return new Intl.NumberFormat('en-US', {

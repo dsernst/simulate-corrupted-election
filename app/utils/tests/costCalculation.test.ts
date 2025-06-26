@@ -50,9 +50,9 @@ describe('costCalculation', () => {
   it('formats costs as currency', () => {
     expect(formatCost(1234.56)).toBe('$1,234.56')
     expect(formatCost(0)).toBe('$0')
-    expect(formatCost(0.1)).toBe('$0.10')
+    expect(formatCost(0.1)).toBe('10¢')
     expect(formatCost(1000000)).toBe('$1,000,000')
-    expect(formatCost(0.01)).toBe('$0.01')
+    expect(formatCost(0.01)).toBe('1¢')
     expect(formatCost(1)).toBe('$1')
     expect(formatCost(1.5)).toBe('$1.50')
     expect(formatCost(1.05)).toBe('$1.05')
