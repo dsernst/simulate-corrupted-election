@@ -17,8 +17,9 @@ export function Button({
     'px-6 py-3 rounded-lg transition-colors text-lg font-semibold'
   const variantClasses = {
     outline:
-      'bg-white text-purple-800 border-2 border-purple-600 hover:bg-purple-50',
-    primary: 'bg-purple-600 hover:bg-purple-700 text-white',
+      'bg-white text-purple-800 border-2 border-purple-600 hover:bg-purple-50 active:bg-purple-100',
+    primary:
+      'bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white',
   }
   const widthClass = fullWidth ? 'w-full' : ''
   const disabledClass = disabled
