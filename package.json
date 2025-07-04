@@ -9,7 +9,8 @@
     "lint": "next lint",
     "test": "bun test",
     "testslow": "bun scripts/find-slow-tests.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "cli": "node cli.js"
   },
   "dependencies": {
     "lru-cache": "^11.1.0",
