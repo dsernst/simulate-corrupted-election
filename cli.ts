@@ -92,7 +92,7 @@ function printUsage() {
   console.log(`
 Election Simulator CLI
 
-Usage: node cli.js <command> [options]
+Usage: npx tsx cli.ts <command> [options]
 
 Commands:
   election              - Generate election results for a seed
@@ -106,12 +106,12 @@ Options:
   --tests <string>      - Test configuration (e.g., "a500b100c50")
 
 Examples:
-  node cli.js election --seed 12345
-  node cli.js run-tests --seed 12345 --tests "a500b100"
-  node cli.js full-simulation --seed 12345 --tests "a500b100c50"
+  npx tsx cli.ts election --seed 12345
+  npx tsx cli.ts run-tests --seed 12345 --tests "a500b100"
+  npx tsx cli.ts full-simulation --seed 12345 --tests "a500b100c50"
 
 Input format (for programmatic use):
-  echo '{"command": "election", "seed": 12345}' | node cli.js
+  echo '{"command": "election", "seed": 12345}' | npx tsx cli.ts
 `)
 }
 
