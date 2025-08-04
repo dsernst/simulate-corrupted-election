@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { Simulator } from './app/utils/simulator'
+import packageJson from './package.json'
 
 interface CLIInput {
   command:
@@ -90,7 +91,7 @@ function parseArgs(): CLIInput {
 
 function printUsage() {
   console.log(`
-Election Simulator CLI
+Election Simulator CLI v${packageJson.version.replace(/\.0$/, '')}
 
 Usage: npx tsx cli.ts <command> [options]
 
