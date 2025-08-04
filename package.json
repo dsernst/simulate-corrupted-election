@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": ". scripts/build",
+    "build-cli": "bun build ./cli.ts --compile --outfile simulator",
     "start": "next start",
     "lint": "next lint",
     "test": "bun test",
