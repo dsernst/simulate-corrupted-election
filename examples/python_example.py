@@ -19,7 +19,7 @@ def call_simulator_cli(input_data):
         dict: The JSON response from the CLI
     """
     # Get the path to the CLI script
-    cli_path = Path(__file__).parent.parent / "cli.ts"
+    cli_path = Path(__file__).parent.parent / "simulator"
 
     try:
         # Convert input to JSON string
@@ -27,7 +27,7 @@ def call_simulator_cli(input_data):
 
         # Call the CLI with JSON input via stdin
         result = subprocess.run(
-            ["npx", "tsx", str(cli_path)],
+            [str(cli_path)],
             input=input_json,
             text=True,
             capture_output=True,

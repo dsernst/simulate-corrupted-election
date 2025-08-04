@@ -9,28 +9,29 @@ library(jsonlite)
 #' @return A list containing the JSON response from the CLI, or NULL if error
 call_simulator_cli <- function(input_data) {
   # Get the path to the CLI script
-  cli_path <- file.path(dirname(dirname(getwd())), "cli.ts")
+  cli_path <- file.path(dirname(dirname(getwd())), "simulator")
 
-  tryCatch({
-    # Convert input to JSON string
-    input_json <- toJSON(input_data, auto_unbox = TRUE)
+  tryCatch(
+    {
+      # Convert input to JSON string
+      input_json <- toJSON(input_data, auto_unbox = TRUE)
 
-    # Call the CLI with JSON input via stdin
-    result <- system2(
-      "npx",
-      args = c("tsx", cli_path),
-      input = input_json,
-      stdout = TRUE,
-      stderr = TRUE
-    )
+      # Call the CLI with JSON input via stdin
+      result <- system2(
+        cli_path,
+        input = input_json,
+        stdout = TRUE,
+        stderr = TRUE
+      )
 
-    # Parse the JSON response
-    return(fromJSON(result))
-
-  }, error = function(e) {
-    cat("Error calling CLI:", e$message, "\n")
-    return(NULL)
-  })
+      # Parse the JSON response
+      return(fromJSON(result))
+    },
+    error = function(e) {
+      cat("Error calling CLI:", e$message, "\n")
+      return(NULL)
+    }
+  )
 }
 
 #' Main function demonstrating usage of the simulator CLI from R

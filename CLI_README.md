@@ -20,32 +20,32 @@ The CLI supports both command-line arguments and JSON input via stdin.
 
 ```bash
 # Generate an election
-npx tsx cli.ts election --seed 12345
+simulator election --seed 12345
 
 # Run tests on an election
-npx tsx cli.ts run-tests --seed 12345 --tests "a500b100c50"
+simulator run-tests --seed 12345 --tests "a500b100c50"
 
 # Get intersection statistics
-npx tsx cli.ts intersections --seed 12345 --tests "a500b100c50"
+simulator intersections --seed 12345 --tests "a500b100c50"
 
 # Get confusion matrices
-npx tsx cli.ts confusion-matrices --seed 12345 --tests "a500b100c50"
+simulator confusion-matrices --seed 12345 --tests "a500b100c50"
 
 # Run full simulation
-npx tsx cli.ts full-simulation --seed 12345 --tests "a500b100c50"
+simulator full-simulation --seed 12345 --tests "a500b100c50"
 ```
 
 #### JSON Input via stdin
 
 ```bash
 # Generate an election
-echo '{"command": "election", "seed": 12345}' | npx tsx cli.ts
+echo '{"command": "election", "seed": 12345}' | simulator
 
 # Run tests
-echo '{"command": "run-tests", "seed": 12345, "tests": "a500b100c50"}' | npx tsx cli.ts
+echo '{"command": "run-tests", "seed": 12345, "tests": "a500b100c50"}' | simulator
 
 # Full simulation
-echo '{"command": "full-simulation", "seed": 12345, "tests": "a500b100c50"}' | npx tsx cli.ts
+echo '{"command": "full-simulation", "seed": 12345, "tests": "a500b100c50"}' | simulator
 ```
 
 ## Available Commands
@@ -81,7 +81,7 @@ import subprocess
 def call_simulator(input_data):
     input_json = json.dumps(input_data)
     result = subprocess.run(
-        ["npx", "tsx", "cli.ts"],
+        ["simulator"],
         input=input_json,
         text=True,
         capture_output=True,
@@ -104,7 +104,7 @@ library(jsonlite)
 
 call_simulator <- function(input_data) {
   input_json <- toJSON(input_data, auto_unbox = TRUE)
-  result <- system2("npx", args = c("tsx", "cli.ts"), input = input_json, stdout = TRUE)
+  result <- system2("simulator", input = input_json, stdout = TRUE)
   return(fromJSON(result))
 }
 
@@ -123,7 +123,7 @@ const { spawn } = require('child_process')
 
 function callSimulator(inputData) {
   return new Promise((resolve, reject) => {
-    const child = spawn('npx', ['tsx', 'cli.ts'])
+    const child = spawn('simulator')
     let output = ''
 
     child.stdout.on('data', (data) => {
@@ -162,7 +162,7 @@ using Base.Process
 
 function call_simulator(input_data)
     input_json = JSON3.write(input_data)
-    cmd = `npx tsx cli.ts`
+    cmd = `simulator`
     result = read(cmd, String; input=input_json)
     return JSON3.read(result)
 end
