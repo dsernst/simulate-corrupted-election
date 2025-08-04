@@ -70,7 +70,7 @@ function parseArgs(): CLIInput {
   const command = args[0] as CLIInput['command']
   if (!command) {
     printUsage()
-    process.exit(1)
+    process.exit(0)
   }
 
   const input: CLIInput = { command }
