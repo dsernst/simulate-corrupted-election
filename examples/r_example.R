@@ -29,7 +29,6 @@ call_simulator_cli <- function(input_data) {
     },
     error = function(e) {
       cat("Error calling CLI:", e$message, "\n")
-      return(NULL)
     }
   )
 }
@@ -81,7 +80,7 @@ main <- function() {
     cat("Intersections calculated successfully!\n")
     cat("Number of intersection groups:", length(intersection_result$intersections), "\n")
     for (intersection in intersection_result$intersections) {
-      cat("  ", intersection$key, ": ", length(intersection$compromises), " compromises\n", sep = "")
+      cat("  ", intersection$key, ": ", length(intersection$compromises), " compromises\n")
     }
     cat("\n")
   }
