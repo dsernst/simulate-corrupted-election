@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { Simulator } from './app/utils/simulator'
-import packageJson from './package.json'
+import { Simulator } from '../app/utils/simulator'
+import packageJson from '../package.json'
 
 interface CLIInput {
   command:

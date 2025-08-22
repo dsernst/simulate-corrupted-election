@@ -5,14 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": ". scripts/build",
-    "build-cli": "bun build ./cli.ts --compile --outfile simulator",
-    "build-cli-windows": "bun build --compile --target=bun-windows-x64 ./cli.ts --outfile simulator_windows_x64",
+    "build-cli": "bun build ./cli/cli.ts --compile --outfile simulator",
+    "build-cli-windows": "bun build --compile --target=bun-windows-x64 ./cli/cli.ts --outfile simulator_windows_x64",
     "start": "next start",
     "lint": "next lint",
     "test": "bun test",
     "testslow": "bun scripts/find-slow-tests.js",
-    "typecheck": "tsc --noEmit",
-    "cli": "node cli.js"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "lru-cache": "^11.1.0",
