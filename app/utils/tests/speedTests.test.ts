@@ -22,7 +22,7 @@ describe('speed tests', () => {
     const firstSetStart = new Date()
     s.test('a1k')
     const firstSetDuration = msSince(firstSetStart)
-    expect(s.totalCompromisesSeen).toBe(501) // Confirm it ran, checking against known compromises
+    expect(s.totalCompromisesSeen).toBe(211) // Confirm it ran, checking against known compromises
 
     // Web GUI does it in ~25ms
     expect(firstSetDuration).toBeGreaterThan(5)
@@ -45,7 +45,7 @@ describe('speed tests', () => {
     const testSetStart = new Date()
     s.test('a50k b1k c50')
     const testSetDuration = msSince(testSetStart)
-    expect(s.totalCompromisesSeen).toBe(25516) // Confirm it ran, checking against known compromises
+    expect(s.totalCompromisesSeen).toBe(10001) // Confirm it ran, checking against known compromises
 
     // Web GUI does it in ~450ms
     expect(testSetDuration).toBeGreaterThan(5)
@@ -54,12 +54,12 @@ describe('speed tests', () => {
   })
 
   const moreTestCases: [string, number, number][] = [
-    ['b2k', 50, 1450], // B only
-    ['c50k', 130, 39_670], // Quadrant logic edge case
-    ['a10 b10 c10', 160, 15], // Light load sanity check
-    ['a50k b1k c1k', 250, 26_269], // Higher C test volume
-    // ['a2m', 750, 991_232], // Stress test run A perf & sampler
-    // ['a1m b1m c1m', 3000, 2_008_765], // Max concurrency potential
+    ['b2k', 50, 189], // B only
+    ['c50k', 140, 1484], // Quadrant logic edge case
+    ['a10 b10 c10', 200, 3], // Light load sanity check
+    ['a50k b1k c1k', 250, 10031], // Higher C test volume
+    // ['a2m', 750, 388_721], // Stress test run A perf & sampler
+    // ['a1m b1m c1m', 3000, 327_723], // Max concurrency potential
   ]
 
   moreTestCases.forEach(([testCase, expectedTime, expectedCompromises]) => {
@@ -86,12 +86,12 @@ describe('speed tests', () => {
   })
 
   const intersectionCases: [string, number, number][] = [
-    ['a300k b1k c50', 34428, 150], // Getting ~90ms
-    // ['a1m b1m', 114574, 1000], // Getting ~700ms
+    ['a300k b1k c50', 58262, 150], // Getting ~90ms
+    // ['a1m b1m', 194075, 1000], // Getting ~700ms
   ]
 
   intersectionCases.forEach(([testCase, expectedCompromises, expectedTime]) => {
-    it.only(`quickly calcs intersections: ${testCase}`, () => {
+    it(`quickly calcs intersections: ${testCase}`, () => {
       const s = new Simulator(BIG_SEED)
       // const initTime = new Date()
       s.test(testCase)

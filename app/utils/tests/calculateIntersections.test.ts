@@ -2,6 +2,7 @@ import { describe, expect, it } from 'bun:test'
 
 import { calculateLayeredStats, TestRun } from '../calculateIntersections'
 import { toDisplayLabelFromKey } from '../calculateIntersections'
+import { pickErrorRates } from '../dynamicErrorRates'
 import { MT19937 } from '../mt19937'
 import { simTests } from '../simTests'
 import { testSet } from '../testSet'
@@ -192,19 +193,22 @@ describe('calculateLayeredStats - with simTests', () => {
     // 400 A tests, 1194 B tests (batch 1)
     const testCountsA = testSet('a400')
     const testCountsB = testSet('b1194')
+    const effectiveness = pickErrorRates(mt)
     const resultsA = simTests(
       testCountsA,
       compromisedVotes,
       totalVotes,
       mt,
-      globalVoteMap
+      globalVoteMap,
+      effectiveness
     )
     const resultsB = simTests(
       testCountsB,
       compromisedVotes,
       totalVotes,
       mt,
-      globalVoteMap
+      globalVoteMap,
+      effectiveness
     )
     // Now run a second batch of 100 A and 100 B
     const testCountsA2 = testSet('a100')
@@ -214,14 +218,16 @@ describe('calculateLayeredStats - with simTests', () => {
       compromisedVotes,
       totalVotes,
       mt,
-      globalVoteMap
+      globalVoteMap,
+      effectiveness
     )
     const resultsB2 = simTests(
       testCountsB2,
       compromisedVotes,
       totalVotes,
       mt,
-      globalVoteMap
+      globalVoteMap,
+      effectiveness
     )
     // Collect all test runs
     const testRuns = [
@@ -251,7 +257,8 @@ describe('calculateLayeredStats - with simTests', () => {
       compromisedVotes,
       totalVotes,
       mt,
-      globalVoteMap
+      globalVoteMap,
+      pickErrorRates(mt)
     )
     // Second test run: A=500 (A again)
     const resultsA2 = simTests(
@@ -259,7 +266,8 @@ describe('calculateLayeredStats - with simTests', () => {
       compromisedVotes,
       totalVotes,
       mt,
-      globalVoteMap
+      globalVoteMap,
+      pickErrorRates(mt)
     )
     // Pass both runs to calculateLayeredStats
     const testRuns = [
@@ -284,7 +292,8 @@ describe('calculateLayeredStats - with simTests', () => {
       compromisedVotes,
       totalVotes,
       new MT19937(seed),
-      voteMap
+      voteMap,
+      pickErrorRates(new MT19937(seed))
     )
 
     // Second test run: A=500
@@ -293,7 +302,8 @@ describe('calculateLayeredStats - with simTests', () => {
       compromisedVotes,
       totalVotes,
       new MT19937(seed + 1),
-      voteMap
+      voteMap,
+      pickErrorRates(new MT19937(seed + 1))
     )
 
     // Pass both runs to calculateLayeredStats

@@ -7,9 +7,10 @@ import {
   LayeredStat,
   TestRun,
 } from './calculateIntersections'
+import { pickErrorRates } from './dynamicErrorRates'
 import { ElectionResults, makeElection } from './makeElection'
 import { MT19937 } from './mt19937'
-import { simTests, VoteTestResult } from './simTests'
+import { simTests, TestEffectiveness, VoteTestResult } from './simTests'
 import { TestSet, testSet, TestsShorthand, toTestSetString } from './testSet'
 
 type CacheKey = `${Seed}.${TestsShorthand}`
@@ -20,10 +21,20 @@ const makeCache = <T extends object>() => new LRUCache<CacheKey, T>({ max: 20 })
 const _electionCache = makeCache<ElectionResults>()
 const _intersectionCache = makeCache<LayeredStat[]>()
 const _confusionMatricesCache = makeCache<ConfusionMatrices>()
+const _effectivenessCache = makeCache<TestEffectiveness>()
 
 export class Simulator {
   public seed: number
   public tests: TestsShorthand = ''
+
+  /** Memoized effectiveness rates from seed */
+  public get effectiveness(): TestEffectiveness {
+    return this._getCachedResult(
+      _effectivenessCache,
+      () => pickErrorRates(new MT19937(this.seed)),
+      { seedOnly: true }
+    )
+  }
 
   /** Memoized election results from seed */
   public get election(): ElectionResults {
@@ -112,7 +123,8 @@ export class Simulator {
       this.election.compromisedVotes,
       this.election.totalVotes,
       this._mt,
-      this.voteMap
+      this.voteMap,
+      this.effectiveness
     )
 
     const newTests = toTestSetString(testCounts)

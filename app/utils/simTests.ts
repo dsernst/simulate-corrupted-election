@@ -3,18 +3,18 @@ import { mapObject } from './misc'
 import { MT19937 } from './mt19937'
 
 export type TestDetectionResults = { testBreakdown: TestBreakdown }
-export type VoteTestResult = {
+
+export type TestEffectiveness = { [key in LongKey]: Effectiveness }
+
+export interface VoteTestResult {
   isActuallyCompromised: boolean
-  testResults: {
-    [key in LongKey]?: boolean // true if detected as compromised
-  }
+  testResults: { [key in LongKey]?: boolean } // true if detected as compromised
   voteId: number
 }
 
 type Effectiveness = { falseCleanRate: number; falseCompromisedRate: number }
 type LongKey = `test${TestType}`
 type TestBreakdown = { [key in LongKey]: TestResult }
-type TestEffectiveness = { [key in LongKey]: Effectiveness }
 type TestResult = {
   count: number
   detectedCompromised: number
@@ -29,23 +29,9 @@ export function simTests(
   compromisedVotes: number,
   totalVotes: number,
   mt: MT19937,
-  voteMap: Map<number, VoteTestResult>
+  voteMap: Map<number, VoteTestResult>,
+  effectiveness: TestEffectiveness
 ): TestDetectionResults {
-  const effectiveness: TestEffectiveness = {
-    testA: {
-      falseCleanRate: 0.4, // 40% chance of missing a compromised vote
-      falseCompromisedRate: 0.1, // 10% chance of false alarm
-    },
-    testB: {
-      falseCleanRate: 0.1, // 10% chance of missing a compromised vote
-      falseCompromisedRate: 0.05, // 5% chance of false alarm
-    },
-    testC: {
-      falseCleanRate: 0, // Perfect detection of compromised votes
-      falseCompromisedRate: 0, // Perfect detection of clean votes
-    },
-  }
-
   // Convert string inputs to numbers, default to 0
   const counts = mapObject(testCounts, parseCount)
 

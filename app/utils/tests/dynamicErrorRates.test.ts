@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'bun:test'
 
+import { pickErrorRates } from '../dynamicErrorRates'
 import { MT19937 } from '../mt19937'
-import { generateEffectiveness } from '../simTests'
 
 describe('dynamic error rates', () => {
   it('should generate effectiveness rates within expected ranges', () => {
     const mt = new MT19937(12345)
-    const effectiveness = generateEffectiveness(mt)
+    const effectiveness = pickErrorRates(mt)
 
     type Range = [number, number]
     const expected: Record<
@@ -39,15 +39,15 @@ describe('dynamic error rates', () => {
     const mt = new MT19937(12345)
     const mt2 = new MT19937(12345)
 
-    expect(generateEffectiveness(mt)).toEqual(generateEffectiveness(mt2))
+    expect(pickErrorRates(mt)).toEqual(pickErrorRates(mt2))
   })
 
   it('should generate different effectiveness rates for different seeds', () => {
     const mt1 = new MT19937(12345)
     const mt2 = new MT19937(54321)
 
-    const effectiveness1 = generateEffectiveness(mt1)
-    const effectiveness2 = generateEffectiveness(mt2)
+    const effectiveness1 = pickErrorRates(mt1)
+    const effectiveness2 = pickErrorRates(mt2)
 
     // Different seeds should produce different effectiveness rates
     expect(effectiveness1.testA.falseCleanRate).not.toBe(
